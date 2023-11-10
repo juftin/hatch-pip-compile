@@ -5,25 +5,11 @@ hatch-pip-compile plugin
 from __future__ import annotations
 
 import pathlib
+import re
 import tempfile
-from typing import Any, ClassVar
+from textwrap import dedent
 
 from hatch.env.virtual import VirtualEnvironment
-from pip._internal.req import InstallRequirement
-from piptools._compat import parse_requirements
-from piptools.cache import DependencyCache
-from piptools.locations import CACHE_DIR
-from piptools.repositories import PyPIRepository
-from piptools.resolver import BacktrackingResolver
-from piptools.writer import OutputWriter
-
-
-class DummyContext:
-    """
-    Dummy Context for Click
-    """
-
-    params: ClassVar[dict[str, Any]] = {}
 
 
 class PipCompileEnvironment(VirtualEnvironment):
@@ -33,125 +19,87 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     PLUGIN_NAME = "pip-compile"
 
-    def _get_piptools_repo(self) -> PyPIRepository:
+    def __init__(self, *args, **kwargs):
         """
-        Get a pip-tools PyPIRepository instance
+        Initialize PipCompileEnvironment with extra attributes
         """
-        return PyPIRepository(pip_args=[], cache_dir=CACHE_DIR)
+        super().__init__(*args, **kwargs)
+        self._piptools_lock_file = self._config_lock_directory / f"{self.name}.lock"
 
-    def _get_piptools_requirements(self, repository: PyPIRepository) -> list[InstallRequirement]:
+    @staticmethod
+    def get_option_types():
         """
-        Generate Requirements
+        Get option types
         """
-        with tempfile.TemporaryDirectory() as temp_dir:
-            requirements_file = pathlib.Path(temp_dir) / "requirements.in"
-            requirements_file.write_text("\n".join(self.dependencies))
-            requirements = list(
-                parse_requirements(
-                    filename=str(requirements_file),
-                    session=repository.session,
-                    finder=repository.finder,
-                    options=repository.options,
-                )
-            )
-        return requirements
+        return {"lock-directory": str, "pip-compile-args": list[str], "pip-compile-hashes": bool}
 
-    def _get_piptools_resolver(
-        self, repository: PyPIRepository, requirements: list[InstallRequirement]
-    ) -> BacktrackingResolver:
+    @property
+    def _config_lock_directory(self) -> pathlib.Path:
         """
-        Get a pip-tools BacktrackingResolver instance
+        Get the lock directory from the config
         """
-        return BacktrackingResolver(
-            constraints=requirements,
-            existing_constraints={},
-            repository=repository,
-            prereleases=False,
-            cache=DependencyCache(CACHE_DIR),
-            clear_caches=False,
-            allow_unsafe=False,
-            unsafe_packages=None,
-        )
+        default_lock_dir = self.root / ".hatch"
+        lock_dir = self.config.get("lock-directory", default_lock_dir)
+        return pathlib.Path(lock_dir)
 
-    def _get_piptools_results(
-        self, resolver: BacktrackingResolver
-    ) -> tuple[set[InstallRequirement], dict[InstallRequirement, set[str]]]:
+    def _pip_compile_command(self, output_file: pathlib.Path, input_file: pathlib.Path) -> None:
         """
-        Fetch pip-tools results
+        Run pip-compile
         """
-        results = resolver.resolve(max_rounds=10)
-        hashes = resolver.resolve_hashes(results)
-        return results, hashes
-
-    def _write_piptools_results(
-        self,
-        repository: PyPIRepository,
-        results: set[InstallRequirement],
-        hashes: dict[InstallRequirement, set[str]],
-        resolver: BacktrackingResolver,
-    ) -> None:
-        """
-        Write pip-tools results to requirements.txt
-        """
-        output_file = self.root / "requirements.txt"
-        writer = OutputWriter(
-            dst_file=output_file.open("wb"),
-            click_ctx=DummyContext(),  # type: ignore
-            dry_run=False,
-            emit_header=True,
-            emit_index_url=False,
-            emit_trusted_host=False,
-            annotate=False,
-            annotation_style="split",
-            strip_extras=True,
-            generate_hashes=True,
-            default_index_url=repository.DEFAULT_INDEX_URL,
-            index_urls=repository.finder.index_urls,
-            trusted_hosts=repository.finder.trusted_hosts,
-            format_control=repository.finder.format_control,
-            linesep="\n",
-            allow_unsafe=False,
-            find_links=repository.finder.find_links,
-            emit_find_links=False,
-            emit_options=False,
-        )
-        writer.write(
-            results=results,
-            unsafe_packages=resolver.unsafe_packages,
-            unsafe_requirements=resolver.unsafe_constraints,
-            markers={},
-            hashes=hashes,
-        )
-
-    def _pip_compile(self) -> None:
-        """
-        Compile requirements.txt
-        """
-        repository = self._get_piptools_repo()
-        requirements = self._get_piptools_requirements(repository=repository)
-        resolver = self._get_piptools_resolver(repository=repository, requirements=requirements)
-        results, hashes = self._get_piptools_results(resolver=resolver)
-        self._write_piptools_results(
-            repository=repository, results=results, hashes=hashes, resolver=resolver
-        )
-
-    def install_project(self):
-        msg = "Project must be installed in dev mode in pip-compile environments."
-        raise NotImplementedError(msg)
-
-    def _pip_install_piptools(self) -> None:
-        """
-        Install pip-tools
-        """
-        output_file = self.root / "requirements.txt"
+        self.platform.check_command(self.construct_pip_install_command(["pip-tools"]))
         cmd = [
-            "python",
-            "-u",
+            self.virtual_env.python_info.executable,
             "-m",
-            "pip",
-            "install",
-            "-r",
+            "piptools",
+            "compile",
+            "--quiet",
+            "--strip-extras",
+            "--no-header",
+            "--output-file",
             str(output_file),
+            "--resolver=backtracking",
+        ]
+        if self.config.get("pip-compile-hashes", True) is True:
+            cmd.append("--generate-hashes")
+        cmd.extend(self.config.get("pip-compile-args", []))
+        cmd.append(str(input_file))
+        self.platform.check_command(cmd)
+        self._post_process_lockfile()
+
+    def _pip_compile_cli(self) -> None:
+        """
+        Run pip-compile
+        """
+        self._config_lock_directory.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = pathlib.Path(tmpdir)
+            input_file = tmp_path / f"{self.name}.in"
+            input_file.write_text("\n".join([*self.dependencies, ""]))
+            self._pip_compile_command(output_file=self._piptools_lock_file, input_file=input_file)
+
+    def _root_requirements(self) -> None:
+        """
+        Run pip-compile
+        """
+        self._config_lock_directory.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = pathlib.Path(tmpdir)
+            input_file = tmp_path / f"{self.name}.in"
+            input_file.write_text("\n".join([*self.dependencies, ""]))
+            self._pip_compile_command(output_file=self._piptools_lock_file, input_file=input_file)
+
+    def _pip_sync_cli(self) -> None:
+        """
+        Run pip-sync
+        """
+        cmd = [
+            self.virtual_env.python_info.executable,
+            "-m",
+            "piptools",
+            "sync",
+            "--python-executable",
+            str(self.virtual_env.python_info.executable),
+            str(self._piptools_lock_file),
         ]
         self.platform.check_command(cmd)
 
@@ -160,19 +108,63 @@ class PipCompileEnvironment(VirtualEnvironment):
         Install the project the first time in dev mode
         """
         with self.safe_activation():
-            self._pip_compile()
-            self._pip_install_piptools()
+            self._pip_compile_cli()
+            self._pip_sync_cli()
 
     def dependencies_in_sync(self):
         """
-        Always return False to force sync_dependencies
+        Handle whether dependencies should be synced
         """
-        return False
+        if len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is False):
+            return False
+        elif len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is True):
+            expected_locks = self._lock_file_compare()
+            if expected_locks is False:
+                return False
+        return super().dependencies_in_sync()
 
     def sync_dependencies(self):
         """
         Sync dependencies
         """
         with self.safe_activation():
-            self._pip_compile()
-            self._pip_install_piptools()
+            self._pip_compile_cli()
+            self._pip_sync_cli()
+
+    def _post_process_lockfile(self) -> None:
+        """
+        Post process lockfile
+        """
+        joined_dependencies = "\n        # - ".join(self.dependencies)
+        prefix = f"""
+        ####################################################################################
+        # 🔒 hatch-pip-compile 🔒
+        #
+        # - {joined_dependencies}
+        #
+        ####################################################################################
+        """
+        lockfile_text = self._piptools_lock_file.read_text()
+        new_data = re.sub(
+            rf"-r \S*/{self.name}\.in",
+            f"{self.metadata.name} (pyproject.toml)",
+            lockfile_text,
+        )
+        new_text = dedent(prefix).strip() + "\n\n" + new_data
+        self._piptools_lock_file.write_text(new_text)
+
+    def _lock_file_compare(self) -> bool:
+        """
+        Compare lock file
+        """
+        lock_file_text = self._piptools_lock_file.read_text()
+        parsed_requirements = []
+        for line in lock_file_text.splitlines():
+            if line.startswith("# - "):
+                rest_of_line = line[4:]
+                parsed_requirements.append(rest_of_line)
+            elif not line.startswith("#"):
+                break
+        expected_output = "\n".join([*parsed_requirements, ""])
+        new_output = "\n".join([*self.dependencies, ""])
+        return expected_output == new_output

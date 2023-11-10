@@ -8,6 +8,7 @@ authors = [
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
+  "Framework :: Hatch",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3.8",
