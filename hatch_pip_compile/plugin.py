@@ -8,6 +8,7 @@ import pathlib
 import re
 import tempfile
 from textwrap import dedent
+from typing import List
 
 from hatch.env.virtual import VirtualEnvironment
 
@@ -31,7 +32,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Get option types
         """
-        return {"lock-directory": str, "pip-compile-args": list[str], "pip-compile-hashes": bool}
+        return {"lock-directory": str, "pip-compile-args": List[str], "pip-compile-hashes": bool}
 
     @property
     def _config_lock_directory(self) -> pathlib.Path:
