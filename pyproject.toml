@@ -99,18 +99,13 @@ deploy = ["mkdocs gh-deploy {args:}"]
 serve = ["mkdocs serve --dev-addr localhost:8080 --livereload"]
 
 [tool.hatch.envs.gen]
-dependencies = [
-  "pip-tools~=7.1.0"
-]
-detached = false
+detached = true
 
 [tool.hatch.envs.gen.scripts]
 release = [
   "npm install --prefix .github/semantic_release/",
   "npx --prefix .github/semantic_release/ semantic-release {args:}"
 ]
-reqs = "pip-compile {args:} --generate-hashes --output-file requirements.txt"
-reqs-update = "pip-compile {args:} --upgrade --generate-hashes --output-file requirements.txt"
 
 [tool.hatch.envs.lint]
 dependencies = [
