@@ -1,0 +1,208 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[project]
+authors = [
+  {name = "Justin Flannery", email = "juftin@juftin.com"}
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy"
+]
+dependencies = [
+  "hatch",
+  "pip-tools>=7,<8"
+]
+description = "hatch plugin to use pip-compile to manage project dependencies"
+dynamic = ["version"]
+license = "MIT"
+name = "hatch-pip-compile"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.entry-points.hatch]
+hatch-pip-compile = "hatch_pip_compile.hooks"
+
+[project.urls]
+Documentation = "https://juftin.github.io/hatch-pip-compile"
+Issues = "https://juftin.github.io/hatch-pip-compile/issues"
+Source = "https://github.com/juftin/hatch-pip-compile"
+
+[tool.coverage.paths]
+hatch_pip_compile = ["hatch_pip_compile", "*/hatch-pip-compile/hatch_pip_compile"]
+tests = ["tests", "*/hatch-pip-compile/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:"
+]
+
+[tool.coverage.run]
+branch = true
+omit = [
+  "hatch_pip_compile/__about__.py"
+]
+parallel = true
+source_pkgs = ["hatch_pip_compile", "tests"]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest"
+]
+path = ".venv"
+post-install-commands = [
+  "pre-commit install"
+]
+python = "3.11"
+
+[tool.hatch.envs.default.scripts]
+cov = [
+  "test-cov",
+  "cov-report"
+]
+cov-report = [
+  "- coverage combine",
+  "coverage report -m"
+]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs~=1.5.2",
+  "mkdocs-material~=9.2.3",
+  "mkdocstrings~=0.22.0",
+  "markdown-exec[ansi]~=1.6.0"
+]
+detached = true
+
+[tool.hatch.envs.docs.scripts]
+build = ["mkdocs build --clean --strict"]
+deploy = ["mkdocs gh-deploy {args:}"]
+serve = ["mkdocs serve --dev-addr localhost:8080 --livereload"]
+
+[tool.hatch.envs.gen]
+dependencies = [
+  "pip-tools~=7.1.0"
+]
+detached = false
+
+[tool.hatch.envs.gen.scripts]
+release = [
+  "npm install --prefix .github/semantic_release/",
+  "npx --prefix .github/semantic_release/ semantic-release {args:}"
+]
+reqs = "pip-compile {args:} --generate-hashes --output-file requirements.txt"
+reqs-update = "pip-compile {args:} --upgrade --generate-hashes --output-file requirements.txt"
+
+[tool.hatch.envs.lint]
+dependencies = [
+  "mypy>=1.6.1",
+  "ruff~=0.1.4"
+]
+detached = true
+
+[tool.hatch.envs.lint.scripts]
+all = [
+  "style",
+  "typing"
+]
+fmt = [
+  "ruff format {args:.}",
+  "ruff --fix {args:.}",
+  "style"
+]
+precommit = [
+  "pre-commit run --all-files"
+]
+style = [
+  "ruff {args:.}",
+  "ruff format --check --diff {args:.}"
+]
+typing = "mypy --install-types --non-interactive {args:hatch_pip_compile tests}"
+
+[tool.hatch.version]
+path = "hatch_pip_compile/__about__.py"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+  "pytest.*",
+  "piptools.*",
+  "hatch.*",
+  "hatchling.*"
+]
+
+[tool.ruff]
+ignore = [
+  # Allow non-abstract empty methods in abstract base classes
+  "B027",
+  # Allow boolean positional values in function calls, like `dict.get(... True)`
+  "FBT003",
+  # Ignore checks for possible passwords
+  "S105",
+  "S106",
+  "S107",
+  # Ignore complexity
+  "C901",
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915"
+]
+line-length = 100
+select = [
+  "A",  # flake8-builtins
+  "ARG",  # flake8-unused-arguments
+  "B",  # flake8-bugbear
+  "C",  # mccabe
+  "DTZ",  # flake8-datetimez
+  "E",  # pycodestyle (Error)
+  "EM",  # flake8-errmsg
+  "F",  # Pyflakes
+  "FBT",  # flake8-boolean-trap
+  "I",  # isort
+  "ICN",  # flake8-import-conventions
+  "N",  # pep8-naming
+  "PLC",  # Pylint (Convention message)
+  "PLE",  # Pylint (Error message)
+  "PLR",  # Pylint (Refactor message)
+  "PLW",  # Pylint (Warning message)
+  "Q",  # flake8-quotes
+  "RUF",  # Ruff-specific rules
+  "S",  # flake8-bandit
+  "T",  # flake8-debugger (T10) and flake8-print (T20)
+  "TID",  # flake8-tidy-imports
+  "UP",  # pyupgrade
+  "W",  # pycodestyle (Warning)
+  "YTT"  # flake8-2020
+]
+target-version = "py38"
+
+[tool.ruff.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.isort]
+known-first-party = ["hatch_pip_compile"]
+
+[tool.ruff.per-file-ignores]
+# Tests can use magic values, assertions, and relative imports
+"tests/**/*" = ["PLR2004", "S101", "TID252"]
+
+[tool.ruff.pydocstyle]
+convention = "numpy"

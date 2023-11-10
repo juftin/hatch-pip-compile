@@ -1,0 +1,61 @@
+# $schema: https://squidfunk.github.io/mkdocs-material/schema.json
+
+site_name: hatch-pip-compile
+nav:
+    - index.md
+    - Contributing 🤝: contributing.md
+theme:
+    favicon: https://juftin.com/favicon.ico
+    logo: https://raw.githubusercontent.com/juftin/juftin/main/static/juftin.png
+    name: material
+    features:
+        - navigation.tracking
+        - content.code.annotate
+        - content.code.copy
+        - navigation.indexes
+    palette:
+        - media: "(prefers-color-scheme: light)"
+          scheme: default
+          accent: purple
+          toggle:
+              icon: material/weather-sunny
+              name: Switch to dark mode
+        - media: "(prefers-color-scheme: dark)"
+          scheme: slate
+          primary: black
+          toggle:
+              icon: material/weather-night
+              name: Switch to light mode
+repo_url: https://github.com/juftin/hatch-pip-compile
+repo_name: hatch-pip-compile
+edit_uri: blob/main/docs/
+site_author: juftin
+remote_branch: gh-pages
+copyright: Copyright © 2023 Justin Flannery
+extra:
+    generator: false
+markdown_extensions:
+    - toc:
+          permalink: "#"
+    - pymdownx.snippets:
+          base_path:
+              - !relative $config_dir
+    - pymdownx.magiclink
+    - attr_list
+    - md_in_html
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.superfences
+    - markdown.extensions.attr_list
+    - pymdownx.keys
+    - pymdownx.tasklist
+    - pymdownx.tilde
+    - admonition
+    - pymdownx.details
+    - pymdownx.emoji
+    - pymdownx.tabbed:
+          alternate_style: true
+plugins:
+    - search
+    - markdown-exec
