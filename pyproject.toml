@@ -21,7 +21,7 @@ classifiers = [
 ]
 dependencies = [
   "hatch",
-  "pip-tools>=7,<8"
+  "pip-tools"
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]
@@ -70,6 +70,7 @@ post-install-commands = [
   "pre-commit install"
 ]
 python = "3.11"
+type = "pip-compile"
 
 [tool.hatch.envs.default.scripts]
 cov = [

@@ -19,7 +19,7 @@ jobs:
             - name: Install Python Dependencies
               run: |
                   python -m pip install --upgrade pip
-                  python -m pip install -q hatch pre-commit
+                  python -m pip install -q hatch pre-commit hatch-pip-compile
                   hatch env create
                   hatch --version
             - name: Lint
