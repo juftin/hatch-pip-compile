@@ -43,7 +43,6 @@
 
 | Command Description            | Command                     | Notes                                                      |
 | ------------------------------ | --------------------------- | ---------------------------------------------------------- |
-| Run Tests                      | `hatch run cov`             | Runs tests with `pytest` and `coverage`                    |
 | Run Formatting                 | `hatch run lint:fmt`        | Runs `ruff` code formatter                                 |
 | Run Linting                    | `hatch run lint:all`        | Runs `ruff` and `mypy` linters / type checkers             |
 | Run Type Checking              | `hatch run lint:typing`     | Runs `mypy` type checker                                   |

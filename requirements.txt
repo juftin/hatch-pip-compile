@@ -1,0 +1,163 @@
+####################################################################################
+# 🔒 hatch-pip-compile 🔒
+#
+# - hatch
+#
+####################################################################################
+
+anyio==4.0.0 \
+    --hash=sha256:cfdb2b588b9fc25ede96d8db56ed50848b0b649dca3dd1df0b11f683bb9e0b5f \
+    --hash=sha256:f7ed51751b2c2add651e5747c891b47e26d2a21be5d32d9311dfe9692f3e5d7a
+    # via httpx
+certifi==2023.7.22 \
+    --hash=sha256:539cc1d13202e33ca466e88b2807e29f4c13049d6d87031a3c110744495cb082 \
+    --hash=sha256:92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9
+    # via
+    #   httpcore
+    #   httpx
+click==8.1.7 \
+    --hash=sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28 \
+    --hash=sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de
+    # via
+    #   hatch
+    #   userpath
+distlib==0.3.7 \
+    --hash=sha256:2e24928bc811348f0feb63014e97aaae3037f2cf48712d51ae61df7fd6075057 \
+    --hash=sha256:9dafe54b34a028eafd95039d5e5d4851a13734540f1331060d31c9916e7147a8
+    # via virtualenv
+editables==0.5 \
+    --hash=sha256:309627d9b5c4adc0e668d8c6fa7bac1ba7c8c5d415c2d27f60f081f8e80d1de2 \
+    --hash=sha256:61e5ffa82629e0d8bfe09bc44a07db3c1ab8ed1ce78a6980732870f19b5e7d4c
+    # via hatchling
+filelock==3.13.1 \
+    --hash=sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e \
+    --hash=sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c
+    # via virtualenv
+h11==0.14.0 \
+    --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
+    --hash=sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761
+    # via httpcore
+hatch==1.7.0 \
+    --hash=sha256:7afc701fd5b33684a6650e1ecab8957e19685f824240ba7458dcacd66f90fb46 \
+    --hash=sha256:efc84112fd02ca85b7bab54f5e2ef71393a98dc849eac9aca390504031f8a1a8
+    # via hatch-pip-compile (pyproject.toml)
+hatchling==1.18.0 \
+    --hash=sha256:50e99c3110ce0afc3f7bdbadff1c71c17758e476731c27607940cfa6686489ca \
+    --hash=sha256:b66dc254931ec42aa68b5febd1d342c58142cc5267b7ff3b12ba3fa5b4900c93
+    # via hatch
+httpcore==1.0.2 \
+    --hash=sha256:096cc05bca73b8e459a1fc3dcf585148f63e534eae4339559c9b8a8d6399acc7 \
+    --hash=sha256:9fc092e4799b26174648e54b74ed5f683132a464e95643b226e00c2ed2fa6535
+    # via httpx
+httpx==0.25.1 \
+    --hash=sha256:fec7d6cc5c27c578a391f7e87b9aa7d3d8fbcd034f6399f9f79b45bcc12a866a \
+    --hash=sha256:ffd96d5cf901e63863d9f1b4b6807861dbea4d301613415d9e6e57ead15fc5d0
+    # via hatch
+hyperlink==21.0.0 \
+    --hash=sha256:427af957daa58bc909471c6c40f74c5450fa123dd093fc53efd2e91d2705a56b \
+    --hash=sha256:e6b14c37ecb73e89c77d78cdb4c2cc8f3fb59a885c5b3f819ff4ed80f25af1b4
+    # via hatch
+idna==3.4 \
+    --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
+    --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
+    # via
+    #   anyio
+    #   httpx
+    #   hyperlink
+importlib-metadata==6.8.0 \
+    --hash=sha256:3ebb78df84a805d7698245025b975d9d67053cd94c79245ba4b3eb694abe68bb \
+    --hash=sha256:dbace7892d8c0c4ac1ad096662232f831d4e64f4c4545bd53016a3e9d4654743
+    # via keyring
+jaraco-classes==3.3.0 \
+    --hash=sha256:10afa92b6743f25c0cf5f37c6bb6e18e2c5bb84a16527ccfc0040ea377e7aaeb \
+    --hash=sha256:c063dd08e89217cee02c8d5e5ec560f2c8ce6cdc2fcdc2e68f7b2e5547ed3621
+    # via keyring
+keyring==24.3.0 \
+    --hash=sha256:4446d35d636e6a10b8bce7caa66913dd9eca5fd222ca03a3d42c38608ac30836 \
+    --hash=sha256:e730ecffd309658a08ee82535a3b5ec4b4c8669a9be11efb66249d8e0aeb9a25
+    # via hatch
+markdown-it-py==3.0.0 \
+    --hash=sha256:355216845c60bd96232cd8d8c40e8f9765cc86f46880e43a8fd22dc1a1a8cab1 \
+    --hash=sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb
+    # via rich
+mdurl==0.1.2 \
+    --hash=sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8 \
+    --hash=sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba
+    # via markdown-it-py
+more-itertools==10.1.0 \
+    --hash=sha256:626c369fa0eb37bac0291bce8259b332fd59ac792fa5497b59837309cd5b114a \
+    --hash=sha256:64e0735fcfdc6f3464ea133afe8ea4483b1c5fe3a3d69852e6503b43a0b222e6
+    # via jaraco-classes
+packaging==23.2 \
+    --hash=sha256:048fb0e9405036518eaaf48a55953c750c11e1a1b68e0dd1a9d62ed0c092cfc5 \
+    --hash=sha256:8c491190033a9af7e1d931d0b5dacc2ef47509b34dd0de67ed209b5203fc88c7
+    # via
+    #   hatch
+    #   hatchling
+pathspec==0.11.2 \
+    --hash=sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20 \
+    --hash=sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3
+    # via hatchling
+pexpect==4.8.0 \
+    --hash=sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937 \
+    --hash=sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c
+    # via hatch
+platformdirs==3.11.0 \
+    --hash=sha256:cf8ee52a3afdb965072dcc652433e0c7e3e40cf5ea1477cd4b3b1d2eb75495b3 \
+    --hash=sha256:e9d171d00af68be50e9202731309c4e658fd8bc76f55c11c7dd760d023bda68e
+    # via
+    #   hatch
+    #   virtualenv
+pluggy==1.3.0 \
+    --hash=sha256:cf61ae8f126ac6f7c451172cf30e3e43d3ca77615509771b3a984a0730651e12 \
+    --hash=sha256:d89c696a773f8bd377d18e5ecda92b7a3793cbe66c87060a6fb58c7b6e1061f7
+    # via hatchling
+ptyprocess==0.7.0 \
+    --hash=sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35 \
+    --hash=sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220
+    # via pexpect
+pygments==2.16.1 \
+    --hash=sha256:13fc09fa63bc8d8671a6d247e1eb303c4b343eaee81d861f3404db2935653692 \
+    --hash=sha256:1daff0494820c69bc8941e407aa20f577374ee88364ee10a98fdbe0aece96e29
+    # via rich
+pyperclip==1.8.2 \
+    --hash=sha256:105254a8b04934f0bc84e9c24eb360a591aaf6535c9def5f29d92af107a9bf57
+    # via hatch
+rich==13.7.0 \
+    --hash=sha256:5cb5123b5cf9ee70584244246816e9114227e0b98ad9176eede6ad54bf5403fa \
+    --hash=sha256:6da14c108c4866ee9520bbffa71f6fe3962e193b7da68720583850cd4548e235
+    # via hatch
+shellingham==1.5.4 \
+    --hash=sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686 \
+    --hash=sha256:8dbca0739d487e5bd35ab3ca4b36e11c4078f3a234bfce294b0a0291363404de
+    # via hatch
+sniffio==1.3.0 \
+    --hash=sha256:e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101 \
+    --hash=sha256:eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384
+    # via
+    #   anyio
+    #   httpx
+tomli-w==1.0.0 \
+    --hash=sha256:9f2a07e8be30a0729e533ec968016807069991ae2fd921a78d42f429ae5f4463 \
+    --hash=sha256:f463434305e0336248cac9c2dc8076b707d8a12d019dd349f5c1e382dd1ae1b9
+    # via hatch
+tomlkit==0.12.3 \
+    --hash=sha256:75baf5012d06501f07bee5bf8e801b9f343e7aac5a92581f20f80ce632e6b5a4 \
+    --hash=sha256:b0a645a9156dc7cb5d3a1f0d4bab66db287fcb8e0430bdd4664a095ea16414ba
+    # via hatch
+trove-classifiers==2023.11.14 \
+    --hash=sha256:2893a80cf3c48645462dea97c72c02a9fb1f7bd3c65f9908d3ffb1a7ef0b3833 \
+    --hash=sha256:64b5e78305a5de347f2cd7ec8c12d704a3ef0cb85cc10c0ca5f73488d1c201f8
+    # via hatchling
+userpath==1.9.1 \
+    --hash=sha256:ce8176728d98c914b6401781bf3b23fccd968d1647539c8788c7010375e02796 \
+    --hash=sha256:e085053e5161f82558793c41d60375289efceb4b77d96033ea9c84fc0893f772
+    # via hatch
+virtualenv==20.24.6 \
+    --hash=sha256:02ece4f56fbf939dbbc33c0715159951d6bf14aaf5457b092e4548e1382455af \
+    --hash=sha256:520d056652454c5098a00c0f073611ccbea4c79089331f60bf9d7ba247bb7381
+    # via hatch
+zipp==3.17.0 \
+    --hash=sha256:0e923e726174922dce09c53c59ad483ff7bbb8e572e00c7f7c46b88556409f31 \
+    --hash=sha256:84e64a1c28cf7e91ed2078bb8cc8c259cb19b76942096c8d7b84947690cabaf0
+    # via importlib-metadata

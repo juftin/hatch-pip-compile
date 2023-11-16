@@ -2,11 +2,13 @@
 hatch-pip-compile plugin
 """
 
+from __future__ import annotations
+
 import pathlib
 import re
 import tempfile
 from textwrap import dedent
-from typing import List
+from typing import Any, List
 
 from hatch.env.virtual import VirtualEnvironment
 
@@ -23,22 +25,39 @@ class PipCompileEnvironment(VirtualEnvironment):
         Initialize PipCompileEnvironment with extra attributes
         """
         super().__init__(*args, **kwargs)
-        self._piptools_lock_file = self._config_lock_directory / f"{self.name}.lock"
+        if self.name == "default":
+            _default_lock_filename = "requirements.txt"
+        else:
+            _default_lock_filename = f"{self.name}.lock"
+        _lock_filename = self.config.get("lock-filename", _default_lock_filename)
+        self._piptools_lock_file = self._config_lock_directory / _lock_filename
 
     @staticmethod
-    def get_option_types():
+    def get_option_types() -> dict[str, Any]:
         """
         Get option types
         """
-        return {"lock-directory": str, "pip-compile-args": List[str], "pip-compile-hashes": bool}
+        return {
+            "lock-directory": str,
+            "lock-filename": str,
+            "pip-compile-hashes": bool,
+            "pip-compile-header": bool,
+            "pip-compile-strip-extras": bool,
+            "pip-compile-args": List[str],
+        }
 
     @property
     def _config_lock_directory(self) -> pathlib.Path:
         """
         Get the lock directory from the config
         """
-        default_lock_dir = self.root / ".hatch"
+        if self.name == "default":
+            default_lock_dir = self.root
+        else:
+            default_lock_dir = self.root / ".hatch"
         lock_dir = self.config.get("lock-directory", default_lock_dir)
+        if lock_dir in [".", "./", ""]:
+            lock_dir = self.root
         return pathlib.Path(lock_dir)
 
     def _pip_compile_command(self, output_file: pathlib.Path, input_file: pathlib.Path) -> None:
@@ -52,8 +71,12 @@ class PipCompileEnvironment(VirtualEnvironment):
             "piptools",
             "compile",
             "--quiet",
-            "--strip-extras",
-            "--no-header",
+            (
+                "--strip-extras"
+                if self.config.get("pip-compile-strip-extras", False) is True
+                else "--no-strip-extras"
+            ),
+            "--header" if self.config.get("pip-compile-header", False) is True else "--no-header",
             "--output-file",
             str(output_file),
             "--resolver=backtracking",
@@ -63,7 +86,8 @@ class PipCompileEnvironment(VirtualEnvironment):
         cmd.extend(self.config.get("pip-compile-args", []))
         cmd.append(str(input_file))
         self.platform.check_command(cmd)
-        self._post_process_lockfile()
+        if self.config.get("pip-compile-header", False) is False:
+            self._post_process_lockfile()
 
     def _pip_compile_cli(self) -> None:
         """
@@ -117,7 +141,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         if len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is False):
             return False
         elif len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is True):
-            expected_locks = self._lock_file_compare()
+            if self.config.get("pip-compile-header", False) is True:
+                expected_locks = True
+            else:
+                expected_locks = self._lock_file_compare()
             if expected_locks is False:
                 return False
         return super().dependencies_in_sync()

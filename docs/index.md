@@ -1,6 +1,6 @@
 # hatch-pip-compile
 
-hatch plugin to use pip-compile to manage project dependencies
+[hatch] plugin to use [pip-compile] to manage project dependencies
 
 [![PyPI](https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=🔨%20hatch-pip-compile)](https://github.com/juftin/hatch-pip-compile)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hatch-pip-compile)](https://pypi.python.org/pypi/hatch-pip-compile/)
@@ -18,8 +18,8 @@ pip install hatch-pip-compile
 
 ### pipx
 
-Personally, I use [pipx](https://github.com/pypa/pipx) to install and use hatch. If you do too,
-you will need to inject the `hatch-pip-compile` plugin into the hatch environment.
+If you use [pipx] to install and use hatch you will need to inject
+the `hatch-pip-compile` plugin into the hatch environment.
 
 ```shell
 pipx install hatch
@@ -30,35 +30,51 @@ pipx inject hatch hatch-pip-compile
 
 The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
 environment needs to be updated. Behind the scenes, this plugin creates a lockfile
-at `.hatch/<ENV_NAME>.lock`. Alongside `pip-compile`, this plugin also uses
-`pip-sync` to install the dependencies from the lockfile into your environment.
+at `requirements.txt` (non-default lockfiles are located at `.hatch/<envName>.lock`).
+Alongside `pip-compile`, this plugin also uses [pip-sync] to install the dependencies
+from the lockfile into your environment.
 
 ## Configuration
 
-The [environment plugin](https://hatch.pypa.io/latest/plugins/environment/) name is `pip-compile`.
+The [environment plugin] name is `pip-compile`.
 
 -   **_pyproject.toml_**
 
     ```toml
-    [tool.hatch.envs.<ENV_NAME>]
+    [tool.hatch.envs.default]
     type = "pip-compile"
     ```
 
 -   **_hatch.toml_**
 
     ```toml
-    [envs.<ENV_NAME>]
+    [envs.default]
     type = "pip-compile"
     ```
 
-### lock-directory
+### Configuration Options
 
-The directory where the lockfiles will be stored. Defaults to `.hatch`.
+| name                     | type        | description                                                                                                 |
+| ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------- |
+| lock-directory           | `str`       | The directory where the lockfiles will be stored. `default` env is project root, non-default is `.hatch`    |
+| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `<envName>.lock` |
+| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                             |
+| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`      |
+| pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`     |
+| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                  |
+
+#### Examples
+
+##### lock-directory
+
+The directory where the lockfiles will be stored. Defaults to
+the project root for the `default` environment, and `.hatch` for
+non-default environments.
 
 -   **_pyproject.toml_**
 
     ```toml
-    [tool.hatch.envs.<ENV_NAME>]
+    [tool.hatch.envs.<envName>]
     type = "pip-compile"
     lock-directory = "requirements"
     ```
@@ -66,19 +82,42 @@ The directory where the lockfiles will be stored. Defaults to `.hatch`.
 -   **_hatch.toml_**
 
     ```toml
-    [envs.<ENV_NAME>]
+    [envs.<envName>]
     type = "pip-compile"
     lock-directory = "requirements"
     ```
 
-### pip-compile-hashes
+##### lock-filename
 
-Whether or not to use hashes in the lockfile. Defaults to `true`.
+The filename of the ultimate lockfile. Defaults to `requirements.txt`
+for the `default` environment, and `<envName>.lock` for non-default environments.
 
 -   **_pyproject.toml_**
 
     ```toml
-    [tool.hatch.envs.<ENV_NAME>]
+    [tool.hatch.envs.lint]
+    type = "pip-compile"
+    lock-directory = "."
+    lock-filename = "linting-lockfile.txt"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.lint]
+    type = "pip-compile"
+    lock-directory = "."
+    lock-filename = "linting-lockfile.txt"
+    ```
+
+##### pip-compile-hashes
+
+Whether to generate hashes in the lockfile. Defaults to `true`.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
     type = "pip-compile"
     pip-compile-hashes = true
     ```
@@ -86,19 +125,20 @@ Whether or not to use hashes in the lockfile. Defaults to `true`.
 -   **_hatch.toml_**
 
     ```toml
-    [envs.<ENV_NAME>]
+    [envs.<envName>]
     type = "pip-compile"
     pip-compile-hashes = true
     ```
 
-### pip-compile-args
+##### pip-compile-args
 
-Extra arguments to pass to `pip-compile`. Defaults to None.
+Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be
+specified here.
 
 -   **_pyproject.toml_**
 
     ```toml
-    [tool.hatch.envs.<ENV_NAME>]
+    [tool.hatch.envs.<envName>]
     type = "pip-compile"
     pip-compile-args = [
         "--index-url",
@@ -109,13 +149,23 @@ Extra arguments to pass to `pip-compile`. Defaults to None.
 -   **_hatch.toml_**
 
     ```toml
-    [envs.<ENV_NAME>]
+    [envs.<envName>]
     type = "pip-compile"
     pip-compile-args = [
         "--index-url",
         "https://pypi.org/simple",
     ]
     ```
+
+## Notes
+
+### Dev Dependencies
+
+Using the default hatch configuration, dev dependencies listed in your
+`default` environment (like `pytest`) will be included on the default lockfile
+(`requirements.txt`). If you want to remove your dev dependencies
+from the lockfile you must remove them from the `default` environment
+on your `pyproject.toml` / `hatch.toml` file.
 
 ---
 
@@ -124,3 +174,12 @@ Extra arguments to pass to `pip-compile`. Defaults to None.
 <br/>
 
 <p align="center"><a href="https://github.com/juftin"><img src="https://raw.githubusercontent.com/juftin/juftin/main/static/juftin.png" width="120" height="120" alt="logo"></p>
+
+[pip-compile]: https://pip-tools.readthedocs.io/en/latest/
+[pip-sync]: https://pip-tools.readthedocs.io/en/latest/
+[hatch]: https://hatch.pypa.io/latest/
+[pipx]: https://pipxproject.github.io/pipx/
+[Docs]: https://juftin.github.io/hatch-pip-compile/
+[Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
+[Changelog]: https://github.com/juftin/hatch-pip-compile/releases
+[environment plugin]: https://hatch.pypa.io/latest/plugins/environment/

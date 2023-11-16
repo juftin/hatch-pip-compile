@@ -20,8 +20,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
 dependencies = [
-  "hatch",
-  "pip-tools"
+  "hatch"
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]
@@ -61,28 +60,12 @@ source_pkgs = ["hatch_pip_compile", "tests"]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest"
-]
 path = ".venv"
 post-install-commands = [
   "pre-commit install"
 ]
 python = "3.11"
 type = "pip-compile"
-
-[tool.hatch.envs.default.scripts]
-cov = [
-  "test-cov",
-  "cov-report"
-]
-cov-report = [
-  "- coverage combine",
-  "coverage report -m"
-]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
 
 [tool.hatch.envs.docs]
 dependencies = [
@@ -131,7 +114,7 @@ style = [
   "ruff {args:.}",
   "ruff format --check --diff {args:.}"
 ]
-typing = "mypy --install-types --non-interactive {args:hatch_pip_compile tests}"
+typing = "mypy --install-types --non-interactive {args:hatch_pip_compile}"
 
 [tool.hatch.version]
 path = "hatch_pip_compile/__about__.py"
