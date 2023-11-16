@@ -1,6 +1,6 @@
 # hatch-pip-compile
 
-[hatch] plugin to use [pip-compile] to manage project dependencies
+[hatch] plugin to use [pip-compile] to manage project dependencies and lockfiles.
 
 [![PyPI](https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=🔨%20hatch-pip-compile)](https://github.com/juftin/hatch-pip-compile)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hatch-pip-compile)](https://pypi.python.org/pypi/hatch-pip-compile/)

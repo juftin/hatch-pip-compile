@@ -2,13 +2,11 @@
 hatch-pip-compile plugin
 """
 
-from __future__ import annotations
-
 import pathlib
 import re
 import tempfile
 from textwrap import dedent
-from typing import Any, List
+from typing import Any, Dict, List
 
 from hatch.env.virtual import VirtualEnvironment
 
@@ -33,7 +31,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self._piptools_lock_file = self._config_lock_directory / _lock_filename
 
     @staticmethod
-    def get_option_types() -> dict[str, Any]:
+    def get_option_types() -> Dict[str, Any]:
         """
         Get option types
         """
@@ -73,7 +71,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "--quiet",
             (
                 "--strip-extras"
-                if self.config.get("pip-compile-strip-extras", False) is True
+                if self.config.get("pip-compile-strip-extras", True) is True
                 else "--no-strip-extras"
             ),
             "--header" if self.config.get("pip-compile-header", False) is True else "--no-header",
