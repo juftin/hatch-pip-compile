@@ -5,6 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=🔨%20hatch-pip-compile)](https://github.com/juftin/hatch-pip-compile)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hatch-pip-compile)](https://pypi.python.org/pypi/hatch-pip-compile/)
 [![GitHub License](https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&label=License)](https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE)
+[![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
@@ -12,19 +13,33 @@
 
 ## Installation
 
-```shell
-pip install hatch-pip-compile
-```
+Declare `hatch-pip-compile` as a dependency in your `pyproject.toml` file under the
+`[tool.hatch.env]` table and hatch will automatically install it. You must also have
+your environment type set to `pip-compile` (see [Configuration](#configuration)).
 
-### pipx
+-   **_pyproject.toml_**
 
-If you use [pipx] to install and use hatch you will need to inject
-the `hatch-pip-compile` plugin into the hatch environment.
+    ```toml
+    [tool.hatch.env]
+    requires = [
+        "hatch-pip-compile"
+    ]
 
-```shell
-pipx install hatch
-pipx inject hatch hatch-pip-compile
-```
+    [tool.hatch.envs.default]
+    type = "pip-compile"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [env]
+    requires = [
+        "hatch-pip-compile"
+    ]
+
+    [envs.default]
+    type = "pip-compile"
+    ```
 
 ## Usage
 
@@ -36,7 +51,8 @@ from the lockfile into your environment.
 
 ## Configuration
 
-The [environment plugin] name is `pip-compile`.
+The [environment plugin] name is `pip-compile`. Set your environment
+type to `pip-compile` to use this plugin for the respective environment.
 
 -   **_pyproject.toml_**
 
@@ -166,6 +182,22 @@ Using the default hatch configuration, dev dependencies listed in your
 (`requirements.txt`). If you want to remove your dev dependencies
 from the lockfile you must remove them from the `default` environment
 on your `pyproject.toml` / `hatch.toml` file.
+
+### Manual Installation
+
+If you want to manually install this plugin instead of adding it to the
+`[tool.hatch.env]` table, you can do so with [pipx]:
+
+```bash
+pipx install hatch
+pipx inject hatch hatch-pip-compile
+```
+
+Alternatively, you can install it with [pip]:
+
+```bash
+pip install hatch hatch-pip-compile
+```
 
 ---
 

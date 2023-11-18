@@ -12,19 +12,33 @@
 
 ## Installation
 
-```shell
-pip install hatch-pip-compile
-```
+Declare `hatch-pip-compile` as a dependency in your `pyproject.toml` file under the
+`[tool.hatch.env]` table and hatch will automatically install it. You must also have
+your environment type set to `pip-compile` (see [Configuration](#configuration)).
 
-### pipx
+-   **_pyproject.toml_**
 
-If you use [pipx] to install and use hatch you will need to inject
-the `hatch-pip-compile` plugin into the hatch environment.
+    ```toml
+    [tool.hatch.env]
+    requires = [
+        "hatch-pip-compile"
+    ]
 
-```shell
-pipx install hatch
-pipx inject hatch hatch-pip-compile
-```
+    [tool.hatch.envs.default]
+    type = "pip-compile"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [env]
+    requires = [
+        "hatch-pip-compile"
+    ]
+
+    [envs.default]
+    type = "pip-compile"
+    ```
 
 ## Usage
 
@@ -36,7 +50,8 @@ from the lockfile into your environment.
 
 ## Configuration
 
-The [environment plugin] name is `pip-compile`.
+The [environment plugin] name is `pip-compile`. Set your environment
+type to `pip-compile` to use this plugin for the respective environment.
 
 -   **_pyproject.toml_**
 
@@ -167,6 +182,22 @@ Using the default hatch configuration, dev dependencies listed in your
 from the lockfile you must remove them from the `default` environment
 on your `pyproject.toml` / `hatch.toml` file.
 
+### Manual Installation
+
+If you want to manually install this plugin instead of adding it to the
+`[tool.hatch.env]` table, you can do so with [pipx]:
+
+```bash
+pipx install hatch
+pipx inject hatch hatch-pip-compile
+```
+
+Alternatively, you can install it with [pip]:
+
+```bash
+pip install hatch hatch-pip-compile
+```
+
 ---
 
 ---
@@ -183,3 +214,4 @@ on your `pyproject.toml` / `hatch.toml` file.
 [Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases
 [environment plugin]: https://hatch.pypa.io/latest/plugins/environment/
+[pip]: https://pip.pypa.io/en/stable/
