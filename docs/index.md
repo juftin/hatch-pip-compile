@@ -69,29 +69,29 @@ type to `pip-compile` to use this plugin for the respective environment.
 
 ### Configuration Options
 
-| name                     | type        | description                                                                                                 |
-| ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------- |
-| lock-directory           | `str`       | The directory where the lockfiles will be stored. `default` env is project root, non-default is `.hatch`    |
-| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `<envName>.lock` |
-| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                             |
-| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`      |
-| pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`     |
-| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                  |
+| name                     | type        | description                                                                                                         |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------- |
+| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `.hatch/{env_name}.lock` |
+| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                     |
+| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`              |
+| pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`             |
+| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                          |
 
 #### Examples
 
-##### lock-directory
+##### lock-filename
 
-The directory where the lockfiles will be stored. Defaults to
-the project root for the `default` environment, and `.hatch` for
-non-default environments.
+The path (including the directory) to the ultimate lockfile. Defaults to `requirements.txt` in the project root
+for the `default` environment, and `.hatch/{env_name}.lock` for non-default environments.
+
+Changing the lock directory:
 
 -   **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
     type = "pip-compile"
-    lock-directory = "requirements"
+    lock-filename = "requirements/{env_name}.lock"
     ```
 
 -   **_hatch.toml_**
@@ -99,21 +99,17 @@ non-default environments.
     ```toml
     [envs.<envName>]
     type = "pip-compile"
-    lock-directory = "requirements"
+    lock-filename = "requirements/{env_name}.lock"
     ```
 
-##### lock-filename
-
-The filename of the ultimate lockfile. Defaults to `requirements.txt`
-for the `default` environment, and `<envName>.lock` for non-default environments.
+Changing the lock filename to a path in the project root:
 
 -   **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.lint]
     type = "pip-compile"
-    lock-directory = "."
-    lock-filename = "linting-lockfile.txt"
+    lock-filename = "linting-requirements.txt"
     ```
 
 -   **_hatch.toml_**
@@ -121,8 +117,7 @@ for the `default` environment, and `<envName>.lock` for non-default environments
     ```toml
     [envs.lint]
     type = "pip-compile"
-    lock-directory = "."
-    lock-filename = "linting-lockfile.txt"
+    lock-filename = "linting-requirements.txt"
     ```
 
 ##### pip-compile-hashes
