@@ -23,12 +23,16 @@ class PipCompileEnvironment(VirtualEnvironment):
         Initialize PipCompileEnvironment with extra attributes
         """
         super().__init__(*args, **kwargs)
-        if self.name == "default":
-            _default_lock_filename = "requirements.txt"
+        lock_filename_config = self.config.get("lock-filename")
+        if lock_filename_config is None:
+            if self.name == "default":
+                lock_filename = "requirements.txt"
+            else:
+                lock_filename = f".hatch/{self.name}.lock"
         else:
-            _default_lock_filename = f"{self.name}.lock"
-        _lock_filename = self.config.get("lock-filename", _default_lock_filename)
-        self._piptools_lock_file = self._config_lock_directory / _lock_filename
+            with self.metadata.context.apply_context(self.context):
+                lock_filename = self.metadata.context.format(lock_filename_config)
+        self._piptools_lock_file = self.root / lock_filename
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -36,27 +40,12 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get option types
         """
         return {
-            "lock-directory": str,
             "lock-filename": str,
             "pip-compile-hashes": bool,
             "pip-compile-header": bool,
             "pip-compile-strip-extras": bool,
             "pip-compile-args": List[str],
         }
-
-    @property
-    def _config_lock_directory(self) -> pathlib.Path:
-        """
-        Get the lock directory from the config
-        """
-        if self.name == "default":
-            default_lock_dir = self.root
-        else:
-            default_lock_dir = self.root / ".hatch"
-        lock_dir = self.config.get("lock-directory", default_lock_dir)
-        if lock_dir in [".", "./", ""]:
-            lock_dir = self.root
-        return pathlib.Path(lock_dir)
 
     def _pip_compile_command(self, output_file: pathlib.Path, input_file: pathlib.Path) -> None:
         """
@@ -91,7 +80,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
-        self._config_lock_directory.mkdir(exist_ok=True)
+        self._piptools_lock_file.parent.mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
@@ -102,7 +91,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
-        self._config_lock_directory.mkdir(exist_ok=True)
+        self._piptools_lock_file.parent.mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
