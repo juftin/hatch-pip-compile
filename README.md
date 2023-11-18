@@ -225,3 +225,4 @@ pip install hatch hatch-pip-compile
 [Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases
 [environment plugin]: https://hatch.pypa.io/latest/plugins/environment/
+[pip]: https://pip.pypa.io/en/stable/
