@@ -28,7 +28,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             if self.name == "default":
                 lock_filename = "requirements.txt"
             else:
-                lock_filename = f".hatch/{self.name}.lock"
+                lock_filename = f"requirements/requirements-{self.name}.txt"
         else:
             with self.metadata.context.apply_context(self.context):
                 lock_filename = self.metadata.context.format(lock_filename_config)
