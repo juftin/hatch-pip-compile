@@ -131,6 +131,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         with self.safe_activation():
             self._pip_compile_cli()
             self._pip_sync_cli()
+            super().install_project_dev_mode()
 
     def dependencies_in_sync(self):
         """
@@ -154,6 +155,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         with self.safe_activation():
             self._pip_compile_cli()
             self._pip_sync_cli()
+            super().install_project_dev_mode()
 
     def _post_process_lockfile(self) -> None:
         """
