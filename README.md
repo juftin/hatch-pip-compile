@@ -45,9 +45,9 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
 
 The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
 environment needs to be updated. Behind the scenes, this plugin creates a lockfile
-at `requirements.txt` (non-default lockfiles are located at `.hatch/<envName>.lock`).
-Alongside `pip-compile`, this plugin also uses [pip-sync] to install the dependencies
-from the lockfile into your environment.
+at `requirements.txt` (non-default lockfiles are located at
+`requirements/requirements-{env_name}.txt`). Alongside `pip-compile`, this plugin also
+uses [pip-sync] to install the dependencies from the lockfile into your environment.
 
 ## Configuration
 
@@ -70,29 +70,29 @@ type to `pip-compile` to use this plugin for the respective environment.
 
 ### Configuration Options
 
-| name                     | type        | description                                                                                                         |
-| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------- |
-| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `.hatch/{env_name}.lock` |
-| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                     |
-| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`              |
-| pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`             |
-| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                          |
+| name                     | type        | description                                                                                                                           |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
+| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                                       |
+| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`                                |
+| pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`                               |
+| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
 
 #### Examples
 
 ##### lock-filename
 
 The path (including the directory) to the ultimate lockfile. Defaults to `requirements.txt` in the project root
-for the `default` environment, and `.hatch/{env_name}.lock` for non-default environments.
+for the `default` environment, and `requirements/requirements-{env_name}.txt` for non-default environments.
 
-Changing the lock directory:
+Changing the lock file path:
 
 -   **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
     type = "pip-compile"
-    lock-filename = "requirements/{env_name}.lock"
+    lock-filename = "locks/{env_name}.lock"
     ```
 
 -   **_hatch.toml_**
@@ -100,7 +100,7 @@ Changing the lock directory:
     ```toml
     [envs.<envName>]
     type = "pip-compile"
-    lock-filename = "requirements/{env_name}.lock"
+    lock-filename = "locks/{env_name}.lock"
     ```
 
 Changing the lock filename to a path in the project root:
@@ -143,8 +143,7 @@ Whether to generate hashes in the lockfile. Defaults to `true`.
 
 ##### pip-compile-args
 
-Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be
-specified here.
+Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be specified here.
 
 -   **_pyproject.toml_**
 

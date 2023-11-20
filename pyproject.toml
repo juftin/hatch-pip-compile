@@ -78,6 +78,7 @@ dependencies = [
   "markdown-exec[ansi]~=1.6.0"
 ]
 detached = true
+type = "pip-compile"
 
 [tool.hatch.envs.docs.scripts]
 build = ["mkdocs build --clean --strict"]
@@ -99,6 +100,7 @@ dependencies = [
   "ruff~=0.1.4"
 ]
 detached = true
+type = "pip-compile"
 
 [tool.hatch.envs.lint.scripts]
 all = [
