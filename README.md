@@ -74,8 +74,8 @@ type to `pip-compile` to use this plugin for the respective environment.
 | ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
 | pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                                       |
-| pip-compile-header       | `bool`      | Whether to use the `pip-compile` header instead of the `hatch-pip-compile` header, defaults to `false`                                |
 | pip-compile-strip-extras | `bool`      | Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to `true`                               |
+| pip-compile-verbose      | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
 | pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
 
 #### Examples
@@ -165,6 +165,28 @@ Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be specified h
         "--index-url",
         "https://pypi.org/simple",
     ]
+    ```
+
+##### pip-compile-verbose
+
+Set to `true` to run `pip-compile` in verbose mode instead of quiet mode.
+
+Optionally, if you would like to silence any warnings set the `pip-compile-verbose` option to `false`.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
+    type = "pip-compile"
+    pip-compile-verbose = true
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.<envName>]
+    type = "pip-compile"
+    pip-compile-verbose = true
     ```
 
 ## Notes
