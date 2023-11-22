@@ -130,7 +130,8 @@ module = [
   "pytest.*",
   "piptools.*",
   "hatch.*",
-  "hatchling.*"
+  "hatchling.*",
+  "packaging.*"
 ]
 
 [tool.ruff]
