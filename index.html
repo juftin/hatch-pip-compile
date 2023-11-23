@@ -334,13 +334,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#lock-directory" class="md-nav__link">
-    lock-directory
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#lock-filename" class="md-nav__link">
     lock-filename
   </a>
@@ -357,6 +350,13 @@
           <li class="md-nav__item">
   <a href="#pip-compile-args" class="md-nav__link">
     pip-compile-args
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pip-compile-verbose" class="md-nav__link">
+    pip-compile-verbose
   </a>
   
 </li>
@@ -495,13 +495,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#lock-directory" class="md-nav__link">
-    lock-directory
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#lock-filename" class="md-nav__link">
     lock-filename
   </a>
@@ -518,6 +511,13 @@
           <li class="md-nav__item">
   <a href="#pip-compile-args" class="md-nav__link">
     pip-compile-args
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pip-compile-verbose" class="md-nav__link">
+    pip-compile-verbose
   </a>
   
 </li>
@@ -587,6 +587,7 @@
 <p><a href="https://github.com/juftin/hatch-pip-compile"><img alt="PyPI" src="https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&amp;label=🔨%20hatch-pip-compile" /></a>
 <a href="https://pypi.python.org/pypi/hatch-pip-compile/"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/hatch-pip-compile" /></a>
 <a href="https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&amp;label=License" /></a>
+<a href="https://github.com/pypa/hatch"><img alt="Hatch project" src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg" /></a>
 <a href="https://github.com/astral-sh/ruff"><img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" /></a>
 <a href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit" /></a>
 <a href="https://github.com/semantic-release/semantic-release"><img alt="semantic-release" src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
@@ -622,9 +623,9 @@ your environment type set to <code>pip-compile</code> (see <a href="#configurati
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
 <p>The <code>hatch-pip-compile</code> plugin will automatically run <code>pip-compile</code> whenever your
 environment needs to be updated. Behind the scenes, this plugin creates a lockfile
-at <code>requirements.txt</code> (non-default lockfiles are located at <code>.hatch/&lt;envName&gt;.lock</code>).
-Alongside <code>pip-compile</code>, this plugin also uses <a href="https://pip-tools.readthedocs.io/en/latest/">pip-sync</a> to install the dependencies
-from the lockfile into your environment.</p>
+at <code>requirements.txt</code> (non-default lockfiles are located at
+<code>requirements/requirements-{env_name}.txt</code>). Alongside <code>pip-compile</code>, this plugin also
+uses <a href="https://pip-tools.readthedocs.io/en/latest/">pip-sync</a> to install the dependencies from the lockfile into your environment.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>The <a href="https://hatch.pypa.io/latest/plugins/environment/">environment plugin</a> name is <code>pip-compile</code>. Set your environment
 type to <code>pip-compile</code> to use this plugin for the respective environment.</p>
@@ -653,14 +654,9 @@ type to <code>pip-compile</code> to use this plugin for the respective environme
 </thead>
 <tbody>
 <tr>
-<td>lock-directory</td>
-<td><code>str</code></td>
-<td>The directory where the lockfiles will be stored. <code>default</code> env is project root, non-default is <code>.hatch</code></td>
-</tr>
-<tr>
 <td>lock-filename</td>
 <td><code>str</code></td>
-<td>The filename of the ultimate lockfile. <code>default</code> env is <code>requirements.txt</code>, non-default is <code>&lt;envName&gt;.lock</code></td>
+<td>The filename of the ultimate lockfile. <code>default</code> env is <code>requirements.txt</code>, non-default is <code>requirements/requirements-{env_name}.txt</code></td>
 </tr>
 <tr>
 <td>pip-compile-hashes</td>
@@ -668,14 +664,14 @@ type to <code>pip-compile</code> to use this plugin for the respective environme
 <td>Whether to generate hashes in the lockfile. Defaults to <code>true</code>.</td>
 </tr>
 <tr>
-<td>pip-compile-header</td>
-<td><code>bool</code></td>
-<td>Whether to use the <code>pip-compile</code> header instead of the <code>hatch-pip-compile</code> header, defaults to <code>false</code></td>
-</tr>
-<tr>
 <td>pip-compile-strip-extras</td>
 <td><code>bool</code></td>
 <td>Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to <code>true</code></td>
+</tr>
+<tr>
+<td>pip-compile-verbose</td>
+<td><code>bool</code></td>
+<td>Set to <code>true</code> to run <code>pip-compile</code> in verbose mode instead of quiet mode, set to <code>false</code> to silence warnings</td>
 </tr>
 <tr>
 <td>pip-compile-args</td>
@@ -685,44 +681,40 @@ type to <code>pip-compile</code> to use this plugin for the respective environme
 </tbody>
 </table>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">#</a></h4>
-<h5 id="lock-directory">lock-directory<a class="headerlink" href="#lock-directory" title="Permanent link">#</a></h5>
-<p>The directory where the lockfiles will be stored. Defaults to
-the project root for the <code>default</code> environment, and <code>.hatch</code> for
-non-default environments.</p>
+<h5 id="lock-filename">lock-filename<a class="headerlink" href="#lock-filename" title="Permanent link">#</a></h5>
+<p>The path (including the directory) to the ultimate lockfile. Defaults to <code>requirements.txt</code> in the project root
+for the <code>default</code> environment, and <code>requirements/requirements-{env_name}.txt</code> for non-default environments.</p>
+<p>Changing the lock file path:</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">lock-directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;locks/{env_name}.lock&quot;</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong><em>hatch.toml</em></strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">lock-directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;requirements&quot;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;locks/{env_name}.lock&quot;</span>
 </code></pre></div>
 </li>
 </ul>
-<h5 id="lock-filename">lock-filename<a class="headerlink" href="#lock-filename" title="Permanent link">#</a></h5>
-<p>The filename of the ultimate lockfile. Defaults to <code>requirements.txt</code>
-for the <code>default</code> environment, and <code>&lt;envName&gt;.lock</code> for non-default environments.</p>
+<p>Changing the lock filename to a path in the project root:</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[tool.hatch.envs.lint]</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">lock-directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;linting-lockfile.txt&quot;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;linting-requirements.txt&quot;</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong><em>hatch.toml</em></strong></p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">[envs.lint]</span>
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">lock-directory</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;linting-lockfile.txt&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">lock-filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;linting-requirements.txt&quot;</span>
 </code></pre></div>
 </li>
 </ul>
@@ -745,8 +737,7 @@ for the <code>default</code> environment, and <code>&lt;envName&gt;.lock</code> 
 </li>
 </ul>
 <h5 id="pip-compile-args">pip-compile-args<a class="headerlink" href="#pip-compile-args" title="Permanent link">#</a></h5>
-<p>Extra arguments to pass to <code>pip-compile</code>. Custom PyPI indexes can be
-specified here.</p>
+<p>Extra arguments to pass to <code>pip-compile</code>. Custom PyPI indexes can be specified here.</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
@@ -769,6 +760,25 @@ specified here.</p>
 </code></pre></div>
 </li>
 </ul>
+<h5 id="pip-compile-verbose">pip-compile-verbose<a class="headerlink" href="#pip-compile-verbose" title="Permanent link">#</a></h5>
+<p>Set to <code>true</code> to run <code>pip-compile</code> in verbose mode instead of quiet mode.</p>
+<p>Optionally, if you would like to silence any warnings set the <code>pip-compile-verbose</code> option to <code>false</code>.</p>
+<ul>
+<li>
+<p><strong><em>pyproject.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+</li>
+<li>
+<p><strong><em>hatch.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+</code></pre></div>
+</li>
+</ul>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
 <h3 id="dev-dependencies">Dev Dependencies<a class="headerlink" href="#dev-dependencies" title="Permanent link">#</a></h3>
 <p>Using the default hatch configuration, dev dependencies listed in your
@@ -779,11 +789,11 @@ on your <code>pyproject.toml</code> / <code>hatch.toml</code> file.</p>
 <h3 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">#</a></h3>
 <p>If you want to manually install this plugin instead of adding it to the
 <code>[tool.hatch.env]</code> table, you can do so with <a href="https://pipxproject.github.io/pipx/">pipx</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <p>Alternatively, you can install it with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <hr />
 <hr />
