@@ -118,7 +118,7 @@ h11==0.14.0 \
 hatch==1.7.0 \
     --hash=sha256:7afc701fd5b33684a6650e1ecab8957e19685f824240ba7458dcacd66f90fb46 \
     --hash=sha256:efc84112fd02ca85b7bab54f5e2ef71393a98dc849eac9aca390504031f8a1a8
-    # via hatch-pip-compile
+    # via hatch.envs.default
 hatchling==1.18.0 \
     --hash=sha256:50e99c3110ce0afc3f7bdbadff1c71c17758e476731c27607940cfa6686489ca \
     --hash=sha256:b66dc254931ec42aa68b5febd1d342c58142cc5267b7ff3b12ba3fa5b4900c93
