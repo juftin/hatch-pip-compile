@@ -77,7 +77,6 @@ dependencies = [
   "mkdocstrings~=0.22.0",
   "markdown-exec[ansi]~=1.6.0"
 ]
-detached = true
 type = "pip-compile"
 
 [tool.hatch.envs.docs.scripts]
