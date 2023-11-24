@@ -187,7 +187,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         lockfile_text = self._piptools_lock_file.read_text()
         new_data = re.sub(
             rf"-r \S*/{self.name}\.in",
-            f"{self.metadata.name}",
+            f"hatch.envs.{self.name}",
             lockfile_text,
         )
         new_text = dedent(prefix).strip() + "\n\n" + new_data
