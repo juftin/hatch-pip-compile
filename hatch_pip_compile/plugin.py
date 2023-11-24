@@ -65,7 +65,11 @@ class PipCompileEnvironment(VirtualEnvironment):
             )
             self._pip_compile_cli()
             self._pip_sync_cli()
-            super().install_project_dev_mode()
+        if not self.skip_install:
+            if self.dev_mode:
+                super().install_project_dev_mode()
+            else:
+                super().install_project()
 
     def _pip_compile_command(self, output_file: pathlib.Path, input_file: pathlib.Path) -> None:
         """
@@ -130,13 +134,21 @@ class PipCompileEnvironment(VirtualEnvironment):
         ]
         self.virtual_env.platform.check_command(cmd)
 
+    def install_project(self):
+        """
+        Install the project the first time
+
+        The same implementation as `sync_dependencies`
+        due to the way `pip-sync` uninstalls our root package
+        """
+        self._hatch_pip_compile_install()
+
     def install_project_dev_mode(self):
         """
         Install the project the first time in dev mode
 
         The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our editable root
-        package
+        due to the way `pip-sync` uninstalls our root package
         """
         self._hatch_pip_compile_install()
 
