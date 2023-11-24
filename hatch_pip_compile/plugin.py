@@ -4,15 +4,13 @@ hatch-pip-compile plugin
 
 import logging
 import pathlib
-import re
 import tempfile
 from typing import Any, Dict, List, Optional
 
 from hatch.env.virtual import VirtualEnvironment
-from packaging.version import Version
 
 from hatch_pip_compile.exceptions import HatchPipCompileError, LockFileNotFoundError
-from hatch_pip_compile.header import PipCompileHeader
+from hatch_pip_compile.lock import PipCompileLock
 
 logger = logging.getLogger(__name__)
 
@@ -40,15 +38,15 @@ class PipCompileEnvironment(VirtualEnvironment):
         else:
             with self.metadata.context.apply_context(self.context):
                 lock_filename = self.metadata.context.format(lock_filename_config)
-        self._piptools_detached_mode: bool = (
+        self._piptools_lock_file = self.root / lock_filename
+        self.piptools_detached_mode: bool = (
             self.metadata.hatch.config.get("envs", {}).get(self.name, {}).get("detached", False)
         )
-        self._piptools_lock_file = self.root / lock_filename
-        self._piptools_header = PipCompileHeader(
+        self.piptools_lock = PipCompileLock(
             lock_file=self._piptools_lock_file,
             dependencies=self.dependencies,
             virtualenv=self.virtual_env,
-            constraints_file=self._piptools_constraints_file,
+            constraints_file=self.piptools_constraints_file,
             project_root=self.root,
             env_name=self.name,
             project_name=self.metadata.name,
@@ -92,9 +90,15 @@ class PipCompileEnvironment(VirtualEnvironment):
         Run pip-compile
         """
         if self._piptools_lock_file.exists() is True:
-            correct_environment = self._lock_file_compare()
-            if correct_environment is True and self._piptools_constraints_file is not None:
-                correct_environment = self._piptools_default_environment._lock_file_compare()
+            correct_environment = self.piptools_lock.compare_requirements(
+                requirements=self.dependencies_complex
+            )
+            if correct_environment is True and self.piptools_constraints_file is not None:
+                correct_environment = (
+                    self.piptools_default_environment.piptools_lock.compare_requirements(
+                        requirements=self.piptools_default_environment.dependencies_complex
+                    )
+                )
             if correct_environment is True:
                 return
         cmd = [
@@ -116,19 +120,21 @@ class PipCompileEnvironment(VirtualEnvironment):
         if self.config.get("pip-compile-hashes", True) is True:
             cmd.append("--generate-hashes")
 
-        if self._piptools_constraints_file is not None:
-            cmd.extend(["--constraint", str(self._piptools_constraints_file)])
+        if self.piptools_constraints_file is not None:
+            cmd.extend(["--constraint", str(self.piptools_constraints_file)])
         cmd.extend(self.config.get("pip-compile-args", []))
         cmd.append(str(input_file))
         self.virtual_env.platform.check_command(cmd)
-        self._piptools_header.write_header()
+        self.piptools_lock.process_lock()
 
     def _pip_compile_cli(self) -> None:
         """
         Run pip-compile
         """
         if self._piptools_lock_file.exists() is True:
-            matched_dependencies = self._lock_file_compare()
+            matched_dependencies = self.piptools_lock.compare_requirements(
+                requirements=self.dependencies_complex
+            )
             if matched_dependencies is True:
                 return
         self._piptools_lock_file.parent.mkdir(exist_ok=True)
@@ -142,7 +148,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-sync
         """
-        self._compare_python_versions()
+        _ = self.piptools_lock.compare_python_versions(
+            verbose=self.config.get("pip-compile-verbose", None)
+        )
         cmd = [
             self.virtual_env.python_info.executable,
             "-m",
@@ -180,7 +188,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         if len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is False):
             return False
         elif len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is True):
-            expected_locks = self._lock_file_compare()
+            expected_locks = self.piptools_lock.compare_requirements(
+                requirements=self.dependencies_complex
+            )
             if expected_locks is False:
                 return False
         return super().dependencies_in_sync()
@@ -191,44 +201,8 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         self._hatch_pip_compile_install()
 
-    def _lock_file_compare(self) -> bool:
-        """
-        Compare lock file
-        """
-        parsed_requirements = self._piptools_header.read_requirements()
-        expected_output = "\n".join([*parsed_requirements, ""])
-        new_output = "\n".join([*self.dependencies, ""])
-        return expected_output == new_output
-
-    def _compare_python_versions(self) -> bool:
-        """
-        Compare python versions
-        """
-        current_version = Version(self.virtual_env.environment["python_version"])
-        lock_file_text = self._piptools_lock_file.read_text()
-        match = re.search(
-            r"# This file is autogenerated by hatch-pip-compile with Python (.*)", lock_file_text
-        )
-        if match is not None:
-            lock_version = Version(match.group(1))
-            if all(
-                [
-                    (
-                        current_version.major != lock_version.major
-                        or current_version.minor != lock_version.minor
-                    ),
-                    self.config.get("pip-compile-verbose", None) is not False,
-                ]
-            ):
-                logger.error(
-                    "[hatch-pip-compile] Your Python version is different "
-                    "from the lock file, your results may vary."
-                )
-            return False
-        return True
-
     @property
-    def _piptools_constraints_file(self) -> Optional[pathlib.Path]:
+    def piptools_constraints_file(self) -> Optional[pathlib.Path]:
         """
         Get default lock file
         """
@@ -240,15 +214,15 @@ class PipCompileEnvironment(VirtualEnvironment):
             )
             if default_config.get("type") != self.PLUGIN_NAME:
                 constraints_file = None
-            elif self._piptools_detached_mode is True:
+            elif self.piptools_detached_mode is True:
                 constraints_file = None
             else:
-                constraints_file = self._piptools_default_environment._piptools_lock_file
-        self._validate_default_lock(constraints_file=constraints_file)
+                constraints_file = self.piptools_default_environment._piptools_lock_file
+        self.piptools_validate_default_lock(constraints_file=constraints_file)
         return constraints_file
 
     @property
-    def _piptools_default_environment(self) -> "PipCompileEnvironment":
+    def piptools_default_environment(self) -> "PipCompileEnvironment":
         """
         Get default pip compile environment
         """
@@ -266,9 +240,21 @@ class PipCompileEnvironment(VirtualEnvironment):
         )
         return default_env
 
-    def _validate_default_lock(self, constraints_file: Optional[pathlib.Path]) -> None:
+    def piptools_validate_default_lock(self, constraints_file: Optional[pathlib.Path]) -> None:
         """
         Validate the default lock file
+
+        Parameters
+        ----------
+        constraints_file : Optional[pathlib.Path]
+            The optional default lock file
+
+        Raises
+        ------
+        LockFileNotFoundError
+            If the default lock file does not exist
+        HatchPipCompileError
+            If the default lock file is out of date
         """
         if constraints_file is None:
             return
@@ -278,7 +264,9 @@ class PipCompileEnvironment(VirtualEnvironment):
             )
             raise LockFileNotFoundError(error_message)
         else:
-            up_to_date = self._piptools_default_environment._lock_file_compare()
+            up_to_date = self.piptools_default_environment.piptools_lock.compare_requirements(
+                requirements=self.piptools_default_environment.dependencies_complex
+            )
             if up_to_date is False:
                 error_message = (
                     f"[hatch-pip-compile] The default lock file {constraints_file} is out of date. "

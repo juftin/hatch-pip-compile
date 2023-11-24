@@ -13,3 +13,9 @@ class LockFileNotFoundError(HatchPipCompileError, FileNotFoundError):
     """
     A lock file was not found
     """
+
+
+class LockFileError(HatchPipCompileError, ValueError):
+    """
+    A lock file content Error
+    """
