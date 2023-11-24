@@ -60,7 +60,6 @@ class PipCompileEnvironment(VirtualEnvironment):
         return {
             "lock-filename": str,
             "pip-compile-hashes": bool,
-            "pip-compile-strip-extras": bool,
             "pip-compile-args": List[str],
         }
 
@@ -107,11 +106,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "piptools",
             "compile",
             "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
-            (
-                "--strip-extras"
-                if self.config.get("pip-compile-strip-extras", True) is True
-                else "--no-strip-extras"
-            ),
+            "--strip-extras",
             "--no-header",
             "--output-file",
             str(output_file),
