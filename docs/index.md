@@ -49,6 +49,10 @@ at `requirements.txt` (non-default lockfiles are located at
 `requirements/requirements-{env_name}.txt`). Alongside `pip-compile`, this plugin also
 uses [pip-sync] to install the dependencies from the lockfile into your environment.
 
+See [lock-filename](#lock-filename) for more information on changing the default
+lockfile paths and [pip-compile-constraint](#pip-compile-constraint) for more
+information on syncing dependency versions across environments.
+
 ## Configuration
 
 The [environment plugin] name is `pip-compile`. Set your environment
@@ -70,12 +74,13 @@ type to `pip-compile` to use this plugin for the respective environment.
 
 ### Configuration Options
 
-| name                | type        | description                                                                                                                           |
-| ------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| lock-filename       | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
-| pip-compile-hashes  | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                                       |
-| pip-compile-verbose | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
-| pip-compile-args    | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
+| name                   | type        | description                                                                                                                           |
+| ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| lock-filename          | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
+| pip-compile-constraint | `str`       | An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.                    |
+| pip-compile-hashes     | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                                       |
+| pip-compile-verbose    | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
+| pip-compile-args       | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
 
 #### Examples
 
@@ -118,6 +123,75 @@ Changing the lock filename to a path in the project root:
     [envs.lint]
     type = "pip-compile"
     lock-filename = "linting-requirements.txt"
+    ```
+
+##### pip-compile-constraint
+
+An environment to use as a constraint, ensuring that all shared dependencies are
+pinned to the same versions. For example, if you have a `default` environment and
+a `test` environment, you can set the `pip-compile-constraint` option to `default`
+on the `test` environment to ensure that all shared dependencies are pinned to the
+same versions.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.default]
+    type = "pip-compile"
+
+    [tool.hatch.envs.test]
+    dependencies = [
+        "pytest"
+    ]
+    type = "pip-compile"
+    pip-compile-constraint = "default"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.default]
+    type = "pip-compile"
+
+    [envs.test]
+    dependencies = [
+        "pytest"
+    ]
+    type = "pip-compile"
+    pip-compile-constraint = "default"
+    ```
+
+By default, all environments inherit from the `default` environment via
+[inheritance]. A common use case is to set the `pip-compile-constraint`
+and `type` options on the `default` environment and inherit them on
+all other environments. It's important to note that when `detached = true`,
+inheritance is disabled and the `type` and `pip-compile-constraint` options
+must be set explicitly.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.default]
+    type = "pip-compile"
+    pip-compile-constraint = "default"
+
+    [tool.hatch.envs.test]
+    dependencies = [
+        "pytest"
+    ]
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.default]
+    type = "pip-compile"
+    pip-compile-constraint = "default"
+
+    [envs.test]
+    dependencies = [
+        "pytest"
+    ]
     ```
 
 ##### pip-compile-hashes
@@ -231,3 +305,4 @@ pip install hatch hatch-pip-compile
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases
 [environment plugin]: https://hatch.pypa.io/latest/plugins/environment/
 [pip]: https://pip.pypa.io/en/stable/
+[inheritance]: https://hatch.pypa.io/1.7/config/environment/overview/#inheritance
