@@ -3,9 +3,10 @@ hatch-pip-compile plugin
 """
 
 import logging
+import os
 import pathlib
 import tempfile
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 from hatch.env.virtual import VirtualEnvironment
 
@@ -92,7 +93,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
-        if self._piptools_lock_file.exists() is True:
+        upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
+        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
+        force_upgrade = upgrade is not False or upgrade_packages is not False
+        if self._piptools_lock_file.exists() is True and force_upgrade is False:
             correct_environment = self.piptools_lock.compare_requirements(
                 requirements=self.dependencies_complex
             )
@@ -104,6 +108,15 @@ class PipCompileEnvironment(VirtualEnvironment):
                 )
             if correct_environment is True:
                 return
+        upgrade_args = []
+        upgrade_package_args = []
+        if upgrade is not False:
+            upgrade_args.append("--upgrade")
+        if upgrade_packages is not False:
+            upgrade_packages = cast(str, upgrade_packages)
+            upgrade_packages_sep = upgrade_packages.split(",")
+            for package in upgrade_packages_sep:
+                upgrade_package_args.append(f"--upgrade-package={package.strip()}")
         cmd = [
             self.virtual_env.python_info.executable,
             "-m",
@@ -118,10 +131,11 @@ class PipCompileEnvironment(VirtualEnvironment):
         ]
         if self.config.get("pip-compile-hashes", True) is True:
             cmd.append("--generate-hashes")
-
         if self.piptools_constraints_file is not None:
             cmd.extend(["--constraint", str(self.piptools_constraints_file)])
         cmd.extend(self.config.get("pip-compile-args", []))
+        cmd.extend(upgrade_args)
+        cmd.extend(upgrade_package_args)
         cmd.append(str(input_file))
         self.virtual_env.platform.check_command(cmd)
         self.piptools_lock.process_lock()
@@ -130,7 +144,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
-        if self._piptools_lock_file.exists() is True:
+        upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
+        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
+        force_upgrade = upgrade is not False or upgrade_packages is not False
+        if self._piptools_lock_file.exists() is True and force_upgrade is False:
             matched_dependencies = self.piptools_lock.compare_requirements(
                 requirements=self.dependencies_complex
             )
@@ -184,6 +201,11 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Handle whether dependencies should be synced
         """
+        upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
+        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
+        force_upgrade = upgrade is not False or upgrade_packages is not False
+        if force_upgrade is True:
+            return False
         if len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is False):
             return False
         elif len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is True):
