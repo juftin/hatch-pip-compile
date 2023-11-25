@@ -64,6 +64,7 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.default]
 path = ".venv"
+pip-compile-constraint = "default"
 post-install-commands = [
   "pre-commit install"
 ]
@@ -77,7 +78,6 @@ dependencies = [
   "mkdocstrings~=0.22.0",
   "markdown-exec[ansi]~=1.6.0"
 ]
-detached = true
 type = "pip-compile"
 
 [tool.hatch.envs.docs.scripts]
