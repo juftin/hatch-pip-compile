@@ -341,6 +341,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pip-compile-constraint" class="md-nav__link">
+    pip-compile-constraint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pip-compile-hashes" class="md-nav__link">
     pip-compile-hashes
   </a>
@@ -502,6 +509,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#pip-compile-constraint" class="md-nav__link">
+    pip-compile-constraint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#pip-compile-hashes" class="md-nav__link">
     pip-compile-hashes
   </a>
@@ -626,6 +640,9 @@ environment needs to be updated. Behind the scenes, this plugin creates a lockfi
 at <code>requirements.txt</code> (non-default lockfiles are located at
 <code>requirements/requirements-{env_name}.txt</code>). Alongside <code>pip-compile</code>, this plugin also
 uses <a href="https://pip-tools.readthedocs.io/en/latest/">pip-sync</a> to install the dependencies from the lockfile into your environment.</p>
+<p>See <a href="#lock-filename">lock-filename</a> for more information on changing the default
+lockfile paths and <a href="#pip-compile-constraint">pip-compile-constraint</a> for more
+information on syncing dependency versions across environments.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>The <a href="https://hatch.pypa.io/latest/plugins/environment/">environment plugin</a> name is <code>pip-compile</code>. Set your environment
 type to <code>pip-compile</code> to use this plugin for the respective environment.</p>
@@ -659,14 +676,14 @@ type to <code>pip-compile</code> to use this plugin for the respective environme
 <td>The filename of the ultimate lockfile. <code>default</code> env is <code>requirements.txt</code>, non-default is <code>requirements/requirements-{env_name}.txt</code></td>
 </tr>
 <tr>
+<td>pip-compile-constraint</td>
+<td><code>str</code></td>
+<td>An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.</td>
+</tr>
+<tr>
 <td>pip-compile-hashes</td>
 <td><code>bool</code></td>
 <td>Whether to generate hashes in the lockfile. Defaults to <code>true</code>.</td>
-</tr>
-<tr>
-<td>pip-compile-strip-extras</td>
-<td><code>bool</code></td>
-<td>Whether to strip the extras from the lockfile ensuring it is constraints compatible, defaults to <code>true</code></td>
 </tr>
 <tr>
 <td>pip-compile-verbose</td>
@@ -718,21 +735,87 @@ for the <code>default</code> environment, and <code>requirements/requirements-{e
 </code></pre></div>
 </li>
 </ul>
+<h5 id="pip-compile-constraint">pip-compile-constraint<a class="headerlink" href="#pip-compile-constraint" title="Permanent link">#</a></h5>
+<p>An environment to use as a constraint, ensuring that all shared dependencies are
+pinned to the same versions. For example, if you have a <code>default</code> environment and
+a <code>test</code> environment, you can set the <code>pip-compile-constraint</code> option to <code>default</code>
+on the <code>test</code> environment to ensure that all shared dependencies are pinned to the
+same versions.</p>
+<ul>
+<li>
+<p><strong><em>pyproject.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[tool.hatch.envs.default]</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">[tool.hatch.envs.test]</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="s2">&quot;pytest&quot;</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">]</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">pip-compile-constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+</code></pre></div>
+</li>
+<li>
+<p><strong><em>hatch.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">[envs.default]</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">[envs.test]</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="s2">&quot;pytest&quot;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="p">]</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="n">pip-compile-constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+</code></pre></div>
+</li>
+</ul>
+<p>By default, all environments inherit from the <code>default</code> environment via
+<a href="https://hatch.pypa.io/1.7/config/environment/overview/#inheritance">inheritance</a>. A common use case is to set the <code>pip-compile-constraint</code>
+and <code>type</code> options on the <code>default</code> environment and inherit them on
+all other environments. It's important to note that when <code>detached = true</code>,
+inheritance is disabled and the <code>type</code> and <code>pip-compile-constraint</code> options
+must be set explicitly.</p>
+<ul>
+<li>
+<p><strong><em>pyproject.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">[tool.hatch.envs.default]</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">pip-compile-constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">[tool.hatch.envs.test]</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="s2">&quot;pytest&quot;</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="p">]</span>
+</code></pre></div>
+</li>
+<li>
+<p><strong><em>hatch.toml</em></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[envs.default]</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">pip-compile-constraint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;default&quot;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">[envs.test]</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="s2">&quot;pytest&quot;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">]</span>
+</code></pre></div>
+</li>
+</ul>
 <h5 id="pip-compile-hashes">pip-compile-hashes<a class="headerlink" href="#pip-compile-hashes" title="Permanent link">#</a></h5>
 <p>Whether to generate hashes in the lockfile. Defaults to <code>true</code>.</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">pip-compile-hashes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">pip-compile-hashes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong><em>hatch.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">pip-compile-hashes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">pip-compile-hashes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
 </li>
 </ul>
@@ -741,22 +824,22 @@ for the <code>default</code> environment, and <code>requirements/requirements-{e
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">pip-compile-args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="s2">&quot;--index-url&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="s2">&quot;https://pypi.org/simple&quot;</span><span class="p">,</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">pip-compile-args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="s2">&quot;--index-url&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="s2">&quot;https://pypi.org/simple&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">]</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong><em>hatch.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">pip-compile-args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="s2">&quot;--index-url&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="s2">&quot;https://pypi.org/simple&quot;</span><span class="p">,</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">pip-compile-args</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="s2">&quot;--index-url&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="s2">&quot;https://pypi.org/simple&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">]</span>
 </code></pre></div>
 </li>
 </ul>
@@ -766,16 +849,16 @@ for the <code>default</code> environment, and <code>requirements/requirements-{e
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">[tool.hatch.envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
 </li>
 <li>
 <p><strong><em>hatch.toml</em></strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">[envs.</span><span class="err">&lt;</span><span class="k">envName</span><span class="err">&gt;</span><span class="k">]</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">pip-compile-verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </code></pre></div>
 </li>
 </ul>
@@ -789,11 +872,11 @@ on your <code>pyproject.toml</code> / <code>hatch.toml</code> file.</p>
 <h3 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">#</a></h3>
 <p>If you want to manually install this plugin instead of adding it to the
 <code>[tool.hatch.env]</code> table, you can do so with <a href="https://pipxproject.github.io/pipx/">pipx</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <p>Alternatively, you can install it with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <hr />
 <hr />
