@@ -59,33 +59,9 @@ at `requirements.txt` (non-default lockfiles are located at
 `requirements/requirements-{env_name}.txt`). Alongside `pip-compile`, this plugin also
 uses [pip-sync] to install the dependencies from the lockfile into your environment.
 
-See [lock-filename](#lock-filename) for more information on changing the default
-lockfile paths and [pip-compile-constraint](#pip-compile-constraint) for more
-information on syncing dependency versions across environments.
-
-### Updating Dependencies
-
-Passing arguments like `--upgrade` / `--upgrade-package` to `pip-compile` is
-controlled by two environment variables: `PIP_COMPILE_UPGRADE` and
-`PIP_COMPILE_UPGRADE_PACKAGE`. When either of these environment variables are
-set `hatch` will assume that the environment is out of date and automatically
-run `pip-compile` the next time the environment is activated.
-
-The below command runs `pip-compile --upgrade` on the `default` environment.
-
-```shell
-PIP_COMPILE_UPGRADE=1 hatch env run --env default -- python --version
-```
-
-The below command runs `pip-compile --upgrade-package=mkdocs --upgrade-package=mkdocs-material`
-on the `docs` environment.
-
-```shell
-PIP_COMPILE_UPGRADE_PACKAGE="mkdocs,mkdocs-material" hatch env run --env docs -- python --version
-```
-
-The above commands call `python --version` on a particular environment,
-but the same behavior applies to any command that activates the environment.
+-   [lock-filename](#lock-filename) - changing the default lockfile path
+-   [pip-compile-constraint](#pip-compile-constraint) - syncing dependency versions across environments
+-   [Upgrading Dependencies](#upgrading-dependencies) - how to upgrade dependencies
 
 ## Configuration
 
@@ -295,6 +271,37 @@ Optionally, if you would like to silence any warnings set the `pip-compile-verbo
     type = "pip-compile"
     pip-compile-verbose = true
     ```
+
+## Upgrading Dependencies
+
+Upgrading all dependencies can be as simple as deleting your lockfile and
+recreating it by reactivating the environment:
+
+```shell
+rm requirements.txt
+hatch env run --env default -- python --version
+```
+
+If you're a user of the `--upgrade` / `--upgrade-package` options on `pip-compile`,
+these features can be enabled on this plugin using the environment variables
+`PIP_COMPILE_UPGRADE` and `PIP_COMPILE_UPGRADE_PACKAGE`. When either of these
+environment variables are set `hatch` will force the lockfile to be regenerated
+whenever the environment is activated.
+
+To run with `upgrade` functionality on the `default` environment:
+
+```shell
+PIP_COMPILE_UPGRADE=1 hatch env run --env default -- python --version
+```
+
+To run with `upgrade-package` functionality on the `docs` environment:
+
+```shell
+PIP_COMPILE_UPGRADE_PACKAGE="mkdocs,mkdocs-material" hatch env run --env docs -- python --version
+```
+
+The above commands call `python --version` on a particular environment,
+but the same behavior applies to any script that activates the environment.
 
 ## Notes
 
