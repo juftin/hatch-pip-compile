@@ -1,7 +1,7 @@
 <h1 align="center">hatch-pip-compile</h1>
 
 <p align="center">
-  <img src="https://i.imgur.com/Jt0lhdM.png" alt="Image" width="250" />
+  <img src="docs/logo.png" alt="Image" width="250" />
 </p>
 
 <p align="center">

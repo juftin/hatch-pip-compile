@@ -57,7 +57,10 @@ parallel = true
 source_pkgs = ["hatch_pip_compile", "tests"]
 
 [tool.hatch.env]
-requires = ["hatch-pip-compile"]
+requires = ["hatch-pip-compile", "hatch-mkdocs"]
+
+[tool.hatch.env.collectors.mkdocs.docs]
+path = "mkdocs.yaml"
 
 [[tool.hatch.envs.all.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -72,21 +75,8 @@ python = "3.11"
 type = "pip-compile"
 
 [tool.hatch.envs.docs]
-dependencies = [
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]",
-  "markdown-exec[ansi]",
-  "mkdocs-gen-files",
-  "mkdocs-literate-nav",
-  "mkdocs-section-index"
-]
+detached = false
 type = "pip-compile"
-
-[tool.hatch.envs.docs.scripts]
-build = ["mkdocs build --clean --strict"]
-deploy = ["mkdocs gh-deploy {args:}"]
-serve = ["mkdocs serve --dev-addr localhost:8080 --livereload"]
 
 [tool.hatch.envs.gen]
 detached = true
