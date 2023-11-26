@@ -6,7 +6,7 @@ import logging
 import os
 import pathlib
 import tempfile
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 from hatch.env.virtual import VirtualEnvironment
 
@@ -93,10 +93,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
-        upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
-        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
-        force_upgrade = upgrade is not False or upgrade_packages is not False
-        if self._piptools_lock_file.exists() is True and force_upgrade is False:
+        upgrade = bool(os.getenv("PIP_COMPILE_UPGRADE"))
+        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or None
+        force_upgrade = upgrade or upgrade_packages
+        if self._piptools_lock_file.exists() is True and force_upgrade:
             correct_environment = self.piptools_lock.compare_requirements(
                 requirements=self.dependencies_complex
             )
@@ -110,10 +110,9 @@ class PipCompileEnvironment(VirtualEnvironment):
                 return
         upgrade_args = []
         upgrade_package_args = []
-        if upgrade is not False:
+        if upgrade:
             upgrade_args.append("--upgrade")
-        if upgrade_packages is not False:
-            upgrade_packages = cast(str, upgrade_packages)
+        if upgrade_packages:
             upgrade_packages_sep = upgrade_packages.split(",")
             for package in upgrade_packages_sep:
                 upgrade_package_args.append(f"--upgrade-package={package.strip()}")
