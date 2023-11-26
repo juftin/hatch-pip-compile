@@ -403,6 +403,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#upgrading-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       Notes
@@ -798,6 +807,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#upgrading-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading Dependencies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
       Notes
@@ -903,9 +921,11 @@ environment needs to be updated. Behind the scenes, this plugin creates a lockfi
 at <code>requirements.txt</code> (non-default lockfiles are located at
 <code>requirements/requirements-{env_name}.txt</code>). Alongside <code>pip-compile</code>, this plugin also
 uses <a href="https://github.com/jazzband/pip-tools">pip-sync</a> to install the dependencies from the lockfile into your environment.</p>
-<p>See <a href="#lock-filename">lock-filename</a> for more information on changing the default
-lockfile paths and <a href="#pip-compile-constraint">pip-compile-constraint</a> for more
-information on syncing dependency versions across environments.</p>
+<ul>
+<li><a href="#lock-filename">lock-filename</a> - changing the default lockfile path</li>
+<li><a href="#pip-compile-constraint">pip-compile-constraint</a> - syncing dependency versions across environments</li>
+<li><a href="#upgrading-dependencies">Upgrading Dependencies</a> - how to upgrade dependencies</li>
+</ul>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>The <a href="https://hatch.pypa.io/latest/plugins/environment/">environment plugin</a> name is <code>pip-compile</code>. Set your environment
 type to <code>pip-compile</code> to use this plugin for the respective environment.</p>
@@ -1125,6 +1145,25 @@ must be set explicitly.</p>
 </code></pre></div>
 </li>
 </ul>
+<h2 id="upgrading-dependencies">Upgrading Dependencies<a class="headerlink" href="#upgrading-dependencies" title="Permanent link">#</a></h2>
+<p>Upgrading all dependencies can be as simple as deleting your lockfile and
+recreating it by reactivating the environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>rm<span class="w"> </span>requirements.txt
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>hatch<span class="w"> </span>env<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span>default<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>--version
+</code></pre></div>
+<p>If you're a user of the <code>--upgrade</code> / <code>--upgrade-package</code> options on <code>pip-compile</code>,
+these features can be enabled on this plugin using the environment variables
+<code>PIP_COMPILE_UPGRADE</code> and <code>PIP_COMPILE_UPGRADE_PACKAGE</code>. When either of these
+environment variables are set <code>hatch</code> will force the lockfile to be upgraded
+whenever the environment is activated.</p>
+<p>To run with <code>upgrade</code> functionality on the <code>default</code> environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">PIP_COMPILE_UPGRADE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>hatch<span class="w"> </span>env<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span>default<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>--version
+</code></pre></div>
+<p>To run with <code>upgrade-package</code> functionality on the <code>docs</code> environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">PIP_COMPILE_UPGRADE_PACKAGE</span><span class="o">=</span><span class="s2">&quot;mkdocs,mkdocs-material&quot;</span><span class="w"> </span>hatch<span class="w"> </span>env<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span>docs<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>--version
+</code></pre></div>
+<p>The above commands call <code>python --version</code> on a particular environment,
+but the same behavior applies to any script that activates the environment.</p>
 <h2 id="notes">Notes<a class="headerlink" href="#notes" title="Permanent link">#</a></h2>
 <h3 id="dev-dependencies">Dev Dependencies<a class="headerlink" href="#dev-dependencies" title="Permanent link">#</a></h3>
 <p>Using the default hatch configuration, dev dependencies listed in your
@@ -1135,11 +1174,11 @@ on your <code>pyproject.toml</code> / <code>hatch.toml</code> file.</p>
 <h3 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">#</a></h3>
 <p>If you want to manually install this plugin instead of adding it to the
 <code>[tool.hatch.env]</code> table, you can do so with <a href="https://github.com/pypa/pipx">pipx</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <p>Alternatively, you can install it with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 
 
