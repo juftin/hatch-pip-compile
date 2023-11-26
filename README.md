@@ -4,7 +4,9 @@
   <img src="https://i.imgur.com/5PboTr9.png" alt="Image" width="250" />
 </p>
 
-[hatch] plugin to use [pip-compile] to manage project dependencies and lockfiles.
+<p align="center">
+<a href="https://hatch.pypa.io/latest/">hatch</a> plugin to use <a href="https://pip-tools.readthedocs.io/en/latest/">pip-compile</a> to manage project dependencies and lockfiles.
+</p>
 
 [![PyPI](https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=🔨%20hatch-pip-compile)](https://github.com/juftin/hatch-pip-compile)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hatch-pip-compile)](https://pypi.python.org/pypi/hatch-pip-compile/)
