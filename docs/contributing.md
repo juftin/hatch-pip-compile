@@ -10,7 +10,7 @@
     see their [documentation](https://pypa.github.io/pipx/installation/).
     If you prefer not to use `pipx`, you can use `pip` instead.
 
-1.  Install [hatch](https://hatch.pypa.io/latest/)
+1.  Install [hatch](https://github.com/pypa/hatch)
 
     ```shell
     pipx install hatch
@@ -41,15 +41,13 @@
 
 ### Hatch Cheat Sheet
 
-| Command Description            | Command                     | Notes                                                      |
-| ------------------------------ | --------------------------- | ---------------------------------------------------------- |
-| Run Formatting                 | `hatch run lint:fmt`        | Runs `ruff` code formatter                                 |
-| Run Linting                    | `hatch run lint:all`        | Runs `ruff` and `mypy` linters / type checkers             |
-| Run Type Checking              | `hatch run lint:typing`     | Runs `mypy` type checker                                   |
-| Update Requirements Lock Files | `hatch run gen:reqs`        | Updating lock file using `pip-compile`                     |
-| Upgrade Dependencies           | `hatch run gen:reqs-update` | Updating lock file using `pip-compile` and `--update` flag |
-| Serve the Documentation        | `hatch run docs:serve`      | Serve the documentation using MkDocs                       |
-| Run the `pre-commit` Hooks     | `hatch run lint:precommit`  | Runs the `pre-commit` hooks on all files                   |
+| Command Description        | Command                    | Notes                                          |
+| -------------------------- | -------------------------- | ---------------------------------------------- |
+| Run Formatting             | `hatch run lint:fmt`       | Runs `ruff` code formatter                     |
+| Run Linting                | `hatch run lint:all`       | Runs `ruff` and `mypy` linters / type checkers |
+| Run Type Checking          | `hatch run lint:typing`    | Runs `mypy` type checker                       |
+| Serve the Documentation    | `hatch run docs:serve`     | Serve the documentation using MkDocs           |
+| Run the `pre-commit` Hooks | `hatch run lint:precommit` | Runs the `pre-commit` hooks on all files       |
 
 ### Hatch Explanation
 

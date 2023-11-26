@@ -1,15 +1,25 @@
-# hatch-pip-compile
+<h1 align="center">hatch-pip-compile</h1>
 
-[hatch] plugin to use [pip-compile] to manage project dependencies and lockfiles.
+<div align="center">
+  <a href="https://github.com/juftin/hatch-pip-compile">
+    <img src="docs/logo.png" alt="hatch-pip-compile" width="250" />
+  </a>
+</div>
 
-[![PyPI](https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=🔨%20hatch-pip-compile)](https://github.com/juftin/hatch-pip-compile)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hatch-pip-compile)](https://pypi.python.org/pypi/hatch-pip-compile/)
-[![GitHub License](https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&label=License)](https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE)
-[![Hatch project](https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg)](https://github.com/pypa/hatch)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.dev)
+<p align="center">
+<a href="https://github.com/pypa/hatch">hatch</a> plugin to use <a href="https://github.com/jazzband/pip-tools">pip-compile</a> to manage project dependencies and lockfiles.
+</p>
+
+<p align="center">
+  <a href="https://github.com/juftin/hatch-pip-compile"><img src="https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=%F0%9F%94%A8%20hatch-pip-compile" alt="PyPI"></a>
+  <a href="https://pypi.python.org/pypi/hatch-pip-compile/"><img src="https://img.shields.io/pypi/pyversions/hatch-pip-compile" alt="PyPI - Python Version"></a>
+  <a href="https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE"><img src="https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&label=License" alt="GitHub License"></a>
+  <a href="https://github.com/pypa/hatch"><img src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg" alt="Hatch project"></a>
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
+  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit" alt="pre-commit"></a>
+  <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>
+  <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
+</p>
 
 ## Installation
 
@@ -298,18 +308,10 @@ pip install hatch hatch-pip-compile
 
 #### See the [Changelog]
 
----
-
----
-
-<br/>
-
-<p align="center"><a href="https://github.com/juftin"><img src="https://raw.githubusercontent.com/juftin/juftin/main/static/juftin.png" width="120" height="120" alt="logo"></p>
-
-[pip-compile]: https://pip-tools.readthedocs.io/en/latest/
-[pip-sync]: https://pip-tools.readthedocs.io/en/latest/
-[hatch]: https://hatch.pypa.io/latest/
-[pipx]: https://pipxproject.github.io/pipx/
+[pip-compile]: https://github.com/jazzband/pip-tools
+[pip-sync]: https://github.com/jazzband/pip-tools
+[hatch]: https://github.com/pypa/hatch
+[pipx]: https://github.com/pypa/pipx
 [Docs]: https://juftin.github.io/hatch-pip-compile/
 [Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases
