@@ -2,7 +2,8 @@
 
 site_name: hatch-pip-compile
 nav:
-    - index.md
+    - Home 🏠: index.md
+    - API Documentation 🤖: reference/
     - Contributing 🤝: contributing.md
 theme:
     favicon: https://juftin.com/favicon.ico
@@ -12,7 +13,6 @@ theme:
         - navigation.tracking
         - content.code.annotate
         - content.code.copy
-        - navigation.indexes
     palette:
         - media: "(prefers-color-scheme: light)"
           scheme: default
@@ -59,3 +59,18 @@ markdown_extensions:
 plugins:
     - search
     - markdown-exec
+    - gen-files:
+          scripts:
+              - docs/gen_ref_pages.py
+    - literate-nav:
+          nav_file: SUMMARY.md
+    - section-index
+    - mkdocstrings:
+          handlers:
+              python:
+                  import:
+                      - https://docs.python.org/3/objects.inv
+                      - https://numpy.org/doc/stable/objects.inv
+                      - https://pandas.pydata.org/docs/objects.inv
+                  options:
+                      docstring_style: numpy

@@ -1,4 +1,8 @@
-# hatch-pip-compile
+<h1 align="center">hatch-pip-compile</h1>
+
+<p align="center">
+  <img src="https://i.imgur.com/5PboTr9.png" alt="Image" width="250" />
+</p>
 
 [hatch] plugin to use [pip-compile] to manage project dependencies and lockfiles.
 

@@ -73,10 +73,13 @@ type = "pip-compile"
 
 [tool.hatch.envs.docs]
 dependencies = [
-  "mkdocs~=1.5.2",
-  "mkdocs-material~=9.2.3",
-  "mkdocstrings~=0.22.0",
-  "markdown-exec[ansi]~=1.6.0"
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
+  "markdown-exec[ansi]",
+  "mkdocs-gen-files",
+  "mkdocs-literate-nav",
+  "mkdocs-section-index"
 ]
 type = "pip-compile"
 
