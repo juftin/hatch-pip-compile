@@ -1,8 +1,10 @@
 <h1 align="center">hatch-pip-compile</h1>
 
-<p align="center">
-  <img src="docs/logo.png" alt="Image" width="250" />
-</p>
+<div align="center">
+  <a href="https://github.com/juftin/hatch-pip-compile">
+    <img src="docs/logo.png" alt="hatch-pip-compile" width="250" />
+  </a>
+</div>
 
 <p align="center">
 <a href="https://hatch.pypa.io/latest/">hatch</a> plugin to use <a href="https://pip-tools.readthedocs.io/en/latest/">pip-compile</a> to manage project dependencies and lockfiles.
