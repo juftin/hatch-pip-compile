@@ -10,7 +10,7 @@
     see their [documentation](https://pypa.github.io/pipx/installation/).
     If you prefer not to use `pipx`, you can use `pip` instead.
 
-1.  Install [hatch](https://hatch.pypa.io/latest/)
+1.  Install [hatch](https://github.com/pypa/hatch)
 
     ```shell
     pipx install hatch

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<a href="https://hatch.pypa.io/latest/">hatch</a> plugin to use <a href="https://pip-tools.readthedocs.io/en/latest/">pip-compile</a> to manage project dependencies and lockfiles.
+<a href="https://github.com/pypa/hatch">hatch</a> plugin to use <a href="https://github.com/jazzband/pip-tools">pip-compile</a> to manage project dependencies and lockfiles.
 </p>
 
 <p align="center">
@@ -296,18 +296,10 @@ Alternatively, you can install it with [pip]:
 pip install hatch hatch-pip-compile
 ```
 
----
-
----
-
-<br/>
-
-<p align="center"><a href="https://github.com/juftin"><img src="https://raw.githubusercontent.com/juftin/juftin/main/static/juftin.png" width="120" height="120" alt="logo"></p>
-
-[pip-compile]: https://pip-tools.readthedocs.io/en/latest/
-[pip-sync]: https://pip-tools.readthedocs.io/en/latest/
-[hatch]: https://hatch.pypa.io/latest/
-[pipx]: https://pipxproject.github.io/pipx/
+[pip-compile]: https://github.com/jazzband/pip-tools
+[pip-sync]: https://github.com/jazzband/pip-tools
+[hatch]: https://github.com/pypa/hatch
+[pipx]: https://github.com/pypa/pipx
 [Docs]: https://juftin.github.io/hatch-pip-compile/
 [Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases
