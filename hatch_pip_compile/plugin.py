@@ -56,6 +56,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             env_name=self.name,
             project_name=self.metadata.name,
         )
+        self.__lockfile_up_to_date: Optional[bool] = None
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -82,7 +83,8 @@ class PipCompileEnvironment(VirtualEnvironment):
             self.virtual_env.platform.check_command(
                 self.construct_pip_install_command(["pip-tools"])
             )
-            self._pip_compile_cli()
+            if not self.lockfile_up_to_date:
+                self._pip_compile_cli()
             self._pip_sync_cli()
         if not self.skip_install:
             if self.dev_mode:
@@ -127,7 +129,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
             cmd.append(str(input_file))
-            self._piptools_lock_file.parent.mkdir(exist_ok=True)
+            self._piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
             input_file.write_text("\n".join([*self.dependencies, ""]))
             self.virtual_env.platform.check_command(cmd)
         self.piptools_lock.process_lock()
@@ -143,9 +145,6 @@ class PipCompileEnvironment(VirtualEnvironment):
         _ = self.piptools_lock.compare_python_versions(
             verbose=self.config.get("pip-compile-verbose", None)
         )
-        if len(self.dependencies) == 0:
-            if self._piptools_lock_file.exists() is True:
-                self._piptools_lock_file.write_text("")
         cmd = [
             self.virtual_env.python_info.executable,
             "-m",
@@ -156,8 +155,10 @@ class PipCompileEnvironment(VirtualEnvironment):
             str(self.virtual_env.python_info.executable),
             str(self._piptools_lock_file),
         ]
+        if not self.dependencies:
+            self._piptools_lock_file.write_text("")
         self.virtual_env.platform.check_command(cmd)
-        if len(self.dependencies) == 0:
+        if not self.dependencies:
             self._piptools_lock_file.unlink()
 
     def install_project(self):
@@ -178,58 +179,72 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         self._hatch_pip_compile_install()
 
-    def dependencies_in_sync(self) -> bool:
+    def _check_lockfile_up_to_date(self) -> bool:
         """
-        Whether the environment is in sync
+        Check if the lockfile is up-to-date
 
         Behavior
         --------
-        1) If there are no dependencies and no lock file, return True.
-        2) Validate the constraint lock file if it exists - raise an error if
-           checks fail. This is done before any other clauses bypass the
-           check return True.
-        3) If there are no dependencies and a lock file, return False.
-           In this case, the lock file will be deleted and environment
-           wiped.
-        4) If there are dependencies and no lock file, return False.
+        1) If there are no dependencies and no lock file, exit early.
+        2) If there are no dependencies and a lock file, return False.
+        3) If there are dependencies and no lock file, return False.
+        4) If a force upgrade is requested, return False.
         5) If there are dependencies and a lock file...
-            a) If the lock file dependencies aren't current, return False.
-            b) If the lock file dependencies are current and the lockfile
+            a) If there is a constraint file...
+                i) Validate the file and raise an error if it is out of date.
+                ii) If the file is valid but the SHA is different, return False.
+            b) If the lock file dependencies aren't current, return False.
+            c) If the lock file dependencies are current but the lockfile
                has a different sha than its constraints file, return False.
-        6) Finally, if all other checks pass, use the built-in hatch behavior
-           to check if the environment is in sync by checking the actual
-           virtual environment.
+        6) Otherwise, return True.
         """
         upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
         force_upgrade = upgrade is not False or upgrade_packages is not False
         if not self.dependencies and not self._piptools_lock_file.exists():
             return True
-        constraints_file = self.piptools_constraints_file
-        if constraints_file:
-            constraint_name = self.config.get("pip-compile-constraint")
-            constraint_env = self.get_piptools_environment(environment_name=constraint_name)
-            constraint_env.piptools_validate_lock(
-                constraints_file=constraints_file, environment=constraint_env
-            )
-        if self.dependencies == 0 and self._piptools_lock_file.exists() is True:
+        elif self.dependencies == 0 and self._piptools_lock_file.exists():
             return False
         elif force_upgrade:
             return False
         elif self.dependencies and not self._piptools_lock_file.exists():
             return False
         elif self.dependencies and self._piptools_lock_file.exists():
+            constraints_file = self.piptools_constraints_file
+            if constraints_file:
+                constraint_name = self.config.get("pip-compile-constraint")
+                constraint_env = self.get_piptools_environment(environment_name=constraint_name)
+                constraint_env.piptools_validate_lock(
+                    constraints_file=constraints_file, environment=constraint_env
+                )
+                current_sha = hashlib.sha256(constraints_file.read_bytes()).hexdigest()
+                sha_match = self.piptools_lock.compare_constraint_sha(sha=current_sha)
+                if sha_match is False:
+                    return False
             expected_dependencies = self.piptools_lock.compare_requirements(
                 requirements=self.dependencies_complex
             )
             if not expected_dependencies:
                 return False
-            elif constraints_file is not None:
-                current_sha = hashlib.sha256(constraints_file.read_bytes()).hexdigest()
-                sha_match = self.piptools_lock.compare_constraint_sha(sha=current_sha)
-                if sha_match is False:
-                    return False
-        return super().dependencies_in_sync()
+        return True
+
+    @property
+    def lockfile_up_to_date(self) -> bool:
+        """
+        Whether the lockfile is up-to-date
+        """
+        if self.__lockfile_up_to_date is None:
+            self.__lockfile_up_to_date = self._check_lockfile_up_to_date()
+        return self.__lockfile_up_to_date
+
+    def dependencies_in_sync(self):
+        """
+        Whether the dependencies are in sync
+        """
+        if not self.lockfile_up_to_date:
+            return False
+        else:
+            return super().dependencies_in_sync()
 
     def sync_dependencies(self):
         """
