@@ -6,6 +6,7 @@ import hashlib
 import logging
 import os
 import pathlib
+import shutil
 import tempfile
 from typing import Any, Dict, List, Optional
 
@@ -114,8 +115,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
             "--strip-extras",
             "--no-header",
-            "--output-file",
-            str(self._piptools_lock_file),
             "--resolver=backtracking",
         ]
         if self.config.get("pip-compile-hashes", True) is True:
@@ -128,11 +127,15 @@ class PipCompileEnvironment(VirtualEnvironment):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
-            cmd.append(str(input_file))
-            self._piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
+            output_file = tmp_path / "lock.txt"
+            cmd.extend(["--output-file", str(output_file), str(input_file)])
             input_file.write_text("\n".join([*self.dependencies, ""]))
+            if self._piptools_lock_file.exists():
+                shutil.copy(self._piptools_lock_file, output_file)
+            self._piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
             self.virtual_env.platform.check_command(cmd)
-        self.piptools_lock.process_lock()
+            self.piptools_lock.process_lock(lockfile=output_file)
+            shutil.move(output_file, self._piptools_lock_file)
 
     def _pip_sync_cli(self) -> None:
         """

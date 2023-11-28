@@ -33,7 +33,7 @@ class PipCompileLock:
     project_name: str
     virtualenv: Optional[VirtualEnv] = None
 
-    def process_lock(self) -> None:
+    def process_lock(self, lockfile: pathlib.Path) -> None:
         """
         Post process lockfile
         """
@@ -45,7 +45,7 @@ class PipCompileLock:
         """
         prefix = dedent(raw_prefix).strip()
         joined_dependencies = "\n".join([f"# - {dep}" for dep in self.dependencies])
-        lockfile_text = self.lock_file.read_text()
+        lockfile_text = lockfile.read_text()
         cleaned_input_file = re.sub(
             rf"-r \S*/{self.env_name}\.in",
             f"hatch.envs.{self.env_name}",
@@ -55,7 +55,7 @@ class PipCompileLock:
             constraint_sha = hashlib.sha256(self.constraints_file.read_bytes()).hexdigest()
             constraints_path = self.constraints_file.relative_to(self.project_root)
             constraints_lines = [
-                f"# [constraints] {constraints_path}",
+                f"# [constraints]: {constraints_path}",
                 f"# [constraints-sha]: {constraint_sha}",
             ]
             joined_dependencies = "\n".join([*constraints_lines, "#", joined_dependencies])
@@ -66,7 +66,7 @@ class PipCompileLock:
             )
         prefix += "\n" + joined_dependencies + "\n#"
         new_text = prefix + "\n\n" + cleaned_input_file
-        self.lock_file.write_text(new_text)
+        lockfile.write_text(new_text)
 
     def read_requirements(self) -> List[Requirement]:
         """
