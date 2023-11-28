@@ -54,11 +54,8 @@ class PipCompileLock:
         if self.constraints_file is not None:
             constraint_sha = hashlib.sha256(self.constraints_file.read_bytes()).hexdigest()
             constraints_path = self.constraints_file.relative_to(self.project_root)
-            constraints_lines = [
-                f"# [constraints]: {constraints_path}",
-                f"# [constraints-sha]: {constraint_sha}",
-            ]
-            joined_dependencies = "\n".join([*constraints_lines, "#", joined_dependencies])
+            constraints_line = f"# [constraints] {constraints_path} (SHA256: {constraint_sha})"
+            joined_dependencies = "\n".join([constraints_line, "#", joined_dependencies])
             cleaned_input_file = re.sub(
                 r"-c \S*",
                 f"-c {constraints_path}",
@@ -149,7 +146,7 @@ class PipCompileLock:
         Compare SHA to the SHA on the lockfile
         """
         lock_file_text = self.lock_file.read_text()
-        match = re.search(r"# \[constraints-sha\]: (.*)", lock_file_text)
+        match = re.search(r"# \[constraints\] \S* \(SHA256: (.*)\)", lock_file_text)
         if match is None:
             return False
         return match.group(1).strip() == sha.strip()
