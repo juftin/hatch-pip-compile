@@ -2,6 +2,7 @@
 hatch-pip-compile header operations
 """
 
+import hashlib
 import logging
 import pathlib
 import re
@@ -51,9 +52,13 @@ class PipCompileLock:
             lockfile_text,
         )
         if self.constraints_file is not None:
+            constraint_sha = hashlib.sha256(self.constraints_file.read_bytes()).hexdigest()
             constraints_path = self.constraints_file.relative_to(self.project_root)
-            constraints_line = f"# [constraints] {constraints_path}"
-            joined_dependencies = "\n".join([constraints_line, "#", joined_dependencies])
+            constraints_lines = [
+                f"# [constraints] {constraints_path}",
+                f"# [constraints-sha]: {constraint_sha}",
+            ]
+            joined_dependencies = "\n".join([*constraints_lines, "#", joined_dependencies])
             cleaned_input_file = re.sub(
                 r"-c \S*",
                 f"-c {constraints_path}",
@@ -138,3 +143,13 @@ class PipCompileLock:
         """
         lock_requirements = self.read_requirements()
         return set(requirements) == set(lock_requirements)
+
+    def compare_constraint_sha(self, sha: str) -> bool:
+        """
+        Compare SHA to the SHA on the lockfile
+        """
+        lock_file_text = self.lock_file.read_text()
+        match = re.search(r"# \[constraints-sha\]: (.*)", lock_file_text)
+        if match is None:
+            return False
+        return match.group(1).strip() == sha.strip()

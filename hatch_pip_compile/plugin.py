@@ -2,6 +2,7 @@
 hatch-pip-compile plugin
 """
 
+import hashlib
 import logging
 import os
 import pathlib
@@ -89,25 +90,12 @@ class PipCompileEnvironment(VirtualEnvironment):
             else:
                 super().install_project()
 
-    def _pip_compile_command(self, output_file: pathlib.Path, input_file: pathlib.Path) -> None:
+    def _pip_compile_cli(self) -> None:
         """
         Run pip-compile
         """
         upgrade = bool(os.getenv("PIP_COMPILE_UPGRADE"))
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or None
-        force_upgrade = upgrade or upgrade_packages
-        if self._piptools_lock_file.exists() is True and force_upgrade:
-            correct_environment = self.piptools_lock.compare_requirements(
-                requirements=self.dependencies_complex
-            )
-            if correct_environment is True and self.piptools_constraints_file is not None:
-                constraints_env = self.config["pip-compile-constraint"]
-                environment = self.get_piptools_environment(environment_name=constraints_env)
-                correct_environment = environment.piptools_lock.compare_requirements(
-                    requirements=environment.dependencies_complex
-                )
-            if correct_environment is True:
-                return
         upgrade_args = []
         upgrade_package_args = []
         if upgrade:
@@ -125,7 +113,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "--strip-extras",
             "--no-header",
             "--output-file",
-            str(output_file),
+            str(self._piptools_lock_file),
             "--resolver=backtracking",
         ]
         if self.config.get("pip-compile-hashes", True) is True:
@@ -135,37 +123,29 @@ class PipCompileEnvironment(VirtualEnvironment):
         cmd.extend(self.config.get("pip-compile-args", []))
         cmd.extend(upgrade_args)
         cmd.extend(upgrade_package_args)
-        cmd.append(str(input_file))
-        self.virtual_env.platform.check_command(cmd)
-        self.piptools_lock.process_lock()
-
-    def _pip_compile_cli(self) -> None:
-        """
-        Run pip-compile
-        """
-        upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
-        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
-        force_upgrade = upgrade is not False or upgrade_packages is not False
-        if self._piptools_lock_file.exists() is True and force_upgrade is False:
-            matched_dependencies = self.piptools_lock.compare_requirements(
-                requirements=self.dependencies_complex
-            )
-            if matched_dependencies is True:
-                return
-        self._piptools_lock_file.parent.mkdir(exist_ok=True)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
+            cmd.append(str(input_file))
+            self._piptools_lock_file.parent.mkdir(exist_ok=True)
             input_file.write_text("\n".join([*self.dependencies, ""]))
-            self._pip_compile_command(output_file=self._piptools_lock_file, input_file=input_file)
+            self.virtual_env.platform.check_command(cmd)
+        self.piptools_lock.process_lock()
 
     def _pip_sync_cli(self) -> None:
         """
-        Run pip-sync
+        run pip-sync
+
+        In the event that a lockfile exists, but there are no dependencies,
+        pip-sync will uninstall everything in the environment before
+        deleting the lockfile.
         """
         _ = self.piptools_lock.compare_python_versions(
             verbose=self.config.get("pip-compile-verbose", None)
         )
+        if len(self.dependencies) == 0:
+            if self._piptools_lock_file.exists() is True:
+                self._piptools_lock_file.write_text("")
         cmd = [
             self.virtual_env.python_info.executable,
             "-m",
@@ -177,6 +157,8 @@ class PipCompileEnvironment(VirtualEnvironment):
             str(self._piptools_lock_file),
         ]
         self.virtual_env.platform.check_command(cmd)
+        if len(self.dependencies) == 0:
+            self._piptools_lock_file.unlink()
 
     def install_project(self):
         """
@@ -196,23 +178,57 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         self._hatch_pip_compile_install()
 
-    def dependencies_in_sync(self):
+    def dependencies_in_sync(self) -> bool:
         """
-        Handle whether dependencies should be synced
+        Whether the environment is in sync
+
+        Behavior
+        --------
+        1) If there are no dependencies and no lock file, return True.
+        2) Validate the constraint lock file if it exists - raise an error if
+           checks fail. This is done before any other clauses bypass the
+           check return True.
+        3) If there are no dependencies and a lock file, return False.
+           In this case, the lock file will be deleted and environment
+           wiped.
+        4) If there are dependencies and no lock file, return False.
+        5) If there are dependencies and a lock file...
+            a) If the lock file dependencies aren't current, return False.
+            b) If the lock file dependencies are current and the lockfile
+               has a different sha than its constraints file, return False.
+        6) Finally, if all other checks pass, use the built-in hatch behavior
+           to check if the environment is in sync by checking the actual
+           virtual environment.
         """
         upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
         force_upgrade = upgrade is not False or upgrade_packages is not False
-        if force_upgrade is True:
+        if not self.dependencies and not self._piptools_lock_file.exists():
+            return True
+        constraints_file = self.piptools_constraints_file
+        if constraints_file:
+            constraint_name = self.config.get("pip-compile-constraint")
+            constraint_env = self.get_piptools_environment(environment_name=constraint_name)
+            constraint_env.piptools_validate_lock(
+                constraints_file=constraints_file, environment=constraint_env
+            )
+        if self.dependencies == 0 and self._piptools_lock_file.exists() is True:
             return False
-        if len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is False):
+        elif force_upgrade:
             return False
-        elif len(self.dependencies) > 0 and (self._piptools_lock_file.exists() is True):
-            expected_locks = self.piptools_lock.compare_requirements(
+        elif self.dependencies and not self._piptools_lock_file.exists():
+            return False
+        elif self.dependencies and self._piptools_lock_file.exists():
+            expected_dependencies = self.piptools_lock.compare_requirements(
                 requirements=self.dependencies_complex
             )
-            if expected_locks is False:
+            if not expected_dependencies:
                 return False
+            elif constraints_file is not None:
+                current_sha = hashlib.sha256(constraints_file.read_bytes()).hexdigest()
+                sha_match = self.piptools_lock.compare_constraint_sha(sha=current_sha)
+                if sha_match is False:
+                    return False
         return super().dependencies_in_sync()
 
     def sync_dependencies(self):
@@ -237,9 +253,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             constraints_file = None
         else:
             constraints_file = environment._piptools_lock_file
-        environment.piptools_validate_lock(
-            constraints_file=constraints_file, environment=environment
-        )
         return constraints_file
 
     def get_piptools_environment(self, environment_name: str) -> "PipCompileEnvironment":
@@ -268,15 +281,15 @@ class PipCompileEnvironment(VirtualEnvironment):
         )
 
     def piptools_validate_lock(
-        self, constraints_file: Optional[pathlib.Path], environment: "PipCompileEnvironment"
+        self, constraints_file: pathlib.Path, environment: "PipCompileEnvironment"
     ) -> None:
         """
         Validate the lock file
 
         Parameters
         ----------
-        constraints_file : Optional[pathlib.Path]
-            The optional lock file
+        constraints_file : pathlib.Path
+            The lock file
         environment : PipCompileEnvironment
             The environment to validate against
 
@@ -287,9 +300,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         HatchPipCompileError
             If the lock file is out of date
         """
-        if constraints_file is None:
-            return
-        elif not constraints_file.exists():
+        if not constraints_file.exists():
             error_message = (
                 f"[hatch-pip-compile] The lock file {constraints_file} does not exist. "
                 f"Please create it: `hatch env create {environment.name}`"
