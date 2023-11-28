@@ -313,14 +313,13 @@ on your `pyproject.toml` / `hatch.toml` file.
 
 ### Disabling Changes to the Lockfile
 
-In some scenarios, like in CI/CD you want the tool to manage the installation
-of an environment, but you don't want the lockfile to be or changed without
-knowing. If you set the `PIP_COMPILE_DISABLED` environment variable to
-any value, the plugin will raise an error if it detects that the lockfile
-needs to be updated.
+In some scenarios, like in CI/CD, you may want to prevent the plugin from
+making changes to the lockfile. If you set the `PIP_COMPILE_DISABLE`
+environment variable to any non-empty value, the plugin will raise an error
+if it detects that the lockfile needs to be updated.
 
 ```shell
-PIP_COMPILE_DISABLED=1 hatch env run python --version
+PIP_COMPILE_DISABLE=1 hatch env run python --version
 ```
 
 ### Manual Installation
