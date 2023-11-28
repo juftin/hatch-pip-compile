@@ -750,12 +750,14 @@ make sure to install pre-commit as well: <code>pipx install pre-commit</code></p
 </code></pre></div>
 </li>
 <li>
-<p>If you need to, you can link hatch's virtual environment to your IDE.
-    It's located in the <code>.venv</code> directory at the root of the project.</p>
+<p>If you need to, you can link a hatch virtual environment to your IDE.
+    They can be located by name with the <code>env find</code> command:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>hatch<span class="w"> </span>env<span class="w"> </span>find<span class="w"> </span>default
+</code></pre></div>
 </li>
 <li>
 <p>Activate the Virtual Environment</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>hatch<span class="w"> </span>shell
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>hatch<span class="w"> </span>shell
 </code></pre></div>
 </li>
 </ol>
@@ -886,12 +888,12 @@ To see the commands for a specific environment, run:</p>
 </ul>
 <p>The one that we're interested in is <code>cov</code>, which will run the tests
 for the project.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>cov
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>cov
 </code></pre></div>
 <p>Since <code>cov</code> is in the default environment, we can run it without
 specifying the environment. However, to run the <code>serve</code> command in the
 <code>docs</code> environment, we need to specify the environment:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>hatch<span class="w"> </span>run<span class="w"> </span>docs:serve
 </code></pre></div>
 <p>You can see what scripts are available using the <code>env show</code> command</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="exec-3--__tabbed_1_1" name="exec-3--__tabbed_1" type="radio" /><input id="exec-3--__tabbed_1_2" name="exec-3--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="exec-3--__tabbed_1_1">hatch CLI</label><label for="exec-3--__tabbed_1_2">Output</label></div>
@@ -974,22 +976,22 @@ commit message emoji prefixes are the only ones to trigger new releases:</p>
 <p>Most features can be squash merged into a single commit on a pull-request.
 When merging multiple commits, they will be summarized into a single release.</p>
 <p>If you're working on a new feature, your commit message might look like:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>✨ New Feature Description
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>✨ New Feature Description
 </code></pre></div>
 <p>Bug fix commits would look like this:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>🐛 Bug Fix Description
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>🐛 Bug Fix Description
 </code></pre></div>
 <p>If you're working on a feature that introduces breaking changes, your
 commit message might look like:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>💥 Breaking Change Description
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>💥 Breaking Change Description
 </code></pre></div>
 <p>Other commits that don't trigger a release, but get included in the
 release notes might look like:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>📝 Documentation Update Description
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>👷 CI/CD Update Description
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>🧪 Testing Changes Description
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>🚚 Moving/Renaming Description
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>⬆️ Dependency Upgrade Description
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>📝 Documentation Update Description
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>👷 CI/CD Update Description
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>🧪 Testing Changes Description
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>🚚 Moving/Renaming Description
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>⬆️ Dependency Upgrade Description
 </code></pre></div>
 <h3 id="pre-releases">Pre-Releases<a class="headerlink" href="#pre-releases" title="Permanent link">#</a></h3>
 <p><a href="https://github.com/semantic-release/semantic-release">semantic-release</a> supports pre-releases. To trigger a pre-release, you
