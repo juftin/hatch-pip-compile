@@ -2,6 +2,7 @@
 hatch-pip-compile plugin
 """
 
+import functools
 import hashlib
 import logging
 import os
@@ -27,8 +28,6 @@ class PipCompileEnvironment(VirtualEnvironment):
     PLUGIN_NAME = "pip-compile"
 
     default_env_name = "default"
-    __lockfile_up_to_date: Optional[bool] = None
-    __constraint_env: Optional["PipCompileEnvironment"] = None
 
     def __repr__(self):
         """
@@ -240,14 +239,13 @@ class PipCompileEnvironment(VirtualEnvironment):
                 return False
         return True
 
-    @property
+    @functools.cached_property
     def lockfile_up_to_date(self) -> bool:
         """
         Whether the lockfile is up-to-date
         """
-        if self.__lockfile_up_to_date is None:
-            self.__lockfile_up_to_date = self._check_lockfile_up_to_date()
-        return self.__lockfile_up_to_date
+        up_to_date = self._check_lockfile_up_to_date()
+        return up_to_date
 
     def dependencies_in_sync(self):
         """
@@ -267,7 +265,7 @@ class PipCompileEnvironment(VirtualEnvironment):
     @property
     def piptools_constraints_file(self) -> Optional[pathlib.Path]:
         """
-        Get default lock file
+        Get the constraint file path
         """
         if self.constraint_env.name == self.name:
             return None
@@ -299,29 +297,22 @@ class PipCompileEnvironment(VirtualEnvironment):
             app=None,
         )
 
-    @property
+    @functools.cached_property
     def constraint_env(self) -> "PipCompileEnvironment":
         """
         Get the constraint environment
         """
-        if not self.__constraint_env:
-            constraint_env = self.config.get("pip-compile-constraint")
-            if constraint_env is None:
-                self.__constraint_env = self
-                return self.__constraint_env
-            elif self.name == constraint_env:
-                self.__constraint_env = self
-                return self.__constraint_env
-            environment = self.get_piptools_environment(environment_name=constraint_env)
-            if environment.config.get("type") != self.PLUGIN_NAME:
-                logger.error("The constraint environment is not a hatch-pip-compile environment.")
-                self.__constraint_env = self
-                return self.__constraint_env
-            else:
-                self.__constraint_env = environment
-                return self.__constraint_env
+        constraint_env = self.config.get("pip-compile-constraint")
+        if constraint_env is None:
+            return self
+        elif self.name == constraint_env:
+            return self
+        environment = self.get_piptools_environment(environment_name=constraint_env)
+        if environment.config.get("type") != self.PLUGIN_NAME:
+            logger.error("The constraint environment is not a hatch-pip-compile environment.")
+            return self
         else:
-            return self.__constraint_env
+            return environment
 
     def validate_constraints_file(
         self, constraints_file: pathlib.Path, environment: "PipCompileEnvironment"
