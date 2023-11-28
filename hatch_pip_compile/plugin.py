@@ -188,7 +188,8 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         self._hatch_pip_compile_install()
 
-    def _check_lockfile_up_to_date(self) -> bool:
+    @functools.cached_property
+    def lockfile_up_to_date(self) -> bool:
         """
         Check if the lockfile is up-to-date
 
@@ -238,14 +239,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             if not expected_dependencies:
                 return False
         return True
-
-    @functools.cached_property
-    def lockfile_up_to_date(self) -> bool:
-        """
-        Whether the lockfile is up-to-date
-        """
-        up_to_date = self._check_lockfile_up_to_date()
-        return up_to_date
 
     def dependencies_in_sync(self):
         """
