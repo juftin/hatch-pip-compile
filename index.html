@@ -431,6 +431,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#disabling-changes-to-the-lockfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling Changes to the Lockfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#manual-installation" class="md-nav__link">
     <span class="md-ellipsis">
       Manual Installation
@@ -835,6 +844,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#disabling-changes-to-the-lockfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling Changes to the Lockfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#manual-installation" class="md-nav__link">
     <span class="md-ellipsis">
       Manual Installation
@@ -1171,14 +1189,21 @@ but the same behavior applies to any script that activates the environment.</p>
 (<code>requirements.txt</code>). If you want to remove your dev dependencies
 from the lockfile you must remove them from the <code>default</code> environment
 on your <code>pyproject.toml</code> / <code>hatch.toml</code> file.</p>
+<h3 id="disabling-changes-to-the-lockfile">Disabling Changes to the Lockfile<a class="headerlink" href="#disabling-changes-to-the-lockfile" title="Permanent link">#</a></h3>
+<p>In some scenarios, like in CI/CD, you may want to prevent the plugin from
+making changes to the lockfile. If you set the <code>PIP_COMPILE_DISABLE</code>
+environment variable to any non-empty value, the plugin will raise an error
+if it detects that the lockfile needs to be updated.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">PIP_COMPILE_DISABLE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>hatch<span class="w"> </span>env<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>--version
+</code></pre></div>
 <h3 id="manual-installation">Manual Installation<a class="headerlink" href="#manual-installation" title="Permanent link">#</a></h3>
 <p>If you want to manually install this plugin instead of adding it to the
 <code>[tool.hatch.env]</code> table, you can do so with <a href="https://github.com/pypa/pipx">pipx</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
-<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 <p>Alternatively, you can install it with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 
 
