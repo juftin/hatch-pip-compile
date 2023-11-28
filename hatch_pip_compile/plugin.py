@@ -323,7 +323,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         Returns
         -------
         bool
-            Whether the lock file is valid
+            Whether the constraints file is valid
         """
         if not constraints_file.exists():
             self.constraint_env._hatch_pip_compile_install()
