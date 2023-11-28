@@ -313,6 +313,17 @@ Using the default hatch configuration, dev dependencies listed in your
 from the lockfile you must remove them from the `default` environment
 on your `pyproject.toml` / `hatch.toml` file.
 
+### Disabling Changes to the Lockfile
+
+In some scenarios, like in CI/CD, you may want to prevent the plugin from
+making changes to the lockfile. If you set the `PIP_COMPILE_DISABLE`
+environment variable to any non-empty value, the plugin will raise an error
+if it detects that the lockfile needs to be updated.
+
+```shell
+PIP_COMPILE_DISABLE=1 hatch env run python --version
+```
+
 ### Manual Installation
 
 If you want to manually install this plugin instead of adding it to the

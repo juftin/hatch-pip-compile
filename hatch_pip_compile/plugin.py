@@ -97,6 +97,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
+        no_compile = bool(os.getenv("PIP_COMPILE_DISABLE"))
+        if no_compile:
+            msg = "hatch-pip-compile is disabled but attempted to run a lockfile update."
+            raise HatchPipCompileError(msg)
         upgrade = bool(os.getenv("PIP_COMPILE_UPGRADE"))
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or None
         upgrade_args = []
