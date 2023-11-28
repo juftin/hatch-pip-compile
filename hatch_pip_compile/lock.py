@@ -2,6 +2,7 @@
 hatch-pip-compile header operations
 """
 
+import hashlib
 import logging
 import pathlib
 import re
@@ -32,7 +33,7 @@ class PipCompileLock:
     project_name: str
     virtualenv: Optional[VirtualEnv] = None
 
-    def process_lock(self) -> None:
+    def process_lock(self, lockfile: pathlib.Path) -> None:
         """
         Post process lockfile
         """
@@ -44,15 +45,16 @@ class PipCompileLock:
         """
         prefix = dedent(raw_prefix).strip()
         joined_dependencies = "\n".join([f"# - {dep}" for dep in self.dependencies])
-        lockfile_text = self.lock_file.read_text()
+        lockfile_text = lockfile.read_text()
         cleaned_input_file = re.sub(
             rf"-r \S*/{self.env_name}\.in",
             f"hatch.envs.{self.env_name}",
             lockfile_text,
         )
         if self.constraints_file is not None:
+            constraint_sha = hashlib.sha256(self.constraints_file.read_bytes()).hexdigest()
             constraints_path = self.constraints_file.relative_to(self.project_root)
-            constraints_line = f"# [constraints] {constraints_path}"
+            constraints_line = f"# [constraints] {constraints_path} (SHA256: {constraint_sha})"
             joined_dependencies = "\n".join([constraints_line, "#", joined_dependencies])
             cleaned_input_file = re.sub(
                 r"-c \S*",
@@ -61,7 +63,7 @@ class PipCompileLock:
             )
         prefix += "\n" + joined_dependencies + "\n#"
         new_text = prefix + "\n\n" + cleaned_input_file
-        self.lock_file.write_text(new_text)
+        lockfile.write_text(new_text)
 
     def read_requirements(self) -> List[Requirement]:
         """
@@ -138,3 +140,13 @@ class PipCompileLock:
         """
         lock_requirements = self.read_requirements()
         return set(requirements) == set(lock_requirements)
+
+    def compare_constraint_sha(self, sha: str) -> bool:
+        """
+        Compare SHA to the SHA on the lockfile
+        """
+        lock_file_text = self.lock_file.read_text()
+        match = re.search(r"# \[constraints\] \S* \(SHA256: (.*)\)", lock_file_text)
+        if match is None:
+            return False
+        return match.group(1).strip() == sha.strip()
