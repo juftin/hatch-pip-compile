@@ -70,6 +70,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-hashes": bool,
             "pip-compile-args": List[str],
             "pip-compile-constraint": str,
+            "pip-compile-installer": str,
         }
 
     def _hatch_pip_compile_install(self):
@@ -79,8 +80,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         1) Create virtual environment if not exists
         2) Install pip-tools
         3) Run pip-compile (if lock file does not exist / is out of date)
-        4) Run pip-sync
-        5) Install project in dev mode
+        4) Install the dependencies (using `pip` or `pip-sync`)
         """
         try:
             _ = self.virtual_env.executables_directory
@@ -92,17 +92,15 @@ class PipCompileEnvironment(VirtualEnvironment):
             )
             if not self.lockfile_up_to_date:
                 self._pip_compile_cli()
-            self._pip_sync_cli()
-        if not self.skip_install:
-            if self.dev_mode:
-                super().install_project_dev_mode()
-            else:
-                super().install_project()
+            self._piptools_install_dependencies()
 
     def _pip_compile_cli(self) -> None:
         """
         Run pip-compile
         """
+        if not self.dependencies and self._piptools_lock_file.exists():
+            self._piptools_lock_file.unlink()
+            return
         no_compile = bool(os.getenv("PIP_COMPILE_DISABLE"))
         if no_compile:
             msg = "hatch-pip-compile is disabled but attempted to run a lockfile update."
@@ -149,11 +147,13 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     def _pip_sync_cli(self) -> None:
         """
-        run pip-sync
+        Install the dependencies with `pip-sync`
 
         In the event that a lockfile exists, but there are no dependencies,
-        pip-sync will uninstall everything in the environment before
-        deleting the lockfile.
+        pip-sync will uninstall everything in the environment.
+
+        This method also re-installs the project after it's uninstalled by
+        pip-sync.
         """
         _ = self.piptools_lock.compare_python_versions(
             verbose=self.config.get("pip-compile-verbose", None)
@@ -173,24 +173,19 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.virtual_env.platform.check_command(cmd)
         if not self.dependencies:
             self._piptools_lock_file.unlink()
+        if not self.skip_install:
+            if self.dev_mode:
+                super().install_project_dev_mode()
+            else:
+                super().install_project()
 
-    def install_project(self):
+    def _pip_install_cli(self) -> None:
         """
-        Install the project the first time
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
+        Install the project with `pip`
         """
-        self._hatch_pip_compile_install()
-
-    def install_project_dev_mode(self):
-        """
-        Install the project the first time in dev mode
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
-        """
-        self._hatch_pip_compile_install()
+        args = ["--requirement", str(self._piptools_lock_file)]
+        install_command = self.construct_pip_install_command(args=args)
+        self.virtual_env.platform.check_command(install_command)
 
     @functools.cached_property
     def lockfile_up_to_date(self) -> bool:
@@ -347,3 +342,16 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
+
+    def _piptools_install_dependencies(self) -> None:
+        """
+        Install dependencies with `pip-sync` or `pip`-install`
+        """
+        method = self.config.get("pip-compile-installer", "pip")
+        if method == "pip" and self.dependencies:
+            self._pip_install_cli()
+        elif method == "pip-sync":
+            self._pip_sync_cli()
+        elif method not in ["pip", "pip-sync"]:
+            msg = f"Invalid pip-tools install method: {method} - must be 'pip' or 'pip-sync'"
+            raise ValueError(msg)
