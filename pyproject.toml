@@ -68,7 +68,7 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 [tool.hatch.envs.default]
 pip-compile-constraint = "default"
 post-install-commands = [
-  "pre-commit install"
+  "- pre-commit install"
 ]
 python = "3.11"
 type = "pip-compile"

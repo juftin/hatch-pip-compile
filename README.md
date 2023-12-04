@@ -88,7 +88,7 @@ type to `pip-compile` to use this plugin for the respective environment.
 | ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | lock-filename          | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
 | pip-compile-constraint | `str`       | An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.                    |
-| pip-compile-hashes     | `bool`      | Whether to generate hashes in the lockfile. Defaults to `true`.                                                                       |
+| pip-compile-hashes     | `bool`      | Whether to generate hashes in the lockfile. Defaults to `false`.                                                                      |
 | pip-compile-verbose    | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
 | pip-compile-args       | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
 
@@ -206,7 +206,7 @@ must be set explicitly.
 
 ##### pip-compile-hashes
 
-Whether to generate hashes in the lockfile. Defaults to `true`.
+Whether to generate hashes in the lockfile. Defaults to `false`.
 
 -   **_pyproject.toml_**
 

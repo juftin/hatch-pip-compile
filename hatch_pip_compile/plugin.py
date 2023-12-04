@@ -127,7 +127,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "--no-header",
             "--resolver=backtracking",
         ]
-        if self.config.get("pip-compile-hashes", True) is True:
+        if self.config.get("pip-compile-hashes", False) is True:
             cmd.append("--generate-hashes")
         if self.piptools_constraints_file is not None:
             cmd.extend(["--constraint", str(self.piptools_constraints_file)])
