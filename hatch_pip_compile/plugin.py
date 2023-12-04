@@ -59,6 +59,13 @@ class PipCompileEnvironment(VirtualEnvironment):
             env_name=self.name,
             project_name=self.metadata.name,
         )
+        self.install_method = self.config.get("pip-compile-installer", "pip")
+        if self.install_method not in ["pip", "pip-sync"]:
+            msg = (
+                f"Invalid pip-tools install method: {self.install_method} - "
+                "must be 'pip' or 'pip-sync'"
+            )
+            raise HatchPipCompileError(msg)
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -71,6 +78,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-args": List[str],
             "pip-compile-constraint": str,
             "pip-compile-installer": str,
+            "pip-compile-install-args": List[str],
         }
 
     def _hatch_pip_compile_install(self):
@@ -81,6 +89,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         2) Install pip-tools
         3) Run pip-compile (if lock file does not exist / is out of date)
         4) Install the dependencies (using `pip` or `pip-sync`)
+        5) Install the project (if not skipped)
         """
         try:
             _ = self.virtual_env.executables_directory
@@ -93,6 +102,11 @@ class PipCompileEnvironment(VirtualEnvironment):
             if not self.lockfile_up_to_date:
                 self._pip_compile_cli()
             self._piptools_install_dependencies()
+            if not self.skip_install:
+                if self.dev_mode:
+                    self._install_project_dev_mode()
+                else:
+                    self._install_project()
 
     def _pip_compile_cli(self) -> None:
         """
@@ -166,24 +180,39 @@ class PipCompileEnvironment(VirtualEnvironment):
             "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
             "--python-executable",
             str(self.virtual_env.python_info.executable),
-            str(self._piptools_lock_file),
         ]
         if not self.dependencies:
             self._piptools_lock_file.write_text("")
+        extra_args = self.config.get("pip-compile-install-args", [])
+        cmd.extend(extra_args)
+        cmd.append(str(self._piptools_lock_file))
         self.virtual_env.platform.check_command(cmd)
         if not self.dependencies:
             self._piptools_lock_file.unlink()
         if not self.skip_install:
             if self.dev_mode:
-                super().install_project_dev_mode()
+                self._install_project_dev_mode()
             else:
-                super().install_project()
+                self._install_project()
+
+    def install_project(self):
+        """
+        Install the project the first time
+        """
+        self._hatch_pip_compile_install()
+
+    def install_project_dev_mode(self):
+        """
+        Install the project the first time in dev mode
+        """
+        self._hatch_pip_compile_install()
 
     def _pip_install_cli(self) -> None:
         """
         Install the project with `pip`
         """
-        args = ["--requirement", str(self._piptools_lock_file)]
+        extra_args = self.config.get("pip-compile-install-args", [])
+        args = [*extra_args, "--requirement", str(self._piptools_lock_file)]
         install_command = self.construct_pip_install_command(args=args)
         self.virtual_env.platform.check_command(install_command)
 
@@ -347,11 +376,32 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Install dependencies with `pip-sync` or `pip`-install`
         """
-        method = self.config.get("pip-compile-installer", "pip")
-        if method == "pip" and self.dependencies:
+        if self.install_method == "pip" and self.dependencies:
             self._pip_install_cli()
-        elif method == "pip-sync":
+        elif self.install_method == "pip-sync":
             self._pip_sync_cli()
-        elif method not in ["pip", "pip-sync"]:
-            msg = f"Invalid pip-tools install method: {method} - must be 'pip' or 'pip-sync'"
-            raise ValueError(msg)
+        else:
+            msg = f"Invalid pip-tools install method: {self.install_method}"
+            raise NotImplementedError(msg)
+
+    def _install_project(self) -> None:
+        """
+        Install the project (`--no-deps`)
+        """
+        with self.safe_activation():
+            proj_with_feats = self.apply_features(str(self.root))
+            self.platform.check_command(
+                self.construct_pip_install_command(args=["--no-deps", proj_with_feats])
+            )
+
+    def _install_project_dev_mode(self) -> None:
+        """
+        Install the project in editable mode (`--no-deps`)
+        """
+        with self.safe_activation():
+            proj_with_feats = self.apply_features(str(self.root))
+            self.platform.check_command(
+                self.construct_pip_install_command(
+                    args=["--no-deps", "--editable", proj_with_feats]
+                )
+            )

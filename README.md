@@ -83,14 +83,15 @@ type to `pip-compile` to use this plugin for the respective environment.
 
 ### Configuration Options
 
-| name                   | type        | description                                                                                                                           |
-| ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| lock-filename          | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
-| pip-compile-constraint | `str`       | An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.                    |
-| pip-compile-hashes     | `bool`      | Whether to generate hashes in the lockfile. Defaults to `false`.                                                                      |
-| pip-compile-verbose    | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
-| pip-compile-installer  | `str`       | Whether to use `pip` or `pip-sync` to install dependencies into the project. Defaults to `pip`                                        |
-| pip-compile-args       | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
+| name                     | type        | description                                                                                                                           |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| lock-filename            | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
+| pip-compile-constraint   | `str`       | An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.                    |
+| pip-compile-hashes       | `bool`      | Whether to generate hashes in the lockfile. Defaults to `false`.                                                                      |
+| pip-compile-verbose      | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
+| pip-compile-installer    | `str`       | Whether to use `pip` or `pip-sync` to install dependencies into the project. Defaults to `pip`                                        |
+| pip-compile-args         | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
+| pip-compile-install-args | `list[str]` | Additional command-line arguments to pass to `pip-compile-installer`                                                                  |
 
 #### Examples
 
@@ -298,6 +299,33 @@ across different Python versions and platforms `pip` is the safer option to use.
     [envs.<envName>]
     type = "pip-compile"
     pip-compile-installer = "pip-sync"
+    ```
+
+##### pip-compile-install-args
+
+Extra arguments to pass to `pip-compile-installer`. For example, if you'd like to use `pip` as the
+installer but want to pass the `--no-deps` flag to `pip install` you can do so with this option:
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip"
+    pip-compile-install-args = [
+        "--no-deps"
+    ]
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip"
+    pip-compile-install-args = [
+        "--no-deps"
+    ]
     ```
 
 ## Upgrading Dependencies
