@@ -984,7 +984,7 @@ type to <code>pip-compile</code> to use this plugin for the respective environme
 <tr>
 <td>pip-compile-hashes</td>
 <td><code>bool</code></td>
-<td>Whether to generate hashes in the lockfile. Defaults to <code>true</code>.</td>
+<td>Whether to generate hashes in the lockfile. Defaults to <code>false</code>.</td>
 </tr>
 <tr>
 <td>pip-compile-verbose</td>
@@ -1103,7 +1103,7 @@ must be set explicitly.</p>
 </li>
 </ul>
 <h5 id="pip-compile-hashes">pip-compile-hashes<a class="headerlink" href="#pip-compile-hashes" title="Permanent link">#</a></h5>
-<p>Whether to generate hashes in the lockfile. Defaults to <code>true</code>.</p>
+<p>Whether to generate hashes in the lockfile. Defaults to <code>false</code>.</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
@@ -1172,7 +1172,7 @@ recreating it by reactivating the environment:</p>
 <p>If you're a user of the <code>--upgrade</code> / <code>--upgrade-package</code> options on <code>pip-compile</code>,
 these features can be enabled on this plugin using the environment variables
 <code>PIP_COMPILE_UPGRADE</code> and <code>PIP_COMPILE_UPGRADE_PACKAGE</code>. When either of these
-environment variables are set <code>hatch</code> will force the lockfile to be upgraded
+environment variables are set <code>hatch</code> will force the lockfile to be regenerated
 whenever the environment is activated.</p>
 <p>To run with <code>upgrade</code> functionality on the <code>default</code> environment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">PIP_COMPILE_UPGRADE</span><span class="o">=</span><span class="m">1</span><span class="w"> </span>hatch<span class="w"> </span>env<span class="w"> </span>run<span class="w"> </span>--env<span class="w"> </span>default<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>--version
