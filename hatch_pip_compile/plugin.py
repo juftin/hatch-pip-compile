@@ -104,9 +104,9 @@ class PipCompileEnvironment(VirtualEnvironment):
             self._piptools_install_dependencies()
             if not self.skip_install:
                 if self.dev_mode:
-                    self._install_project_dev_mode()
+                    self.install_project_no_deps_dev()
                 else:
-                    self._install_project()
+                    self.install_project_no_deps()
 
     def _pip_compile_cli(self) -> None:
         """
@@ -191,9 +191,9 @@ class PipCompileEnvironment(VirtualEnvironment):
             self._piptools_lock_file.unlink()
         if not self.skip_install:
             if self.dev_mode:
-                self._install_project_dev_mode()
+                self.install_project_no_deps_dev()
             else:
-                self._install_project()
+                self.install_project_no_deps()
 
     def install_project(self):
         """
@@ -384,7 +384,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             msg = f"Invalid pip-tools install method: {self.install_method}"
             raise NotImplementedError(msg)
 
-    def _install_project(self) -> None:
+    def install_project_no_deps(self) -> None:
         """
         Install the project (`--no-deps`)
         """
@@ -394,7 +394,7 @@ class PipCompileEnvironment(VirtualEnvironment):
                 self.construct_pip_install_command(args=["--no-deps", proj_with_feats])
             )
 
-    def _install_project_dev_mode(self) -> None:
+    def install_project_no_deps_dev(self) -> None:
         """
         Install the project in editable mode (`--no-deps`)
         """
