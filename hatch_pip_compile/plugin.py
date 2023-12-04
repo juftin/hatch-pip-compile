@@ -389,9 +389,8 @@ class PipCompileEnvironment(VirtualEnvironment):
         Install the project (`--no-deps`)
         """
         with self.safe_activation():
-            proj_with_feats = self.apply_features(str(self.root))
             self.platform.check_command(
-                self.construct_pip_install_command(args=["--no-deps", proj_with_feats])
+                self.construct_pip_install_command(args=["--no-deps", str(self.root)])
             )
 
     def install_project_no_deps_dev(self) -> None:
@@ -399,9 +398,6 @@ class PipCompileEnvironment(VirtualEnvironment):
         Install the project in editable mode (`--no-deps`)
         """
         with self.safe_activation():
-            proj_with_feats = self.apply_features(str(self.root))
             self.platform.check_command(
-                self.construct_pip_install_command(
-                    args=["--no-deps", "--editable", proj_with_feats]
-                )
+                self.construct_pip_install_command(args=["--no-deps", "--editable", str(self.root)])
             )
