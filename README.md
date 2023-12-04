@@ -56,7 +56,8 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
 The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
 environment needs to be updated. Behind the scenes, this plugin creates a lockfile
 at `requirements.txt` (non-default lockfiles are located at
-`requirements/requirements-{env_name}.txt`).
+`requirements/requirements-{env_name}.txt`). Once the dependencies are resolved
+the plugin will install the lockfile into your virtual environment.
 
 -   [lock-filename](#lock-filename) - changing the default lockfile path
 -   [pip-compile-constraint](#pip-compile-constraint) - syncing dependency versions across environments
