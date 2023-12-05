@@ -293,14 +293,14 @@ class PipCompileEnvironment(VirtualEnvironment):
             Whether the constraints file is valid
         """
         if not constraints_file.exists():
-            self.constraint_env.installer.full_install()
+            self.constraint_env.installer.run_pip_compile()
             return False
         else:
             up_to_date = environment.piptools_lock.compare_requirements(
                 requirements=environment.dependencies_complex
             )
             if not up_to_date:
-                self.constraint_env.installer.full_install()
+                self.constraint_env.installer.run_pip_compile()
                 return False
         return True
 

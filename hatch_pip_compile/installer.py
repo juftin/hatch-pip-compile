@@ -36,12 +36,6 @@ class PluginInstaller(ABC):
         """
         self.install_dependencies()
 
-    def full_install(self) -> None:
-        """
-        Run the end-to-end install process
-        """
-        self.install_dependencies()
-
     def run_pip_compile(self) -> None:
         """
         Run pip-compile if necessary
@@ -145,7 +139,7 @@ class PipSyncInstaller(PluginInstaller):
         if not self.environment.dependencies:
             self.environment.piptools_lock_file.unlink()
 
-    def full_install(self) -> None:
+    def _full_install(self) -> None:
         """
         Run the full install process
 
@@ -166,22 +160,22 @@ class PipSyncInstaller(PluginInstaller):
         """
         Sync dependencies
         """
-        self.full_install()
+        self._full_install()
 
     def install_project(self):
         """
         Install the project the first time
 
-        The same implementation as `full_install`
+        The same implementation as `_full_install`
         due to the way `pip-sync` uninstalls our root package
         """
-        self.full_install()
+        self._full_install()
 
     def install_project_dev_mode(self):
         """
         Install the project the first time in dev mode
 
-        The same implementation as `full_install`
+        The same implementation as `_full_install`
         due to the way `pip-sync` uninstalls our root package
         """
-        self.full_install()
+        self._full_install()
