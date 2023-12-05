@@ -38,7 +38,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         return f"<{self.__class__.__name__} - {self.name}>"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """
         Initialize PipCompileEnvironment with extra attributes
         """
