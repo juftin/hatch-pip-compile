@@ -282,6 +282,24 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         return self.metadata.hatch.config.get("envs", {})
 
+    def install_project(self) -> None:
+        """
+        Install the project (`--no-deps`)
+        """
+        with self.safe_activation():
+            self.platform.check_command(
+                self.construct_pip_install_command(args=["--no-deps", str(self.root)])
+            )
+
+    def install_project_dev_mode(self) -> None:
+        """
+        Install the project in editable mode (`--no-deps`)
+        """
+        with self.safe_activation():
+            self.platform.check_command(
+                self.construct_pip_install_command(args=["--no-deps", "--editable", str(self.root)])
+            )
+
 
 class PipCompileEnvironmentWithPipInstall(PipCompileEnvironment):
     def sync_dependencies(self) -> None:
