@@ -243,6 +243,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Sync dependencies
         """
+        self.run_pip_compile()
         self.installer.sync_dependencies()
 
     @property
