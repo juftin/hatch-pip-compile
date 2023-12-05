@@ -72,33 +72,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-constraint": str,
         }
 
-    def _hatch_pip_compile_install(self):
-        """
-        Run the full hatch-pip-compile install process
-
-        1) Create virtual environment if not exists
-        2) Install pip-tools
-        3) Run pip-compile (if lock file does not exist / is out of date)
-        4) Run pip-sync
-        5) Install project in dev mode
-        """
-        try:
-            _ = self.virtual_env.executables_directory
-        except OSError:
-            self.create()
-        with self.safe_activation():
-            self.virtual_env.platform.check_command(
-                self.construct_pip_install_command(["pip-tools"])
-            )
-            if not self.lockfile_up_to_date:
-                self._pip_compile_cli()
-            self._pip_sync_cli()
-        if not self.skip_install:
-            if self.dev_mode:
-                super().install_project_dev_mode()
-            else:
-                super().install_project()
-
     def _pip_compile_cli(self) -> None:
         """
         Run pip-compile
@@ -146,51 +119,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             self.virtual_env.platform.check_command(cmd)
             self.piptools_lock.process_lock(lockfile=output_file)
             shutil.move(output_file, self._piptools_lock_file)
-
-    def _pip_sync_cli(self) -> None:
-        """
-        run pip-sync
-
-        In the event that a lockfile exists, but there are no dependencies,
-        pip-sync will uninstall everything in the environment before
-        deleting the lockfile.
-        """
-        _ = self.piptools_lock.compare_python_versions(
-            verbose=self.config.get("pip-compile-verbose", None)
-        )
-        cmd = [
-            self.virtual_env.python_info.executable,
-            "-m",
-            "piptools",
-            "sync",
-            "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
-            "--python-executable",
-            str(self.virtual_env.python_info.executable),
-            str(self._piptools_lock_file),
-        ]
-        if not self.dependencies:
-            self._piptools_lock_file.write_text("")
-        self.virtual_env.platform.check_command(cmd)
-        if not self.dependencies:
-            self._piptools_lock_file.unlink()
-
-    def install_project(self):
-        """
-        Install the project the first time
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
-        """
-        self._hatch_pip_compile_install()
-
-    def install_project_dev_mode(self):
-        """
-        Install the project the first time in dev mode
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
-        """
-        self._hatch_pip_compile_install()
 
     @functools.cached_property
     def lockfile_up_to_date(self) -> bool:
@@ -252,12 +180,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             return False
         else:
             return super().dependencies_in_sync()
-
-    def sync_dependencies(self):
-        """
-        Sync dependencies
-        """
-        self._hatch_pip_compile_install()
 
     @property
     def piptools_constraints_file(self) -> Optional[pathlib.Path]:
@@ -347,3 +269,81 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
+
+    def _hatch_pip_compile_install(self):
+        """
+        Run the full hatch-pip-compile install process
+
+        1) Create virtual environment if not exists
+        2) Install pip-tools
+        3) Run pip-compile (if lock file does not exist / is out of date)
+        4) Run pip-sync
+        5) Install project in dev mode
+        """
+        try:
+            _ = self.virtual_env.executables_directory
+        except OSError:
+            self.create()
+        with self.safe_activation():
+            self.virtual_env.platform.check_command(
+                self.construct_pip_install_command(["pip-tools"])
+            )
+            if not self.lockfile_up_to_date:
+                self._pip_compile_cli()
+            self._pip_sync_cli()
+        if not self.skip_install:
+            if self.dev_mode:
+                super().install_project_dev_mode()
+            else:
+                super().install_project()
+
+    def _pip_sync_cli(self) -> None:
+        """
+        run pip-sync
+
+        In the event that a lockfile exists, but there are no dependencies,
+        pip-sync will uninstall everything in the environment before
+        deleting the lockfile.
+        """
+        _ = self.piptools_lock.compare_python_versions(
+            verbose=self.config.get("pip-compile-verbose", None)
+        )
+        cmd = [
+            self.virtual_env.python_info.executable,
+            "-m",
+            "piptools",
+            "sync",
+            "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
+            "--python-executable",
+            str(self.virtual_env.python_info.executable),
+            str(self._piptools_lock_file),
+        ]
+        if not self.dependencies:
+            self._piptools_lock_file.write_text("")
+        self.virtual_env.platform.check_command(cmd)
+        if not self.dependencies:
+            self._piptools_lock_file.unlink()
+
+    def install_project(self):
+        """
+        Install the project the first time
+
+        The same implementation as `sync_dependencies`
+        due to the way `pip-sync` uninstalls our root package
+        """
+        self._hatch_pip_compile_install()
+
+    def install_project_dev_mode(self):
+        """
+        Install the project the first time in dev mode
+
+        The same implementation as `sync_dependencies`
+        due to the way `pip-sync` uninstalls our root package
+        """
+        self._hatch_pip_compile_install()
+
+    def sync_dependencies(self):
+        """
+        Sync dependencies
+        """
+        self._hatch_pip_compile_install()
