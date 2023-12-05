@@ -139,6 +139,18 @@ class PipCompileEnvironment(VirtualEnvironment):
             shutil.move(output_file, self.piptools_lock_file)
         self.lockfile_up_to_date = True
 
+    def install_project(self) -> None:
+        """
+        Install the project (`--no-deps`)
+        """
+        self.installer.install_project()
+
+    def install_project_dev_mode(self) -> None:
+        """
+        Install the project in editable mode (`--no-deps`)
+        """
+        self.installer.install_project_dev_mode()
+
     @functools.cached_property
     def lockfile_up_to_date(self) -> bool:
         """
@@ -199,6 +211,12 @@ class PipCompileEnvironment(VirtualEnvironment):
             return False
         else:
             return super().dependencies_in_sync()
+
+    def sync_dependencies(self) -> None:
+        """
+        Sync dependencies
+        """
+        self.installer.sync_dependencies()
 
     @property
     def piptools_constraints_file(self) -> Optional[pathlib.Path]:
@@ -292,21 +310,3 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
-
-    def install_project(self) -> None:
-        """
-        Install the project (`--no-deps`)
-        """
-        self.installer.install_project()
-
-    def install_project_dev_mode(self) -> None:
-        """
-        Install the project in editable mode (`--no-deps`)
-        """
-        self.installer.install_project_dev_mode()
-
-    def sync_dependencies(self) -> None:
-        """
-        Sync dependencies
-        """
-        self.installer.sync_dependencies()
