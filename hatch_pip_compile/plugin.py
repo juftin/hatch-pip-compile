@@ -13,6 +13,8 @@ from typing import Any, Dict, List, Optional
 
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
+from hatchling.dep.core import dependencies_in_sync
+from packaging.requirements import Requirement
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
 from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
@@ -86,6 +88,31 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-installer": str,
             "pip-compile-install-args": List[str],
         }
+
+    def install_pip_tools(self) -> None:
+        """
+        Install pip-tools (if not already installed)
+        """
+        with self.safe_activation():
+            in_sync = dependencies_in_sync(
+                requirements=[Requirement("pip-tools")],
+                sys_path=self.virtual_env.sys_path,
+                environment=self.virtual_env.environment,
+            )
+            if not in_sync:
+                self.platform.check_command(self.construct_pip_install_command(["pip-tools"]))
+
+    def run_pip_compile(self) -> None:
+        """
+        Run pip-compile if necessary
+        """
+        if not self.lockfile_up_to_date:
+            self.install_pip_tools()
+            if self.piptools_lock_file.exists():
+                _ = self.piptools_lock.compare_python_versions(
+                    verbose=self.config.get("pip-compile-verbose", None)
+                )
+            self.pip_compile_cli()
 
     def pip_compile_cli(self) -> None:
         """
@@ -293,14 +320,14 @@ class PipCompileEnvironment(VirtualEnvironment):
             Whether the constraints file is valid
         """
         if not constraints_file.exists():
-            self.constraint_env.installer.run_pip_compile()
+            self.constraint_env.run_pip_compile()
             return False
         else:
             up_to_date = environment.piptools_lock.compare_requirements(
                 requirements=environment.dependencies_complex
             )
             if not up_to_date:
-                self.constraint_env.installer.run_pip_compile()
+                self.constraint_env.run_pip_compile()
                 return False
         return True
 
