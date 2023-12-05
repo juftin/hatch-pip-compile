@@ -189,11 +189,6 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.virtual_env.platform.check_command(cmd)
         if not self.dependencies:
             self._piptools_lock_file.unlink()
-        if not self.skip_install:
-            if self.dev_mode:
-                self.install_project_no_deps_dev()
-            else:
-                self.install_project_no_deps()
 
     def install_project(self):
         """
