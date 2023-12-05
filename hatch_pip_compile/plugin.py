@@ -59,6 +59,17 @@ class PipCompileEnvironment(VirtualEnvironment):
             env_name=self.name,
             project_name=self.metadata.name,
         )
+        install_method = self.config.get("pip-compile-installer", "pip")
+        if install_method == "pip":
+            self.__class__ = PipCompileEnvironmentWithPipInstall
+        elif install_method == "pip-sync":
+            self.__class__ = PipCompileEnvironmentWithPipSync
+        else:
+            msg = (
+                f"Invalid pip-tools install method: {self.install_method} - "
+                "must be 'pip' or 'pip-sync'"
+            )
+            raise HatchPipCompileError(msg)
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -70,6 +81,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-hashes": bool,
             "pip-compile-args": List[str],
             "pip-compile-constraint": str,
+            "pip-compile-installer": str,
         }
 
     def _pip_compile_cli(self) -> None:
@@ -270,6 +282,25 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         return self.metadata.hatch.config.get("envs", {})
 
+
+class PipCompileEnvironmentWithPipInstall(PipCompileEnvironment):
+    def sync_dependencies(self) -> None:
+        """
+        Install the project with `pip`
+        """
+        with self.safe_activation():
+            if not self.lockfile_up_to_date:
+                self.virtual_env.platform.check_command(
+                    self.construct_pip_install_command(["pip-tools"])
+                )
+                self._pip_compile_cli()
+            extra_args = self.config.get("pip-compile-install-args", [])
+            args = [*extra_args, "--requirement", str(self._piptools_lock_file)]
+            install_command = self.construct_pip_install_command(args=args)
+            self.virtual_env.platform.check_command(install_command)
+
+
+class PipCompileEnvironmentWithPipSync(PipCompileEnvironment):
     def _hatch_pip_compile_install(self):
         """
         Run the full hatch-pip-compile install process
@@ -299,7 +330,7 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     def _pip_sync_cli(self) -> None:
         """
-        run pip-sync
+        Install the dependencies with `pip-sync`
 
         In the event that a lockfile exists, but there are no dependencies,
         pip-sync will uninstall everything in the environment before
