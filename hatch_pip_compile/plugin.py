@@ -89,6 +89,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile
         """
+        if not self.dependencies:
+            self._piptools_lock_file.unlink(missing_ok=True)
+            return
         no_compile = bool(os.getenv("PIP_COMPILE_DISABLE"))
         if no_compile:
             msg = "hatch-pip-compile is disabled but attempted to run a lockfile update."
@@ -313,6 +316,8 @@ class PipCompileEnvironmentWithPipInstall(PipCompileEnvironment):
                     self.construct_pip_install_command(["pip-tools"])
                 )
                 self._pip_compile_cli()
+            if not self._piptools_lock_file.exists():
+                return
             extra_args = self.config.get("pip-compile-install-args", [])
             args = [*extra_args, "--requirement", str(self._piptools_lock_file)]
             install_command = self.construct_pip_install_command(args=args)
