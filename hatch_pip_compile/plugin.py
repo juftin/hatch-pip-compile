@@ -82,6 +82,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-args": List[str],
             "pip-compile-constraint": str,
             "pip-compile-installer": str,
+            "pip-compile-install-args": List[str],
         }
 
     def _pip_compile_cli(self) -> None:
@@ -365,10 +366,12 @@ class PipCompileEnvironmentWithPipSync(PipCompileEnvironment):
             "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
             "--python-executable",
             str(self.virtual_env.python_info.executable),
-            str(self._piptools_lock_file),
         ]
         if not self.dependencies:
             self._piptools_lock_file.write_text("")
+        extra_args = self.config.get("pip-compile-install-args", [])
+        cmd.extend(extra_args)
+        cmd.append(str(self._piptools_lock_file))
         self.virtual_env.platform.check_command(cmd)
         if not self.dependencies:
             self._piptools_lock_file.unlink()
