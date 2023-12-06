@@ -13,8 +13,11 @@ from typing import Any, Dict, List, Optional
 
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
+from hatchling.dep.core import dependencies_in_sync
+from packaging.requirements import Requirement
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
+from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
 from hatch_pip_compile.lock import PipCompileLock
 
 logger = logging.getLogger(__name__)
@@ -35,7 +38,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         return f"<{self.__class__.__name__} - {self.name}>"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """
         Initialize PipCompileEnvironment with extra attributes
         """
@@ -49,9 +52,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         else:
             with self.metadata.context.apply_context(self.context):
                 lock_filename = self.metadata.context.format(lock_filename_config)
-        self._piptools_lock_file = self.root / lock_filename
+        self.piptools_lock_file = self.root / lock_filename
         self.piptools_lock = PipCompileLock(
-            lock_file=self._piptools_lock_file,
+            lock_file=self.piptools_lock_file,
             dependencies=self.dependencies,
             virtualenv=self.virtual_env,
             constraints_file=self.piptools_constraints_file,
@@ -59,6 +62,18 @@ class PipCompileEnvironment(VirtualEnvironment):
             env_name=self.name,
             project_name=self.metadata.name,
         )
+        install_method = self.config.get("pip-compile-installer", "pip")
+        self.installer: PluginInstaller
+        if install_method == "pip":
+            self.installer = PipInstaller(environment=self)
+        elif install_method == "pip-sync":
+            self.installer = PipSyncInstaller(environment=self)
+        else:
+            msg = (
+                f"Invalid pip-tools install method: {install_method} - "
+                "must be 'pip' or 'pip-sync'"
+            )
+            raise HatchPipCompileError(msg)
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -70,39 +85,43 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-hashes": bool,
             "pip-compile-args": List[str],
             "pip-compile-constraint": str,
+            "pip-compile-installer": str,
+            "pip-compile-install-args": List[str],
         }
 
-    def _hatch_pip_compile_install(self):
+    def install_pip_tools(self) -> None:
         """
-        Run the full hatch-pip-compile install process
-
-        1) Create virtual environment if not exists
-        2) Install pip-tools
-        3) Run pip-compile (if lock file does not exist / is out of date)
-        4) Run pip-sync
-        5) Install project in dev mode
+        Install pip-tools (if not already installed)
         """
-        try:
-            _ = self.virtual_env.executables_directory
-        except OSError:
-            self.create()
         with self.safe_activation():
-            self.virtual_env.platform.check_command(
-                self.construct_pip_install_command(["pip-tools"])
+            in_sync = dependencies_in_sync(
+                requirements=[Requirement("pip-tools")],
+                sys_path=self.virtual_env.sys_path,
+                environment=self.virtual_env.environment,
             )
-            if not self.lockfile_up_to_date:
-                self._pip_compile_cli()
-            self._pip_sync_cli()
-        if not self.skip_install:
-            if self.dev_mode:
-                super().install_project_dev_mode()
-            else:
-                super().install_project()
+            if not in_sync:
+                self.platform.check_command(self.construct_pip_install_command(["pip-tools"]))
 
-    def _pip_compile_cli(self) -> None:
+    def run_pip_compile(self) -> None:
+        """
+        Run pip-compile if necessary
+        """
+        if not self.lockfile_up_to_date:
+            with self.safe_activation():
+                self.install_pip_tools()
+                if self.piptools_lock_file.exists():
+                    _ = self.piptools_lock.compare_python_versions(
+                        verbose=self.config.get("pip-compile-verbose", None)
+                    )
+                self.pip_compile_cli()
+
+    def pip_compile_cli(self) -> None:
         """
         Run pip-compile
         """
+        if not self.dependencies:
+            self.piptools_lock_file.unlink(missing_ok=True)
+            return
         no_compile = bool(os.getenv("PIP_COMPILE_DISABLE"))
         if no_compile:
             msg = "hatch-pip-compile is disabled but attempted to run a lockfile update."
@@ -140,57 +159,25 @@ class PipCompileEnvironment(VirtualEnvironment):
             output_file = tmp_path / "lock.txt"
             cmd.extend(["--output-file", str(output_file), str(input_file)])
             input_file.write_text("\n".join([*self.dependencies, ""]))
-            if self._piptools_lock_file.exists():
-                shutil.copy(self._piptools_lock_file, output_file)
-            self._piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
+            if self.piptools_lock_file.exists():
+                shutil.copy(self.piptools_lock_file, output_file)
+            self.piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
             self.virtual_env.platform.check_command(cmd)
             self.piptools_lock.process_lock(lockfile=output_file)
-            shutil.move(output_file, self._piptools_lock_file)
+            shutil.move(output_file, self.piptools_lock_file)
+        self.lockfile_up_to_date = True
 
-    def _pip_sync_cli(self) -> None:
+    def install_project(self) -> None:
         """
-        run pip-sync
+        Install the project (`--no-deps`)
+        """
+        self.installer.install_project()
 
-        In the event that a lockfile exists, but there are no dependencies,
-        pip-sync will uninstall everything in the environment before
-        deleting the lockfile.
+    def install_project_dev_mode(self) -> None:
         """
-        _ = self.piptools_lock.compare_python_versions(
-            verbose=self.config.get("pip-compile-verbose", None)
-        )
-        cmd = [
-            self.virtual_env.python_info.executable,
-            "-m",
-            "piptools",
-            "sync",
-            "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
-            "--python-executable",
-            str(self.virtual_env.python_info.executable),
-            str(self._piptools_lock_file),
-        ]
-        if not self.dependencies:
-            self._piptools_lock_file.write_text("")
-        self.virtual_env.platform.check_command(cmd)
-        if not self.dependencies:
-            self._piptools_lock_file.unlink()
-
-    def install_project(self):
+        Install the project in editable mode (`--no-deps`)
         """
-        Install the project the first time
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
-        """
-        self._hatch_pip_compile_install()
-
-    def install_project_dev_mode(self):
-        """
-        Install the project the first time in dev mode
-
-        The same implementation as `sync_dependencies`
-        due to the way `pip-sync` uninstalls our root package
-        """
-        self._hatch_pip_compile_install()
+        self.installer.install_project_dev_mode()
 
     @functools.cached_property
     def lockfile_up_to_date(self) -> bool:
@@ -215,7 +202,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
         force_upgrade = upgrade is not False or upgrade_packages is not False
-        if not self.dependencies and not self._piptools_lock_file.exists():
+        if not self.dependencies and not self.piptools_lock_file.exists():
             return True
         if self.piptools_constraints_file:
             valid_constraint = self.validate_constraints_file(
@@ -223,13 +210,13 @@ class PipCompileEnvironment(VirtualEnvironment):
             )
             if not valid_constraint:
                 return False
-        if not self.dependencies and self._piptools_lock_file.exists():
+        if not self.dependencies and self.piptools_lock_file.exists():
             return False
         elif force_upgrade:
             return False
-        elif self.dependencies and not self._piptools_lock_file.exists():
+        elif self.dependencies and not self.piptools_lock_file.exists():
             return False
-        elif self.dependencies and self._piptools_lock_file.exists():
+        elif self.dependencies and self.piptools_lock_file.exists():
             if self.piptools_constraints_file:
                 current_sha = hashlib.sha256(
                     self.piptools_constraints_file.read_bytes()
@@ -253,11 +240,12 @@ class PipCompileEnvironment(VirtualEnvironment):
         else:
             return super().dependencies_in_sync()
 
-    def sync_dependencies(self):
+    def sync_dependencies(self) -> None:
         """
         Sync dependencies
         """
-        self._hatch_pip_compile_install()
+        self.run_pip_compile()
+        self.installer.sync_dependencies()
 
     @property
     def piptools_constraints_file(self) -> Optional[pathlib.Path]:
@@ -267,7 +255,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         if self.constraint_env.name == self.name:
             return None
         else:
-            return self.constraint_env._piptools_lock_file
+            return self.constraint_env.piptools_lock_file
 
     def get_piptools_environment(self, environment_name: str) -> "PipCompileEnvironment":
         """
@@ -309,6 +297,10 @@ class PipCompileEnvironment(VirtualEnvironment):
             logger.error("The constraint environment is not a hatch-pip-compile environment.")
             return self
         else:
+            try:
+                _ = environment.virtual_env.executables_directory
+            except OSError:
+                environment.create()
             return environment
 
     def validate_constraints_file(
@@ -330,14 +322,14 @@ class PipCompileEnvironment(VirtualEnvironment):
             Whether the constraints file is valid
         """
         if not constraints_file.exists():
-            self.constraint_env._hatch_pip_compile_install()
+            self.constraint_env.run_pip_compile()
             return False
         else:
             up_to_date = environment.piptools_lock.compare_requirements(
                 requirements=environment.dependencies_complex
             )
             if not up_to_date:
-                self.constraint_env._hatch_pip_compile_install()
+                self.constraint_env.run_pip_compile()
                 return False
         return True
 

@@ -56,8 +56,8 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
 The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
 environment needs to be updated. Behind the scenes, this plugin creates a lockfile
 at `requirements.txt` (non-default lockfiles are located at
-`requirements/requirements-{env_name}.txt`). Alongside `pip-compile`, this plugin also
-uses [pip-sync] to install the dependencies from the lockfile into your environment.
+`requirements/requirements-{env_name}.txt`). Once the dependencies are resolved
+the plugin will install the lockfile into your virtual environment.
 
 -   [lock-filename](#lock-filename) - changing the default lockfile path
 -   [pip-compile-constraint](#pip-compile-constraint) - syncing dependency versions across environments
@@ -84,6 +84,11 @@ type to `pip-compile` to use this plugin for the respective environment.
 
 ### Configuration Options
 
+The plugin gives you options to configure how lockfiles are generated and how they are installed
+into your environment.
+
+#### Generating Lockfiles
+
 | name                   | type        | description                                                                                                                           |
 | ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | lock-filename          | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
@@ -91,6 +96,13 @@ type to `pip-compile` to use this plugin for the respective environment.
 | pip-compile-hashes     | `bool`      | Whether to generate hashes in the lockfile. Defaults to `false`.                                                                      |
 | pip-compile-verbose    | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
 | pip-compile-args       | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
+
+#### Installing Lockfiles
+
+| name                     | type        | description                                                                                    |
+| ------------------------ | ----------- | ---------------------------------------------------------------------------------------------- |
+| pip-compile-installer    | `str`       | Whether to use `pip` or `pip-sync` to install dependencies into the project. Defaults to `pip` |
+| pip-compile-install-args | `list[str]` | Additional command-line arguments to pass to `pip-compile-installer`                           |
 
 #### Examples
 
@@ -270,6 +282,61 @@ Optionally, if you would like to silence any warnings set the `pip-compile-verbo
     [envs.<envName>]
     type = "pip-compile"
     pip-compile-verbose = true
+    ```
+
+##### pip-compile-installer
+
+Whether to use [pip] or [pip-sync] to install dependencies into the project. Defaults to `pip`.
+When you choose the `pip` option the plugin will run `pip install -r {lockfile}` under the hood
+to install the dependencies. When you choose the `pip-sync` option `pip-sync {lockfile}` is invoked
+by the plugin.
+
+The key difference between these options is that `pip-sync` will uninstall any packages that are
+not in the lockfile and remove them from your environment. `pip-sync` is useful if you want to ensure
+that your environment is exactly the same as the lockfile. If the environment should be used
+across different Python versions and platforms `pip` is the safer option to use.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip-sync"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip-sync"
+    ```
+
+##### pip-compile-install-args
+
+Extra arguments to pass to `pip-compile-installer`. For example, if you'd like to use `pip` as the
+installer but want to pass the `--no-deps` flag to `pip install` you can do so with this option:
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip"
+    pip-compile-install-args = [
+        "--no-deps"
+    ]
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.<envName>]
+    type = "pip-compile"
+    pip-compile-installer = "pip"
+    pip-compile-install-args = [
+        "--no-deps"
+    ]
     ```
 
 ## Upgrading Dependencies
