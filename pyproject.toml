@@ -47,6 +47,7 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:"
 ]
+show_missing = true
 
 [tool.coverage.run]
 branch = true
@@ -61,9 +62,6 @@ requires = ["hatch-pip-compile", "hatch-mkdocs"]
 
 [tool.hatch.env.collectors.mkdocs.docs]
 path = "mkdocs.yaml"
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.default]
 pip-compile-constraint = "default"
@@ -113,6 +111,24 @@ style = [
 ]
 typing = "mypy --install-types --non-interactive {args:hatch_pip_compile}"
 
+[tool.hatch.envs.matrix]
+template = "test"
+type = "virtual"
+
+[[tool.hatch.envs.matrix.matrix]]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.test]
+dependencies = [
+  "pytest",
+  "pytest-cov"
+]
+
+[tool.hatch.envs.test.scripts]
+cov = [
+  "pytest --cov-config=pyproject.toml --cov {args:tests}"
+]
+
 [tool.hatch.version]
 path = "hatch_pip_compile/__about__.py"
 
@@ -141,7 +157,9 @@ ignore = [
   "PLR0911",
   "PLR0912",
   "PLR0913",
-  "PLR0915"
+  "PLR0915",
+  # Prefer `next(iter(mock_check_command.call_args))`
+  "RUF015"
 ]
 line-length = 100
 select = [
