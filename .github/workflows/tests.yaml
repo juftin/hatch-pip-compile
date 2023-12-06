@@ -42,10 +42,16 @@ jobs:
               uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python }}
+            - name: Install Default Python
+              if: matrix.python != '3.11'
+              uses: actions/setup-python@v4
+              with:
+                  python-version: "3.11"
             - name: Install Hatch
               run: |
-                  python -m pip install --upgrade pip
+                  python -m pip install --upgrade pip wheel
                   python -m pip install -q hatch pre-commit
+                  python -m pip install -q "${{ github.workspace }}"
                   hatch --version
             - name: Test Suite
               run: |
