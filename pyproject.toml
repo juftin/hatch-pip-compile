@@ -58,7 +58,7 @@ parallel = true
 source_pkgs = ["hatch_pip_compile", "tests"]
 
 [tool.hatch.env]
-requires = ["hatch-pip-compile", "hatch-mkdocs"]
+requires = ["hatch-mkdocs"]
 
 [tool.hatch.env.collectors.mkdocs.docs]
 path = "mkdocs.yaml"

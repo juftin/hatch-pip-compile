@@ -28,10 +28,9 @@ jobs:
                   python-version: "3.11"
             - name: Install Hatch
               run: |
-                  python -m pip install --upgrade pip
+                  python -m pip install --upgrade pip wheel
                   python -m pip install -q hatch pre-commit
-                  python -m pip install -q -e .
-                  hatch -v env create
+                  python -m pip install -q "${{ github.workspace }}"
                   hatch --version
             - name: Release
               run: hatch run gen:release
@@ -60,9 +59,9 @@ jobs:
                   python-version: "3.11"
             - name: Install Hatch
               run: |
-                  python -m pip install --upgrade pip
+                  python -m pip install --upgrade pip wheel
                   python -m pip install -q hatch pre-commit
-                  python -m pip install -q -e .
+                  python -m pip install -q "${{ github.workspace }}"
                   hatch --version
             - name: Set Up GitHub Actions User
               run: |
