@@ -38,7 +38,7 @@ class PluginInstaller(ABC):
         Install the project (`--no-deps`)
         """
         with self.environment.safe_activation():
-            self.environment.platform.check_command(
+            self.environment.plugin_check_command(
                 self.environment.construct_pip_install_command(
                     args=["--no-deps", str(self.environment.root)]
                 )
@@ -49,7 +49,7 @@ class PluginInstaller(ABC):
         Install the project in editable mode (`--no-deps`)
         """
         with self.environment.safe_activation():
-            self.environment.platform.check_command(
+            self.environment.plugin_check_command(
                 self.environment.construct_pip_install_command(
                     args=["--no-deps", "--editable", str(self.environment.root)]
                 )
@@ -71,7 +71,7 @@ class PipInstaller(PluginInstaller):
             extra_args = self.environment.config.get("pip-compile-install-args", [])
             args = [*extra_args, "--requirement", str(self.environment.piptools_lock_file)]
             install_command = self.environment.construct_pip_install_command(args=args)
-            self.environment.virtual_env.platform.check_command(install_command)
+            self.environment.plugin_check_command(install_command)
 
 
 class PipSyncInstaller(PluginInstaller):
@@ -104,7 +104,7 @@ class PipSyncInstaller(PluginInstaller):
         extra_args = self.environment.config.get("pip-compile-install-args", [])
         cmd.extend(extra_args)
         cmd.append(str(self.environment.piptools_lock_file))
-        self.environment.virtual_env.platform.check_command(cmd)
+        self.environment.plugin_check_command(cmd)
         if not self.environment.dependencies:
             self.environment.piptools_lock_file.unlink()
 
