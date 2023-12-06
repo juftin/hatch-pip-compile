@@ -117,6 +117,7 @@ class PipSyncInstaller(PluginInstaller):
         3) (re)install project
         """
         with self.environment.safe_activation():
+            self.environment.run_pip_compile()
             self.install_dependencies()
         if not self.environment.skip_install:
             if self.environment.dev_mode:

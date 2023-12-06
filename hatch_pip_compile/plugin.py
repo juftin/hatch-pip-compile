@@ -107,12 +107,13 @@ class PipCompileEnvironment(VirtualEnvironment):
         Run pip-compile if necessary
         """
         if not self.lockfile_up_to_date:
-            self.install_pip_tools()
-            if self.piptools_lock_file.exists():
-                _ = self.piptools_lock.compare_python_versions(
-                    verbose=self.config.get("pip-compile-verbose", None)
-                )
-            self.pip_compile_cli()
+            with self.safe_activation():
+                self.install_pip_tools()
+                if self.piptools_lock_file.exists():
+                    _ = self.piptools_lock.compare_python_versions(
+                        verbose=self.config.get("pip-compile-verbose", None)
+                    )
+                self.pip_compile_cli()
 
     def pip_compile_cli(self) -> None:
         """
