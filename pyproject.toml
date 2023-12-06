@@ -113,7 +113,6 @@ typing = "mypy --install-types --non-interactive {args:hatch_pip_compile}"
 
 [tool.hatch.envs.matrix]
 template = "test"
-type = "virtual"
 
 [[tool.hatch.envs.matrix.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
