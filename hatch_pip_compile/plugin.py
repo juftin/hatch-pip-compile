@@ -9,7 +9,8 @@ import os
 import pathlib
 import shutil
 import tempfile
-from typing import Any, Dict, List, Optional
+from subprocess import CompletedProcess
+from typing import Any, Dict, List, Optional, Union
 
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
@@ -100,7 +101,7 @@ class PipCompileEnvironment(VirtualEnvironment):
                 environment=self.virtual_env.environment,
             )
             if not in_sync:
-                self.platform.check_command(self.construct_pip_install_command(["pip-tools"]))
+                self.plugin_check_command(self.construct_pip_install_command(["pip-tools"]))
 
     def run_pip_compile(self) -> None:
         """
@@ -162,7 +163,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             if self.piptools_lock_file.exists():
                 shutil.copy(self.piptools_lock_file, output_file)
             self.piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
-            self.virtual_env.platform.check_command(cmd)
+            self.plugin_check_command(cmd)
             self.piptools_lock.process_lock(lockfile=output_file)
             shutil.move(output_file, self.piptools_lock_file)
         self.lockfile_up_to_date = True
@@ -339,3 +340,15 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
+
+    def plugin_check_command(
+        self, command: Union[str, List[str]], *, shell: bool = False, **kwargs: Any
+    ) -> CompletedProcess:
+        """
+        Run a command from the virtualenv
+        """
+        return self.virtual_env.platform.check_command(
+            command=command,
+            shell=shell,
+            **kwargs,
+        )
