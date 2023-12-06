@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://github.com/juftin/hatch-pip-compile">
-    <img src="docs/logo.png" alt="hatch-pip-compile" width="250" />
+    <img src="https://raw.githubusercontent.com/juftin/hatch-pip-compile/main/docs/logo.png" alt="hatch-pip-compile" width="250" />
   </a>
 </div>
 
