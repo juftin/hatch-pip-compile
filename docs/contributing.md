@@ -154,8 +154,7 @@ commit message might look like:
 💥 Breaking Change Description
 ```
 
-Other commits that don't trigger a release, but get included in the
-release notes might look like:
+Other commits that don't trigger a release might look like:
 
 ```text
 📝 Documentation Update Description
@@ -163,6 +162,7 @@ release notes might look like:
 🧪 Testing Changes Description
 🚚 Moving/Renaming Description
 ⬆️ Dependency Upgrade Description
+🎨 Non-Material Code Tidying Description
 ```
 
 ### Pre-Releases
