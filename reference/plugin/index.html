@@ -1347,7 +1347,9 @@
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="k">class</span> <span class="nc">PipCompileEnvironment</span><span class="p">(</span><span class="n">VirtualEnvironment</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-27" name="__codelineno-0-27"></a><span class="k">class</span> <span class="nc">PipCompileEnvironment</span><span class="p">(</span><span class="n">VirtualEnvironment</span><span class="p">):</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a><span class="sd">    Virtual Environment supported by pip-compile</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1620,61 +1622,63 @@
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a>        <span class="k">if</span> <span class="n">environment</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PLUGIN_NAME</span><span class="p">:</span>
 <a id="__codelineno-0-298" name="__codelineno-0-298"></a>            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The constraint environment is not a hatch-pip-compile environment.&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-299" name="__codelineno-0-299"></a>            <span class="k">return</span> <span class="bp">self</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a>                <span class="n">_</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">executables_directory</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="n">environment</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="k">return</span> <span class="n">environment</span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a>    <span class="k">def</span> <span class="nf">validate_constraints_file</span><span class="p">(</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">constraints_file</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;PipCompileEnvironment&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">        Validate the constraints file</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Parameters</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">        ----------</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        constraints_file : pathlib.Path</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">            The lock file</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        environment : PipCompileEnvironment</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            The environment to validate against</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        Returns</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">        -------</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        bool</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">            Whether the constraints file is valid</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>            <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="n">up_to_date</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">piptools_lock</span><span class="o">.</span><span class="n">compare_requirements</span><span class="p">(</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>                <span class="n">requirements</span><span class="o">=</span><span class="n">environment</span><span class="o">.</span><span class="n">dependencies_complex</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">up_to_date</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">return</span> <span class="kc">True</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="nd">@property</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>    <span class="k">def</span> <span class="nf">pipools_environment_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="sd">        Get the environment dictionary</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">hatch</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;envs&quot;</span><span class="p">,</span> <span class="p">{})</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="k">def</span> <span class="nf">plugin_check_command</span><span class="p">(</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompletedProcess</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">        Run a command from the virtualenv</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">        &quot;&quot;&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">check_command</span><span class="p">(</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="p">)</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>        <span class="k">elif</span> <span class="ow">not</span> <span class="n">environment</span><span class="o">.</span><span class="n">dependencies</span><span class="p">:</span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a>            <span class="k">return</span> <span class="bp">self</span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>            <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>                <span class="n">_</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">executables_directory</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a>                <span class="n">environment</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a>            <span class="k">return</span> <span class="n">environment</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">def</span> <span class="nf">validate_constraints_file</span><span class="p">(</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">constraints_file</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;PipCompileEnvironment&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">        Validate the constraints file</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">        Parameters</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        ----------</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">        constraints_file : pathlib.Path</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">            The lock file</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">        environment : PipCompileEnvironment</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">            The environment to validate against</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">        Returns</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        -------</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">        bool</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">            Whether the constraints file is valid</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>            <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">up_to_date</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">piptools_lock</span><span class="o">.</span><span class="n">compare_requirements</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>                <span class="n">requirements</span><span class="o">=</span><span class="n">environment</span><span class="o">.</span><span class="n">dependencies_complex</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">up_to_date</span><span class="p">:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>        <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>    <span class="nd">@property</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>    <span class="k">def</span> <span class="nf">pipools_environment_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a><span class="sd">        Get the environment dictionary</span>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">hatch</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;envs&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>    <span class="k">def</span> <span class="nf">plugin_check_command</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompletedProcess</span><span class="p">:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">        Run a command from the virtualenv</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">        &quot;&quot;&quot;</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">check_command</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>            <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -2343,9 +2347,7 @@ validity and defining inheritance.</p>
 
           <details class="quote">
             <summary>Source code in <code>hatch_pip_compile/plugin.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-344">344</a></span>
-<span class="normal"><a href="#__codelineno-0-345">345</a></span>
-<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-346">346</a></span>
 <span class="normal"><a href="#__codelineno-0-347">347</a></span>
 <span class="normal"><a href="#__codelineno-0-348">348</a></span>
 <span class="normal"><a href="#__codelineno-0-349">349</a></span>
@@ -2353,17 +2355,19 @@ validity and defining inheritance.</p>
 <span class="normal"><a href="#__codelineno-0-351">351</a></span>
 <span class="normal"><a href="#__codelineno-0-352">352</a></span>
 <span class="normal"><a href="#__codelineno-0-353">353</a></span>
-<span class="normal"><a href="#__codelineno-0-354">354</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-344" name="__codelineno-0-344"></a><span class="k">def</span> <span class="nf">plugin_check_command</span><span class="p">(</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompletedProcess</span><span class="p">:</span>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="sd">    Run a command from the virtualenv</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">check_command</span><span class="p">(</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>        <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>    <span class="p">)</span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-346" name="__codelineno-0-346"></a><span class="k">def</span> <span class="nf">plugin_check_command</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompletedProcess</span><span class="p">:</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a><span class="sd">    Run a command from the virtualenv</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">virtual_env</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">check_command</span><span class="p">(</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>        <span class="n">shell</span><span class="o">=</span><span class="n">shell</span><span class="p">,</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -2538,9 +2542,7 @@ validity and defining inheritance.</p>
 
           <details class="quote">
             <summary>Source code in <code>hatch_pip_compile/plugin.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-307">307</a></span>
-<span class="normal"><a href="#__codelineno-0-308">308</a></span>
-<span class="normal"><a href="#__codelineno-0-309">309</a></span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-309">309</a></span>
 <span class="normal"><a href="#__codelineno-0-310">310</a></span>
 <span class="normal"><a href="#__codelineno-0-311">311</a></span>
 <span class="normal"><a href="#__codelineno-0-312">312</a></span>
@@ -2566,35 +2568,37 @@ validity and defining inheritance.</p>
 <span class="normal"><a href="#__codelineno-0-332">332</a></span>
 <span class="normal"><a href="#__codelineno-0-333">333</a></span>
 <span class="normal"><a href="#__codelineno-0-334">334</a></span>
-<span class="normal"><a href="#__codelineno-0-335">335</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span> <span class="nf">validate_constraints_file</span><span class="p">(</span>
-<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">constraints_file</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;PipCompileEnvironment&quot;</span>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    Validate the constraints file</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Parameters</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a><span class="sd">    ----------</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    constraints_file : pathlib.Path</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">        The lock file</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    environment : PipCompileEnvironment</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        The environment to validate against</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">    Returns</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a><span class="sd">    -------</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    bool</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">        Whether the constraints file is valid</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">up_to_date</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">piptools_lock</span><span class="o">.</span><span class="n">compare_requirements</span><span class="p">(</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>            <span class="n">requirements</span><span class="o">=</span><span class="n">environment</span><span class="o">.</span><span class="n">dependencies_complex</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">up_to_date</span><span class="p">:</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>            <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">return</span> <span class="kc">True</span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="k">def</span> <span class="nf">validate_constraints_file</span><span class="p">(</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">constraints_file</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="s2">&quot;PipCompileEnvironment&quot;</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a><span class="sd">    Validate the constraints file</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a><span class="sd">    Parameters</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a><span class="sd">    ----------</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a><span class="sd">    constraints_file : pathlib.Path</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a><span class="sd">        The lock file</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a><span class="sd">    environment : PipCompileEnvironment</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a><span class="sd">        The environment to validate against</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a><span class="sd">    Returns</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a><span class="sd">    -------</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="sd">    bool</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a><span class="sd">        Whether the constraints file is valid</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">constraints_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">up_to_date</span> <span class="o">=</span> <span class="n">environment</span><span class="o">.</span><span class="n">piptools_lock</span><span class="o">.</span><span class="n">compare_requirements</span><span class="p">(</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">requirements</span><span class="o">=</span><span class="n">environment</span><span class="o">.</span><span class="n">dependencies_complex</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="p">)</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">up_to_date</span><span class="p">:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">constraint_env</span><span class="o">.</span><span class="n">run_pip_compile</span><span class="p">()</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">return</span> <span class="kc">True</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
