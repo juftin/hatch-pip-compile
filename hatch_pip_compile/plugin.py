@@ -297,6 +297,8 @@ class PipCompileEnvironment(VirtualEnvironment):
         if environment.config.get("type") != self.PLUGIN_NAME:
             logger.error("The constraint environment is not a hatch-pip-compile environment.")
             return self
+        elif not environment.dependencies:
+            return self
         else:
             try:
                 _ = environment.virtual_env.executables_directory
