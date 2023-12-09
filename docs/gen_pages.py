@@ -36,3 +36,10 @@ for path in sorted(source_code.rglob("*.py")):
 
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
+
+with open("README.md") as in_file:
+    readme_content = in_file.read()
+# Exclude parts that are between two exact `<!--skip-->` lines
+readme_content = "\n".join(readme_content.split("\n<!--skip-->\n")[::2])
+with mkdocs_gen_files.open("index.md", "w") as index_file:
+    index_file.write(readme_content)

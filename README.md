@@ -407,6 +407,8 @@ Alternatively, you can install it with [pip]:
 pip install hatch hatch-pip-compile
 ```
 
+<!--skip-->
+
 ---
 
 ---
@@ -416,6 +418,8 @@ pip install hatch hatch-pip-compile
 #### Looking to contribute? See the [Contributing Guide]
 
 #### See the [Changelog]
+
+<!--skip-->
 
 [pip-compile]: https://github.com/jazzband/pip-tools
 [pip-sync]: https://github.com/jazzband/pip-tools
