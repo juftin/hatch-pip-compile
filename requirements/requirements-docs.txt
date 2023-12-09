@@ -3,6 +3,7 @@
 #
 # [constraints] requirements.txt (SHA256: 9dc610f2c50b92a04dc522873ebc8dd69d35bf8ce9feeef14c5341e8e4ef3019)
 #
+# - markdown-callouts
 # - markdown-exec
 # - mkdocs
 # - mkdocs-gen-files
@@ -119,11 +120,14 @@ keyring==24.3.0
     #   hatch
 markdown==3.5.1
     # via
+    #   markdown-callouts
     #   mkdocs
     #   mkdocs-autorefs
     #   mkdocs-material
     #   mkdocstrings
     #   pymdown-extensions
+markdown-callouts==0.3.0
+    # via hatch.envs.docs
 markdown-exec==1.7.0
     # via hatch.envs.docs
 markdown-it-py==3.0.0

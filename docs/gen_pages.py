@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 project_dir = Path(__file__).resolve().parent.parent
 source_code = project_dir.joinpath("hatch_pip_compile")
-nav = mkdocs_gen_files.Nav()
 
 for path in sorted(source_code.rglob("*.py")):
     module_path = path.relative_to(project_dir).with_suffix("")
@@ -26,13 +25,15 @@ for path in sorted(source_code.rglob("*.py")):
     elif parts[-1] == "__main__":
         continue
 
-    nav[parts] = doc_path.as_posix()
-
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
-        ident = ".".join(parts)
-        fd.write(f"::: {ident}")
+        fd.write(f"# `{parts[-1]}`\n\n::: {'.'.join(parts)}")
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
-with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
-    nav_file.writelines(nav.build_literate_nav())
+
+with open("README.md") as in_file:
+    readme_content = in_file.read()
+# Exclude parts that are between two exact `<!--skip-->` lines
+readme_content = "\n".join(readme_content.split("\n<!--skip-->\n")[::2])
+with mkdocs_gen_files.open("index.md", "w") as index_file:
+    index_file.write(readme_content)
