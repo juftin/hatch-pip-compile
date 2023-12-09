@@ -87,12 +87,9 @@ class PipSyncInstaller(PluginInstaller):
         uninstall everything in the environment before deleting the
         lockfile.
         """
-        self.environment.install_pip_tools()
+        import piptools.scripts.sync
+
         cmd = [
-            self.environment.virtual_env.python_info.executable,
-            "-m",
-            "piptools",
-            "sync",
             "--verbose"
             if self.environment.config.get("pip-compile-verbose", None) is True
             else "--quiet",
@@ -104,7 +101,7 @@ class PipSyncInstaller(PluginInstaller):
         extra_args = self.environment.config.get("pip-compile-install-args", [])
         cmd.extend(extra_args)
         cmd.append(str(self.environment.piptools_lock_file))
-        self.environment.plugin_check_command(cmd)
+        piptools.scripts.sync.cli(cmd, standalone_mode=False)
         if not self.environment.dependencies:
             self.environment.piptools_lock_file.unlink()
 

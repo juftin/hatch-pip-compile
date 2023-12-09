@@ -20,7 +20,8 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
 dependencies = [
-  "hatch"
+  "hatch",
+  "pip-tools",
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]

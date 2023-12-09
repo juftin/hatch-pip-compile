@@ -2,7 +2,6 @@
 Plugin tests.
 """
 
-from subprocess import CompletedProcess
 from unittest.mock import Mock, patch
 
 from hatch.utils.fs import Path
@@ -91,20 +90,13 @@ def test_lockfile_up_to_date_mismatch(
     assert default_environment.lockfile_up_to_date is False
 
 
-@patch("hatch_pip_compile.plugin.PipCompileEnvironment.plugin_check_command")
+@patch("piptools.scripts.compile.cli")
 def test_pip_compile_cli(mock_check_command: Mock, default_environment: PipCompileEnvironment):
     """
     Test the `pip_compile_cli` method is called with the expected arguments
     """
-    mock_check_command.return_value = CompletedProcess(
-        args=[], returncode=0, stdout=b"", stderr=b""
-    )
     default_environment.pip_compile_cli()
     expected_call = [
-        "python",
-        "-m",
-        "piptools",
-        "compile",
         "--quiet",
         "--strip-extras",
         "--no-header",

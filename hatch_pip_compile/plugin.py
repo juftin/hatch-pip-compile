@@ -14,8 +14,6 @@ from typing import Any, Dict, List, Optional, Union
 
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
-from hatchling.dep.core import dependencies_in_sync
-from packaging.requirements import Requirement
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
 from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
@@ -90,26 +88,12 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-install-args": List[str],
         }
 
-    def install_pip_tools(self) -> None:
-        """
-        Install pip-tools (if not already installed)
-        """
-        with self.safe_activation():
-            in_sync = dependencies_in_sync(
-                requirements=[Requirement("pip-tools")],
-                sys_path=self.virtual_env.sys_path,
-                environment=self.virtual_env.environment,
-            )
-            if not in_sync:
-                self.plugin_check_command(self.construct_pip_install_command(["pip-tools"]))
-
     def run_pip_compile(self) -> None:
         """
         Run pip-compile if necessary
         """
         if not self.lockfile_up_to_date:
             with self.safe_activation():
-                self.install_pip_tools()
                 if self.piptools_lock_file.exists():
                     _ = self.piptools_lock.compare_python_versions(
                         verbose=self.config.get("pip-compile-verbose", None)
@@ -137,11 +121,10 @@ class PipCompileEnvironment(VirtualEnvironment):
             upgrade_packages_sep = upgrade_packages.split(",")
             for package in upgrade_packages_sep:
                 upgrade_package_args.append(f"--upgrade-package={package.strip()}")
+
+        import piptools.scripts.compile
+
         cmd = [
-            self.virtual_env.python_info.executable,
-            "-m",
-            "piptools",
-            "compile",
             "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
             "--strip-extras",
             "--no-header",
@@ -163,7 +146,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             if self.piptools_lock_file.exists():
                 shutil.copy(self.piptools_lock_file, output_file)
             self.piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
-            self.plugin_check_command(cmd)
+            piptools.scripts.compile.cli(cmd, standalone_mode=False)
             self.piptools_lock.process_lock(lockfile=output_file)
             shutil.move(output_file, self.piptools_lock_file)
         self.lockfile_up_to_date = True
@@ -349,7 +332,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run a command from the virtualenv
         """
-        return self.virtual_env.platform.check_command(
+        return self.platform.check_command(
             command=command,
             shell=shell,
             **kwargs,
