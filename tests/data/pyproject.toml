@@ -9,17 +9,15 @@ authors = [
 dependencies = [
   "hatch"
 ]
-description = "hatch plugin to use pip-compile to manage project dependencies"
+description = "testing hatch-pip-compile"
 license = "MIT"
-name = "hatch-pip-compile"
+name = "hatch-pip-compile-test"
 readme = "README.md"
 requires-python = ">=3.8"
 version = "0.1.0"
 
-[tool.hatch.env]
-requires = ["hatch-pip-compile"]
-
 [tool.hatch.envs.default]
+path = ".venv/hatch-pip-compile"
 pip-compile-constraint = "default"
 type = "pip-compile"
 
@@ -29,9 +27,11 @@ dependencies = [
   "ruff~=0.1.4"
 ]
 detached = true
+path = ".venv/lint"
 
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",
   "pytest-cov"
 ]
+path = ".venv/test"

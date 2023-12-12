@@ -3,7 +3,7 @@
 ## Environment Setup
 
 > TIP: **pipx**
-> 
+>
 > This documentaion uses [pipx] to
 > install and manage non-project command line tools like `hatch` and
 > `pre-commit`. If you don't already have `pipx` installed, make sure to

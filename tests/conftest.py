@@ -5,27 +5,40 @@ Shared fixtures for tests.
 import os
 import pathlib
 import shutil
+from dataclasses import dataclass, field
+from subprocess import CompletedProcess
 from typing import Generator
+from unittest.mock import patch
 
 import pytest
+import tomlkit
 from hatch.config.constants import AppEnvVars, ConfigEnvVars, PublishEnvVars
 from hatch.project.core import Project
 from hatch.utils.fs import Path, temp_directory
 from hatch.utils.platform import Platform
-from platformdirs import user_cache_dir, user_data_dir
 
 from hatch_pip_compile.plugin import PipCompileEnvironment
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
+def mock_check_command():
+    """
+    Disable the `plugin_check_command` for testing
+    """
+    with patch("hatch_pip_compile.plugin.PipCompileEnvironment.plugin_check_command") as mock:
+        mock.return_value = CompletedProcess(args=[], returncode=0, stdout=b"", stderr=b"")
+        yield mock
+
+
+@pytest.fixture
 def platform() -> Platform:
     """
-    Platform information.
+    Platform
     """
     return Platform()
 
 
-@pytest.fixture()
+@pytest.fixture
 def isolation(platform: Platform) -> Generator[Path, None, None]:
     """
     Isolated hatch environment for testing.
@@ -49,7 +62,7 @@ def isolation(platform: Platform) -> Generator[Path, None, None]:
             "COLUMNS": "80",
             "LINES": "24",
         }
-        if platform.windows:
+        if platform.windows:  # pragma: no cover
             default_env_vars["COMSPEC"] = "cmd.exe"
         else:
             default_env_vars["SHELL"] = "sh"
@@ -60,75 +73,70 @@ def isolation(platform: Platform) -> Generator[Path, None, None]:
             yield temp_dir
 
 
-@pytest.fixture
-def isolated_data_dir() -> Path:
+@dataclass
+class PipCompileFixture:
     """
-    Isolated data directory for testing.
+    Testing Fixture Data Container
     """
-    return Path(os.environ[ConfigEnvVars.DATA])
+
+    __test__ = False
+
+    isolation: pathlib.Path
+    toml_doc: tomlkit.TOMLDocument
+    pyproject: pathlib.Path
+    project: Project
+    platform: Platform
+    isolated_data_dir: pathlib.Path
+
+    default_environment: PipCompileEnvironment = field(init=False)
+    test_environment: PipCompileEnvironment = field(init=False)
+
+    def __post_init__(self) -> None:
+        """
+        Post Init
+        """
+        self.default_environment = self.reload_environment("default")
+        self.test_environment = self.reload_environment("test")
+
+    def reload_environment(self, environment: str) -> PipCompileEnvironment:
+        """
+        Reload a new environment given the current state of the isolated project
+        """
+        new_project = Project(self.isolation)
+        return PipCompileEnvironment(
+            root=self.isolation,
+            metadata=new_project.metadata,
+            name=environment,
+            config=new_project.config.envs[environment],
+            matrix_variables={},
+            data_directory=self.isolated_data_dir,
+            isolated_data_directory=self.isolated_data_dir,
+            platform=self.platform,
+            verbosity=0,
+        )
+
+    def update_pyproject(self) -> None:
+        """
+        Update pyproject.toml
+        """
+        tomlkit.dump(self.toml_doc, self.pyproject.open("w"))
 
 
 @pytest.fixture
-def default_data_dir() -> Path:
+def pip_compile(
+    isolation: Path,
+    platform: Platform,
+) -> PipCompileFixture:
     """
-    Path to Data Directory
+    PipCompile testing fixture
     """
-    return Path(user_data_dir("hatch", appauthor=False))
-
-
-@pytest.fixture
-def default_cache_dir() -> Path:
-    """
-    Path to Cache Directory
-    """
-    return Path(user_cache_dir("hatch", appauthor=False))
-
-
-@pytest.fixture
-def project(isolation: Path) -> Project:
-    """
-    Standard project configuration
-    """
-    return Project(isolation)
-
-
-@pytest.fixture
-def default_environment(
-    project: Project, isolated_data_dir: Path, platform: Platform, isolation: Path
-) -> PipCompileEnvironment:
-    """
-    Isolated PipCompileEnvironment - `default`
-    """
-    environment = PipCompileEnvironment(
-        root=isolation,
-        metadata=project.metadata,
-        name="default",
-        config=project.config.envs["default"],
-        matrix_variables={},
-        data_directory=isolated_data_dir,
-        isolated_data_directory=isolated_data_dir,
+    pyproject = isolation / "pyproject.toml"
+    isolated_data_dir = Path(os.environ[ConfigEnvVars.DATA])
+    return PipCompileFixture(
+        isolation=isolation,
+        toml_doc=tomlkit.parse(string=pyproject.read_text()),
+        pyproject=pyproject,
+        project=Project(path=isolation),
         platform=platform,
-        verbosity=0,
+        isolated_data_dir=isolated_data_dir,
     )
-    return environment
-
-
-@pytest.fixture
-def test_environment(
-    project: Project, isolated_data_dir: Path, platform: Platform, isolation: Path
-) -> PipCompileEnvironment:
-    """
-    Isolated PipCompileEnvironment - `test`
-    """
-    environment = PipCompileEnvironment(
-        root=isolation,
-        metadata=project.metadata,
-        name="test",
-        config=project.config.envs["test"],
-        matrix_variables={},
-        data_directory=isolated_data_dir,
-        isolated_data_directory=isolated_data_dir,
-        platform=platform,
-        verbosity=0,
-    )
-    return environment

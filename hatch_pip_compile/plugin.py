@@ -81,7 +81,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Get option types
         """
-        return {
+        return {  # pragma: no cover
             "lock-filename": str,
             "pip-compile-hashes": bool,
             "pip-compile-args": List[str],
@@ -122,6 +122,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         if not self.dependencies:
             self.piptools_lock_file.unlink(missing_ok=True)
+            self.lockfile_up_to_date = True
             return
         no_compile = bool(os.getenv("PIP_COMPILE_DISABLE"))
         if no_compile:
