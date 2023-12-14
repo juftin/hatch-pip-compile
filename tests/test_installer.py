@@ -3,7 +3,7 @@ Installation Tests
 """
 
 from typing import Dict, Type
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -12,7 +12,6 @@ from hatch_pip_compile.installer import PluginInstaller
 from tests.conftest import PipCompileFixture
 
 
-@patch("hatch_pip_compile.plugin.PipCompileEnvironment.plugin_check_command")
 def test_pip_install_dependencies(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
     """
     Assert the `pip` installation command is called with the expected arguments
