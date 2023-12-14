@@ -121,7 +121,8 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 [tool.hatch.envs.test]
 dependencies = [
   "pytest",
-  "pytest-cov"
+  "pytest-cov",
+  "tomlkit"
 ]
 
 [tool.hatch.envs.test.scripts]

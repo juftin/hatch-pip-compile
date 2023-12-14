@@ -5,6 +5,7 @@
 #
 # - pytest
 # - pytest-cov
+# - tomlkit
 # - hatch
 #
 
@@ -23,7 +24,9 @@ click==8.1.7
     #   hatch
     #   userpath
 coverage==7.3.2
-    # via pytest-cov
+    # via
+    #   coverage
+    #   pytest-cov
 distlib==0.3.7
     # via
     #   -c requirements.txt
@@ -163,6 +166,7 @@ tomli-w==1.0.0
 tomlkit==0.12.3
     # via
     #   -c requirements.txt
+    #   hatch.envs.matrix.py3.9
     #   hatch
 trove-classifiers==2023.11.29
     # via
