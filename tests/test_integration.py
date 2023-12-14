@@ -52,7 +52,7 @@ def test_delete_dependencies(
     assert updated_environment.lockfile_up_to_date is False
     pip_compile.application.prepare_environment(environment=updated_environment)
     assert updated_environment.lockfile_up_to_date is True
-    assert (pip_compile.isolation / ".venv" / "hatch-pip-compile").exists()
+    assert (pip_compile.isolation / ".venv" / "hatch-pip-compile-test").exists()
     assert updated_environment.dependencies == []
     assert updated_environment.piptools_lock_file.exists() is False
 

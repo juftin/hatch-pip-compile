@@ -140,3 +140,13 @@ def test_env_var_disabled(pip_compile: PipCompileFixture, monkeypatch: pytest.Mo
     monkeypatch.setenv("PIP_COMPILE_DISABLE", "1")
     with pytest.raises(HatchPipCompileError, match="attempted to run a lockfile update"):
         pip_compile.default_environment.pip_compile_cli()
+
+
+def test_constraint_env_self(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the value of the constraint env b/w the default and test environments
+    """
+    assert (
+        pip_compile.default_environment.constraint_env.name == pip_compile.default_environment.name
+    )
+    assert pip_compile.test_environment.constraint_env.name == pip_compile.default_environment.name
