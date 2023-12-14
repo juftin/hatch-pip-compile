@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 import pytest
 import tomlkit
+from hatch.cli.application import Application
 from hatch.config.constants import AppEnvVars, ConfigEnvVars, PublishEnvVars
 from hatch.project.core import Project
 from hatch.utils.fs import Path, temp_directory
@@ -89,6 +90,7 @@ class PipCompileFixture:
     platform: Platform
     isolated_data_dir: pathlib.Path
 
+    application: Application = field(init=False)
     default_environment: PipCompileEnvironment = field(init=False)
     test_environment: PipCompileEnvironment = field(init=False)
 
@@ -96,6 +98,12 @@ class PipCompileFixture:
         """
         Post Init
         """
+        self.application = Application(
+            exit_func=lambda x: None,  # noqa: ARG005
+            verbosity=0,
+            interactive=False,
+            enable_color=False,
+        )
         self.default_environment = self.reload_environment("default")
         self.test_environment = self.reload_environment("test")
 
