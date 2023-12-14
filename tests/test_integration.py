@@ -36,13 +36,18 @@ def test_new_dependency(
     assert new_lockfile_requirements == [packaging.requirements.Requirement("requests")]
 
 
-def test_delete_dependencies(pip_compile: PipCompileFixture) -> None:
+@pytest.mark.parametrize("installer", ["pip", "pip-sync"])
+def test_delete_dependencies(
+    installer: str, installer_dict: Dict[str, Type[PluginInstaller]], pip_compile: PipCompileFixture
+) -> None:
     """
     Test deleting all dependencies also deletes the lockfile
     """
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
     pip_compile.toml_doc["project"]["dependencies"] = []
     pip_compile.update_pyproject()
     updated_environment = pip_compile.reload_environment("default")
+    assert isinstance(updated_environment.installer, installer_dict[installer])
     assert updated_environment.dependencies == []
     assert updated_environment.lockfile_up_to_date is False
     updated_environment.create()
