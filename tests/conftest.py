@@ -7,7 +7,7 @@ import pathlib
 import shutil
 from dataclasses import dataclass, field
 from subprocess import CompletedProcess
-from typing import Generator
+from typing import Dict, Generator, Type
 from unittest.mock import patch
 
 import pytest
@@ -17,11 +17,12 @@ from hatch.project.core import Project
 from hatch.utils.fs import Path, temp_directory
 from hatch.utils.platform import Platform
 
+from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
 from hatch_pip_compile.plugin import PipCompileEnvironment
 
 
 @pytest.fixture
-def mock_check_command():
+def mock_check_command() -> Generator[patch, None, None]:
     """
     Disable the `plugin_check_command` for testing
     """
@@ -140,3 +141,14 @@ def pip_compile(
         platform=platform,
         isolated_data_dir=isolated_data_dir,
     )
+
+
+@pytest.fixture
+def installer_dict() -> Dict[str, Type[PluginInstaller]]:
+    """
+    Installer dictionary for parametrized tests
+    """
+    return {
+        "pip": PipInstaller,
+        "pip-sync": PipSyncInstaller,
+    }

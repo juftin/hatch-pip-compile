@@ -2,13 +2,13 @@
 Installation Tests
 """
 
-from subprocess import CompletedProcess
+from typing import Dict, Type
 from unittest.mock import Mock, patch
 
 import pytest
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
-from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller
+from hatch_pip_compile.installer import PluginInstaller
 from tests.conftest import PipCompileFixture
 
 
@@ -17,9 +17,6 @@ def test_pip_install_dependencies(mock_check_command: Mock, pip_compile: PipComp
     """
     Assert the `pip` installation command is called with the expected arguments
     """
-    mock_check_command.return_value = CompletedProcess(
-        args=[], returncode=0, stdout=b"", stderr=b""
-    )
     pip_compile.default_environment.create()
     pip_compile.default_environment.installer.install_dependencies()
     expected_call = [
@@ -37,24 +34,17 @@ def test_pip_install_dependencies(mock_check_command: Mock, pip_compile: PipComp
     assert call_args == expected_call
 
 
-def test_installer_pip(pip_compile: PipCompileFixture) -> None:
+@pytest.mark.parametrize("installer", ["pip", "pip-sync"])
+def test_installer_type(
+    installer: str, installer_dict: Dict[str, Type[PluginInstaller]], pip_compile: PipCompileFixture
+) -> None:
     """
-    Test that the `pip` installer is used when configured
+    Test the `pip-compile-installer` configuration option
     """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = "pip"
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
     pip_compile.update_pyproject()
     updated_environment = pip_compile.reload_environment("default")
-    assert isinstance(updated_environment.installer, PipInstaller)
-
-
-def test_installer_pip_sync(pip_compile: PipCompileFixture) -> None:
-    """
-    Test that the `pip-sync` installer is used when configured
-    """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = "pip-sync"
-    pip_compile.update_pyproject()
-    updated_environment = pip_compile.reload_environment("default")
-    assert isinstance(updated_environment.installer, PipSyncInstaller)
+    assert isinstance(updated_environment.installer, installer_dict[installer])
 
 
 def test_installer_unknown(pip_compile: PipCompileFixture) -> None:

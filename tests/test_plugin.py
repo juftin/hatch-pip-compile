@@ -12,7 +12,7 @@ from tests.conftest import PipCompileFixture
 
 def test_lockfile_path(
     pip_compile: PipCompileFixture,
-):
+) -> None:
     """
     Test the default lockfile paths
     """
@@ -28,7 +28,7 @@ def test_lockfile_path(
 
 def test_piptools_constraints_file(
     pip_compile: PipCompileFixture,
-):
+) -> None:
     """
     Test constraints paths
     """
