@@ -153,7 +153,8 @@ An environment to use as a constraint, ensuring that all shared dependencies are
 pinned to the same versions. For example, if you have a `default` environment and
 a `test` environment, you can set the `pip-compile-constraint` option to `default`
 on the `test` environment to ensure that all shared dependencies are pinned to the
-same versions.
+same versions. `pip-compile-constraint` can also be set to an empty string disable
+the feature.
 
 -   **_pyproject.toml_**
 

@@ -289,7 +289,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         Get the constraint environment
         """
         constraint_env = self.config.get("pip-compile-constraint")
-        if constraint_env is None:
+        if not constraint_env:
             return self
         elif self.name == constraint_env:
             return self
