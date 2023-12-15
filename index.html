@@ -1113,7 +1113,8 @@ for the <code>default</code> environment, and <code>requirements/requirements-{e
 pinned to the same versions. For example, if you have a <code>default</code> environment and
 a <code>test</code> environment, you can set the <code>pip-compile-constraint</code> option to <code>default</code>
 on the <code>test</code> environment to ensure that all shared dependencies are pinned to the
-same versions.</p>
+same versions. <code>pip-compile-constraint</code> can also be set to an empty string disable
+the feature.</p>
 <ul>
 <li>
 <p><strong><em>pyproject.toml</em></strong></p>
