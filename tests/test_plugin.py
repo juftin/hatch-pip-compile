@@ -2,104 +2,92 @@
 Plugin tests.
 """
 
-from subprocess import CompletedProcess
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
-from hatch.utils.fs import Path
+import pytest
 
-from hatch_pip_compile.plugin import PipCompileEnvironment
+from hatch_pip_compile.exceptions import HatchPipCompileError
+from tests.conftest import PipCompileFixture
 
 
 def test_lockfile_path(
-    isolation: Path,
-    default_environment: PipCompileEnvironment,
-    test_environment: PipCompileEnvironment,
-):
+    pip_compile: PipCompileFixture,
+) -> None:
     """
     Test the default lockfile paths
     """
-    assert default_environment.piptools_lock_file == isolation / "requirements.txt"
     assert (
-        test_environment.piptools_lock_file == isolation / "requirements" / "requirements-test.txt"
+        pip_compile.default_environment.piptools_lock_file
+        == pip_compile.isolation / "requirements.txt"
+    )
+    assert (
+        pip_compile.test_environment.piptools_lock_file
+        == pip_compile.isolation / "requirements" / "requirements-test.txt"
     )
 
 
 def test_piptools_constraints_file(
-    default_environment: PipCompileEnvironment,
-    test_environment: PipCompileEnvironment,
-):
+    pip_compile: PipCompileFixture,
+) -> None:
     """
     Test constraints paths
     """
-    assert default_environment.piptools_constraints_file is None
-    assert test_environment.piptools_constraints_file == default_environment.piptools_lock_file
+    assert pip_compile.default_environment.piptools_constraints_file is None
+    assert (
+        pip_compile.test_environment.piptools_constraints_file
+        == pip_compile.default_environment.piptools_lock_file
+    )
 
 
-def test_expected_dependencies(
-    default_environment: PipCompileEnvironment,
-    test_environment: PipCompileEnvironment,
-):
+def test_expected_dependencies(pip_compile: PipCompileFixture) -> None:
     """
     Test expected dependencies from `PipCompileEnvironment`
     """
-    assert set(default_environment.dependencies) == {"hatch"}
-    assert set(test_environment.dependencies) == {"pytest", "pytest-cov", "hatch"}
+    assert set(pip_compile.default_environment.dependencies) == {"hatch"}
+    assert set(pip_compile.test_environment.dependencies) == {"pytest", "pytest-cov", "hatch"}
 
 
-def test_lockfile_up_to_date(
-    default_environment: PipCompileEnvironment,
-    test_environment: PipCompileEnvironment,
-):
+def test_lockfile_up_to_date(pip_compile: PipCompileFixture) -> None:
     """
     Test the prepared lockfiles are up-to-date
     """
-    assert default_environment.lockfile_up_to_date is True
-    assert test_environment.lockfile_up_to_date is True
+    assert pip_compile.default_environment.lockfile_up_to_date is True
+    assert pip_compile.test_environment.lockfile_up_to_date is True
 
 
-def test_lockfile_up_to_date_missing(
-    default_environment: PipCompileEnvironment,
-):
+def test_lockfile_up_to_date_missing(pip_compile: PipCompileFixture) -> None:
     """
     Test the `lockfile_up_to_date` property when the lockfile is missing
     """
-    default_environment.piptools_lock_file.unlink()
-    assert default_environment.lockfile_up_to_date is False
-    assert default_environment.dependencies_in_sync() is False
+    pip_compile.default_environment.piptools_lock_file.unlink()
+    assert pip_compile.default_environment.lockfile_up_to_date is False
+    assert pip_compile.default_environment.dependencies_in_sync() is False
 
 
-def test_lockfile_up_to_date_empty(
-    default_environment: PipCompileEnvironment,
-):
+def test_lockfile_up_to_date_empty(pip_compile: PipCompileFixture) -> None:
     """
     Test the `lockfile_up_to_date` property when the lockfile is empty
     """
-    default_environment.piptools_lock_file.write_text("")
-    assert default_environment.lockfile_up_to_date is False
-    assert default_environment.dependencies_in_sync() is False
+    pip_compile.default_environment.piptools_lock_file.write_text("")
+    assert pip_compile.default_environment.lockfile_up_to_date is False
+    assert pip_compile.default_environment.dependencies_in_sync() is False
 
 
-def test_lockfile_up_to_date_mismatch(
-    default_environment: PipCompileEnvironment,
-):
+def test_lockfile_up_to_date_mismatch(pip_compile: PipCompileFixture) -> None:
     """
     Test the `lockfile_up_to_date` property when the lockfile is mismatched
     """
-    lock_text = default_environment.piptools_lock_file.read_text()
+    lock_text = pip_compile.default_environment.piptools_lock_file.read_text()
     lock_text = lock_text.replace("# - hatch", "#")
-    default_environment.piptools_lock_file.write_text(lock_text)
-    assert default_environment.lockfile_up_to_date is False
+    pip_compile.default_environment.piptools_lock_file.write_text(lock_text)
+    assert pip_compile.default_environment.lockfile_up_to_date is False
 
 
-@patch("hatch_pip_compile.plugin.PipCompileEnvironment.plugin_check_command")
-def test_pip_compile_cli(mock_check_command: Mock, default_environment: PipCompileEnvironment):
+def test_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
     """
     Test the `pip_compile_cli` method is called with the expected arguments
     """
-    mock_check_command.return_value = CompletedProcess(
-        args=[], returncode=0, stdout=b"", stderr=b""
-    )
-    default_environment.pip_compile_cli()
+    pip_compile.default_environment.pip_compile_cli()
     expected_call = [
         "python",
         "-m",
@@ -113,3 +101,52 @@ def test_pip_compile_cli(mock_check_command: Mock, default_environment: PipCompi
     ]
     call_args = list(mock_check_command.call_args)[0][0][:-2]
     assert call_args == expected_call
+
+
+def test_environment_change(
+    pip_compile: PipCompileFixture,
+) -> None:
+    """
+    Override the `dependencies` property and assert the `lockfile_up_to_date` property is False
+    """
+    assert pip_compile.test_environment.lockfile_up_to_date is True
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["test"]["dependencies"] = ["requests"]
+    pip_compile.update_pyproject()
+    new_environment = pip_compile.reload_environment("test")
+    assert new_environment.dependencies == ["requests", "hatch"]
+    assert new_environment.lockfile_up_to_date is False
+
+
+def test_constraint_dependency_change(
+    pip_compile: PipCompileFixture, mock_check_command: Mock
+) -> None:
+    """
+    Update the constraint environment and assert it and its downstream environments are out-of-sync
+    """
+    assert pip_compile.default_environment.lockfile_up_to_date is True
+    assert pip_compile.test_environment.lockfile_up_to_date is True
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["dependencies"] = ["requests"]
+    pip_compile.update_pyproject()
+    new_default_env = pip_compile.reload_environment("default")
+    new_test_env = pip_compile.reload_environment("test")
+    assert new_default_env.lockfile_up_to_date is False
+    assert new_test_env.lockfile_up_to_date is False
+
+
+def test_env_var_disabled(pip_compile: PipCompileFixture, monkeypatch: pytest.MonkeyPatch) -> None:
+    """
+    Test the `lockfile_up_to_date` property when the lockfile is empty
+    """
+    monkeypatch.setenv("PIP_COMPILE_DISABLE", "1")
+    with pytest.raises(HatchPipCompileError, match="attempted to run a lockfile update"):
+        pip_compile.default_environment.pip_compile_cli()
+
+
+def test_constraint_env_self(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the value of the constraint env b/w the default and test environments
+    """
+    assert (
+        pip_compile.default_environment.constraint_env.name == pip_compile.default_environment.name
+    )
+    assert pip_compile.test_environment.constraint_env.name == pip_compile.default_environment.name

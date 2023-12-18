@@ -5,6 +5,7 @@
 #
 # - pytest
 # - pytest-cov
+# - tomlkit
 # - hatch
 #
 
@@ -165,6 +166,7 @@ tomli-w==1.0.0
 tomlkit==0.12.3
     # via
     #   -c requirements.txt
+    #   hatch.envs.matrix.py3.10
     #   hatch
 trove-classifiers==2023.11.29
     # via
