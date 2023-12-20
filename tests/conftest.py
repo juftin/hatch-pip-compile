@@ -162,3 +162,11 @@ def installer_dict() -> Dict[str, Type[PluginInstaller]]:
         "pip": PipInstaller,
         "pip-sync": PipSyncInstaller,
     }
+
+
+@pytest.fixture(autouse=True)
+def pip_compile_disable(monkeypatch: pytest.MonkeyPatch) -> None:
+    """
+    Delete the PIP_COMPILE_DISABLE environment variable
+    """
+    monkeypatch.delenv("PIP_COMPILE_DISABLE", raising=False)
