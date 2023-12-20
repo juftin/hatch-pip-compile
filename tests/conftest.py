@@ -104,6 +104,8 @@ class PipCompileFixture:
             interactive=False,
             enable_color=False,
         )
+        self.application.data_dir = self.isolated_data_dir
+        self.application.project = self.project
         self.default_environment = self.reload_environment("default")
         self.test_environment = self.reload_environment("test")
 
