@@ -7,6 +7,8 @@ on:
 jobs:
     lint:
         runs-on: ubuntu-latest
+        env:
+            PIP_COMPILE_DISABLE: true
         steps:
             - name: Set up Github Workspace
               uses: actions/checkout@v4
