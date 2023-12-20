@@ -150,3 +150,11 @@ class PipCompileLock:
         if match is None:
             return False
         return match.group(1).strip() == sha.strip()
+
+    def get_hash(self) -> Optional[str]:
+        """
+        Get hash of lock file
+        """
+        if not self.lock_file.exists():
+            return None
+        return hashlib.sha256(self.lock_file.read_bytes()).hexdigest()

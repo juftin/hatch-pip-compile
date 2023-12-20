@@ -90,6 +90,18 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-install-args": List[str],
         }
 
+    def dependency_hash(self) -> str:
+        """
+        Get the dependency hash
+        """
+        self.run_pip_compile()
+        hatch_hash = super().dependency_hash()
+        if not self.dependencies:
+            return hatch_hash
+        else:
+            lockfile_hash = self.piptools_lock.get_hash()
+            return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
+
     def install_pip_tools(self) -> None:
         """
         Install pip-tools (if not already installed)
@@ -350,8 +362,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run a command from the virtualenv
         """
-        return self.virtual_env.platform.check_command(
-            command=command,
-            shell=shell,
-            **kwargs,
-        )
+        with self.safe_activation():
+            return self.virtual_env.platform.check_command(
+                command=command,
+                shell=shell,
+                **kwargs,
+            )
