@@ -20,7 +20,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
 dependencies = [
-  "hatch"
+  "hatch>=1.7.0"
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]
@@ -127,7 +127,30 @@ dependencies = [
 
 [tool.hatch.envs.test.scripts]
 cov = [
-  "pytest --cov-config=pyproject.toml --cov {args:tests}"
+  "pytest --cov-config=pyproject.toml --cov {args: tests/ -v}"
+]
+
+[tool.hatch.envs.versions]
+dependencies = []
+pip-compile-constraint = ""
+template = "test"
+type = "pip-compile"
+
+[[tool.hatch.envs.versions.matrix]]
+version = [
+  "1.7.x",
+  "1.8.x",
+  "1.9.x"
+]
+
+[tool.hatch.envs.versions.overrides]
+matrix.version.dependencies = [
+  "pytest",
+  "pytest-cov",
+  "tomlkit",
+  {value = "hatch~=1.7.0", if = ["1.7.x"]},
+  {value = "hatch~=1.8.0", if = ["1.8.x"]},
+  {value = "hatch~=1.9.0", if = ["1.9.x"]}
 ]
 
 [tool.hatch.version]
