@@ -21,7 +21,7 @@ classifiers = [
 ]
 dependencies = [
   "hatch>=1.7.0,<2",
-  "pip-tools>=6,<8"
+  "pip-tools>=6"
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]

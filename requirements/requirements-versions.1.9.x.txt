@@ -6,7 +6,7 @@
 # - tomlkit
 # - hatch~=1.9.0
 # - hatch<2,>=1.7.0
-# - pip-tools<8,>=6
+# - pip-tools>=6
 #
 
 anyio==4.2.0
