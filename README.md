@@ -15,6 +15,7 @@
   <a href="https://pypi.python.org/pypi/hatch-pip-compile/"><img src="https://img.shields.io/pypi/pyversions/hatch-pip-compile" alt="PyPI - Python Version"></a>
   <a href="https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE"><img src="https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&label=License" alt="GitHub License"></a>
   <a href="https://github.com/pypa/hatch"><img src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg" alt="Hatch project"></a>
+  <a href="https://github.com/jazzband/pip-tools"><img src="https://jazzband.co/static/img/badge.svg" alt="Pip Tools project"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
   <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit" alt="pre-commit"></a>
   <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>

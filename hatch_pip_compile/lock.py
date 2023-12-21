@@ -13,6 +13,7 @@ from typing import Iterable, List, Optional
 from hatch.env.virtual import VirtualEnv
 from packaging.requirements import Requirement
 from packaging.version import Version
+from piptools._compat.pip_compat import PipSession, parse_requirements
 
 from hatch_pip_compile.exceptions import LockFileError
 
@@ -65,9 +66,9 @@ class PipCompileLock:
         new_text = prefix + "\n\n" + cleaned_input_file
         lockfile.write_text(new_text)
 
-    def read_requirements(self) -> List[Requirement]:
+    def read_header_requirements(self) -> List[Requirement]:
         """
-        Read requirements from lock file
+        Read requirements from lock file header
         """
         lock_file_text = self.lock_file.read_text()
         parsed_requirements = []
@@ -138,7 +139,7 @@ class PipCompileLock:
         requirements : Iterable[Requirement]
             List of requirements to compare against the lock file
         """
-        lock_requirements = self.read_requirements()
+        lock_requirements = self.read_header_requirements()
         return set(requirements) == set(lock_requirements)
 
     def compare_constraint_sha(self, sha: str) -> bool:
@@ -151,10 +152,20 @@ class PipCompileLock:
             return False
         return match.group(1).strip() == sha.strip()
 
-    def get_hash(self) -> Optional[str]:
+    def get_file_content_hash(self) -> str:
         """
         Get hash of lock file
         """
-        if not self.lock_file.exists():
-            return None
         return hashlib.sha256(self.lock_file.read_bytes()).hexdigest()
+
+    def read_lock_requirements(self) -> List[Requirement]:
+        """
+        Read all requirements from lock file
+        """
+        if not self.dependencies:
+            return []
+        install_requirements = parse_requirements(
+            str(self.lock_file),
+            session=PipSession(),
+        )
+        return [ireq.req for ireq in install_requirements]

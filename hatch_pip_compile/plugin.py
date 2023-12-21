@@ -99,7 +99,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         if not self.dependencies:
             return hatch_hash
         else:
-            lockfile_hash = self.piptools_lock.get_hash()
+            lockfile_hash = self.piptools_lock.get_file_content_hash()
             return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
 
     def install_pip_tools(self) -> None:
@@ -232,9 +232,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             return False
         elif self.dependencies and self.piptools_lock_file.exists():
             if self.piptools_constraints_file:
-                current_sha = hashlib.sha256(
-                    self.piptools_constraints_file.read_bytes()
-                ).hexdigest()
+                current_sha = self.constraint_env.piptools_lock.get_file_content_hash()
                 sha_match = self.piptools_lock.compare_constraint_sha(sha=current_sha)
                 if sha_match is False:
                     return False
@@ -252,7 +250,12 @@ class PipCompileEnvironment(VirtualEnvironment):
         if not self.lockfile_up_to_date:
             return False
         else:
-            return super().dependencies_in_sync()
+            with self.safe_activation():
+                return dependencies_in_sync(
+                    self.piptools_lock.read_lock_requirements(),
+                    sys_path=self.virtual_env.sys_path,
+                    environment=self.virtual_env.environment,
+                )
 
     def sync_dependencies(self) -> None:
         """
