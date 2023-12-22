@@ -54,15 +54,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             with self.metadata.context.apply_context(self.context):
                 lock_filename = self.metadata.context.format(lock_filename_config)
         self.piptools_lock_file = self.root / lock_filename
-        self.piptools_lock = PipCompileLock(
-            lock_file=self.piptools_lock_file,
-            dependencies=self.dependencies,
-            virtualenv=self.virtual_env,
-            constraints_file=self.piptools_constraints_file,
-            project_root=self.root,
-            env_name=self.name,
-            project_name=self.metadata.name,
-        )
+        self.piptools_lock = PipCompileLock(environment=self)
         install_method = self.config.get("pip-compile-installer", "pip")
         self.installer: PluginInstaller
         if install_method == "pip":
