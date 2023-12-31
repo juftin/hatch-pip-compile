@@ -149,3 +149,13 @@ def test_check_dependency_hash_creates_lock(pip_compile: PipCompileFixture) -> N
     updated_environment = pip_compile.reload_environment("default")
     _ = updated_environment.dependency_hash()
     assert updated_environment.piptools_lock_file.exists() is True
+
+
+def test_dependencies_in_sync(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the `dependencies_in_sync` method
+    """
+    assert pip_compile.default_environment.lockfile_up_to_date is True
+    assert pip_compile.default_environment.dependencies_in_sync() is False
+    pip_compile.application.prepare_environment(pip_compile.default_environment)
+    assert pip_compile.default_environment.dependencies_in_sync() is True
