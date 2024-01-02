@@ -18,7 +18,7 @@
       
       
       <link rel="icon" href="https://juftin.com/favicon.ico">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.2">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
     
     
       
@@ -1104,7 +1104,7 @@
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_file</span><span class="p">),</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>            <span class="n">session</span><span class="o">=</span><span class="n">PipSession</span><span class="p">(),</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>        <span class="p">)</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">ireq</span><span class="o">.</span><span class="n">req</span> <span class="k">for</span> <span class="n">ireq</span> <span class="ow">in</span> <span class="n">install_requirements</span><span class="p">]</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">ireq</span><span class="o">.</span><span class="n">req</span> <span class="k">for</span> <span class="n">ireq</span> <span class="ow">in</span> <span class="n">install_requirements</span><span class="p">]</span>  <span class="c1"># type: ignore[misc]</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -1583,7 +1583,7 @@ which will print the warning. Used as a plugin flag.</p>
 <a id="__codelineno-0-168" name="__codelineno-0-168"></a>        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_file</span><span class="p">),</span>
 <a id="__codelineno-0-169" name="__codelineno-0-169"></a>        <span class="n">session</span><span class="o">=</span><span class="n">PipSession</span><span class="p">(),</span>
 <a id="__codelineno-0-170" name="__codelineno-0-170"></a>    <span class="p">)</span>
-<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">ireq</span><span class="o">.</span><span class="n">req</span> <span class="k">for</span> <span class="n">ireq</span> <span class="ow">in</span> <span class="n">install_requirements</span><span class="p">]</span>
+<a id="__codelineno-0-171" name="__codelineno-0-171"></a>    <span class="k">return</span> <span class="p">[</span><span class="n">ireq</span><span class="o">.</span><span class="n">req</span> <span class="k">for</span> <span class="n">ireq</span> <span class="ow">in</span> <span class="n">install_requirements</span><span class="p">]</span>  <span class="c1"># type: ignore[misc]</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
