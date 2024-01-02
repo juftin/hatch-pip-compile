@@ -168,4 +168,4 @@ class PipCompileLock:
             str(self.lock_file),
             session=PipSession(),
         )
-        return [ireq.req for ireq in install_requirements]
+        return [ireq.req for ireq in install_requirements]  # type: ignore[misc]

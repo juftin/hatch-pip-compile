@@ -85,6 +85,14 @@ release = [
   "npm install --prefix .github/semantic_release/",
   "npx --prefix .github/semantic_release/ semantic-release {args:}"
 ]
+upgrade-all = [
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env default -- python --version",
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env lint -- python --version",
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env test -- python --version",
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env docs -- python --version",
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env matrix -- python --version",
+  "PIP_COMPILE_UPGRADE=1 hatch env run --env versions -- python --version"
+]
 
 [tool.hatch.envs.lint]
 dependencies = [
