@@ -5,11 +5,14 @@
 # - pytest-cov
 # - tomlkit
 # - hatch~=1.7.0
-# - hatch>=1.7.0
+# - hatch<2,>=1.7.0
+# - pip-tools>=6
 #
 
 anyio==4.2.0
     # via httpx
+build==1.0.3
+    # via pip-tools
 certifi==2023.11.17
     # via
     #   httpcore
@@ -17,6 +20,7 @@ certifi==2023.11.17
 click==8.1.7
     # via
     #   hatch
+    #   pip-tools
     #   userpath
 coverage==7.3.3
     # via
@@ -61,6 +65,7 @@ more-itertools==10.1.0
     # via jaraco-classes
 packaging==23.2
     # via
+    #   build
     #   hatch
     #   hatchling
     #   pytest
@@ -68,6 +73,8 @@ pathspec==0.12.1
     # via hatchling
 pexpect==4.9.0
     # via hatch
+pip-tools==7.3.0
+    # via hatch.envs.versions.1.7.x
 platformdirs==4.1.0
     # via
     #   hatch
@@ -82,6 +89,8 @@ pygments==2.17.2
     # via rich
 pyperclip==1.8.2
     # via hatch
+pyproject-hooks==1.0.0
+    # via build
 pytest==7.4.3
     # via
     #   hatch.envs.versions.1.7.x
@@ -108,5 +117,11 @@ userpath==1.9.1
     # via hatch
 virtualenv==20.25.0
     # via hatch
+wheel==0.42.0
+    # via pip-tools
 zipp==3.17.0
     # via importlib-metadata
+
+# The following packages are considered to be unsafe in a requirements file:
+# pip
+# setuptools

@@ -28,7 +28,7 @@ def test_new_dependency(
     """
     Test adding a new dependency
     """
-    original_requirements = pip_compile.default_environment.piptools_lock.read_requirements()
+    original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
     pip_compile.toml_doc["project"]["dependencies"] = ["requests"]
     pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
@@ -38,7 +38,9 @@ def test_new_dependency(
     assert updated_environment.dependencies == ["requests"]
     pip_compile.application.prepare_environment(environment=updated_environment)
     assert updated_environment.lockfile_up_to_date is True
-    new_lockfile_requirements = pip_compile.default_environment.piptools_lock.read_requirements()
+    new_lockfile_requirements = (
+        pip_compile.default_environment.piptools_lock.read_header_requirements()
+    )
     assert new_lockfile_requirements == [packaging.requirements.Requirement("requests")]
     result = updated_environment.plugin_check_command(
         command=["python", "-m", "pip", "list"],
@@ -72,13 +74,15 @@ def test_create_constraint_environment(pip_compile: PipCompileFixture) -> None:
     """
     Syncing an environment with a constraint env also syncs the constraint env
     """
-    original_requirements = pip_compile.default_environment.piptools_lock.read_requirements()
+    original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
     pip_compile.toml_doc["project"]["dependencies"] = ["requests"]
     pip_compile.update_pyproject()
     test_environment = pip_compile.reload_environment("test")
     pip_compile.application.prepare_environment(environment=test_environment)
-    new_lockfile_requirements = pip_compile.default_environment.piptools_lock.read_requirements()
+    new_lockfile_requirements = (
+        pip_compile.default_environment.piptools_lock.read_header_requirements()
+    )
     assert new_lockfile_requirements == [packaging.requirements.Requirement("requests")]
     result = test_environment.plugin_check_command(
         command=["python", "-m", "pip", "list"],
@@ -145,3 +149,13 @@ def test_check_dependency_hash_creates_lock(pip_compile: PipCompileFixture) -> N
     updated_environment = pip_compile.reload_environment("default")
     _ = updated_environment.dependency_hash()
     assert updated_environment.piptools_lock_file.exists() is True
+
+
+def test_dependencies_in_sync(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the `dependencies_in_sync` method
+    """
+    assert pip_compile.default_environment.lockfile_up_to_date is True
+    assert pip_compile.default_environment.dependencies_in_sync() is False
+    pip_compile.application.prepare_environment(pip_compile.default_environment)
+    assert pip_compile.default_environment.dependencies_in_sync() is True
