@@ -22,7 +22,7 @@ click==8.1.7
     #   hatch
     #   pip-tools
     #   userpath
-coverage==7.3.3
+coverage==7.4.0
     # via
     #   coverage
     #   pytest-cov
@@ -34,13 +34,13 @@ filelock==3.13.1
     # via virtualenv
 h11==0.14.0
     # via httpcore
-hatch==1.9.0
+hatch==1.9.1
     # via hatch.envs.versions.1.9.x
 hatchling==1.21.0
     # via hatch
 httpcore==1.0.2
     # via httpx
-httpx==0.25.2
+httpx==0.26.0
     # via hatch
 hyperlink==21.0.0
     # via hatch
@@ -49,7 +49,7 @@ idna==3.6
     #   anyio
     #   httpx
     #   hyperlink
-importlib-metadata==7.0.0
+importlib-metadata==7.0.1
     # via keyring
 iniconfig==2.0.0
     # via pytest
@@ -89,7 +89,7 @@ pygments==2.17.2
     # via rich
 pyproject-hooks==1.0.0
     # via build
-pytest==7.4.3
+pytest==7.4.4
     # via
     #   hatch.envs.versions.1.9.x
     #   pytest-cov
