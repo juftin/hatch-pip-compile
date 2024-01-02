@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation" class="md-skip">
+        <a href="#usage" class="md-skip">
           Skip to content
         </a>
       
@@ -295,18 +295,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation
+      Usage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage
+      Installation
     </span>
   </a>
   
@@ -720,18 +720,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
-      Installation
+      Usage
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
-      Usage
+      Installation
     </span>
   </a>
   
@@ -953,6 +953,18 @@
   <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
 </p>
 
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
+<p>The <code>hatch-pip-compile</code> plugin will automatically run <code>pip-compile</code> whenever your
+environment needs to be updated. Behind the scenes, this plugin creates a lockfile
+at <code>requirements.txt</code> (non-default lockfiles are located at
+<code>requirements/requirements-{env_name}.txt</code>). Once the dependencies are resolved
+the plugin will install the lockfile into your virtual environment.</p>
+<ul>
+<li><a href="#lock-filename">lock-filename</a> - changing the default lockfile path</li>
+<li><a href="#pip-compile-constraint">pip-compile-constraint</a> - syncing dependency versions across environments</li>
+<li><a href="#upgrading-dependencies">Upgrading Dependencies</a> - how to upgrade dependencies</li>
+<li><a href="#pip-compile-hashes">Using Hashes</a> - how to include hashes in your lockfile</li>
+</ul>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
 <p>Declare <code>hatch-pip-compile</code> as a dependency in your <code>pyproject.toml</code> file under the
 <code>[tool.hatch.env]</code> table and hatch will automatically install it. You must also have
@@ -980,17 +992,6 @@ your environment type set to <code>pip-compile</code> (see <a href="#configurati
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pip-compile&quot;</span>
 </code></pre></div>
 </li>
-</ul>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">#</a></h2>
-<p>The <code>hatch-pip-compile</code> plugin will automatically run <code>pip-compile</code> whenever your
-environment needs to be updated. Behind the scenes, this plugin creates a lockfile
-at <code>requirements.txt</code> (non-default lockfiles are located at
-<code>requirements/requirements-{env_name}.txt</code>). Once the dependencies are resolved
-the plugin will install the lockfile into your virtual environment.</p>
-<ul>
-<li><a href="#lock-filename">lock-filename</a> - changing the default lockfile path</li>
-<li><a href="#pip-compile-constraint">pip-compile-constraint</a> - syncing dependency versions across environments</li>
-<li><a href="#upgrading-dependencies">Upgrading Dependencies</a> - how to upgrade dependencies</li>
 </ul>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>The <a href="https://hatch.pypa.io/latest/plugins/environment/">environment plugin</a> name is <code>pip-compile</code>. Set your environment
@@ -1114,7 +1115,7 @@ for the <code>default</code> environment, and <code>requirements/requirements-{e
 pinned to the same versions. For example, if you have a <code>default</code> environment and
 a <code>test</code> environment, you can set the <code>pip-compile-constraint</code> option to <code>default</code>
 on the <code>test</code> environment to ensure that all shared dependencies are pinned to the
-same versions. <code>pip-compile-constraint</code> can also be set to an empty string disable
+same versions. <code>pip-compile-constraint</code> can also be set to an empty string to disable
 the feature.</p>
 <ul>
 <li>
@@ -1326,8 +1327,11 @@ if it detects that the lockfile needs to be updated.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>pipx<span class="w"> </span>install<span class="w"> </span>hatch
 <a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>pipx<span class="w"> </span>inject<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
-<p>Alternatively, you can install it with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
+<p><code>pipx</code> also supports upgrading the plugin when any new versions are released:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>pipx<span class="w"> </span>runpip<span class="w"> </span>hatch<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>hatch-pip-compile
+</code></pre></div>
+<p>Alternatively, you can install the plugin directly with <a href="https://pip.pypa.io/en/stable/">pip</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>pip<span class="w"> </span>install<span class="w"> </span>hatch<span class="w"> </span>hatch-pip-compile
 </code></pre></div>
 
 
