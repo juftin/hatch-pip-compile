@@ -22,6 +22,19 @@
   <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
 </p>
 
+## Usage
+
+The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
+environment needs to be updated. Behind the scenes, this plugin creates a lockfile
+at `requirements.txt` (non-default lockfiles are located at
+`requirements/requirements-{env_name}.txt`). Once the dependencies are resolved
+the plugin will install the lockfile into your virtual environment.
+
+-   [lock-filename](#lock-filename) - changing the default lockfile path
+-   [pip-compile-constraint](#pip-compile-constraint) - syncing dependency versions across environments
+-   [Upgrading Dependencies](#upgrading-dependencies) - how to upgrade dependencies
+-   [Using Hashes](#pip-compile-hashes) - how to include hashes in your lockfile
+
 ## Installation
 
 Declare `hatch-pip-compile` as a dependency in your `pyproject.toml` file under the
@@ -51,18 +64,6 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
     [envs.default]
     type = "pip-compile"
     ```
-
-## Usage
-
-The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
-environment needs to be updated. Behind the scenes, this plugin creates a lockfile
-at `requirements.txt` (non-default lockfiles are located at
-`requirements/requirements-{env_name}.txt`). Once the dependencies are resolved
-the plugin will install the lockfile into your virtual environment.
-
--   [lock-filename](#lock-filename) - changing the default lockfile path
--   [pip-compile-constraint](#pip-compile-constraint) - syncing dependency versions across environments
--   [Upgrading Dependencies](#upgrading-dependencies) - how to upgrade dependencies
 
 ## Configuration
 
@@ -154,7 +155,7 @@ An environment to use as a constraint, ensuring that all shared dependencies are
 pinned to the same versions. For example, if you have a `default` environment and
 a `test` environment, you can set the `pip-compile-constraint` option to `default`
 on the `test` environment to ensure that all shared dependencies are pinned to the
-same versions. `pip-compile-constraint` can also be set to an empty string disable
+same versions. `pip-compile-constraint` can also be set to an empty string to disable
 the feature.
 
 -   **_pyproject.toml_**
@@ -403,7 +404,13 @@ pipx install hatch
 pipx inject hatch hatch-pip-compile
 ```
 
-Alternatively, you can install it with [pip]:
+`pipx` also supports upgrading the plugin when any new versions are released:
+
+```shell
+pipx runpip hatch install --upgrade hatch-pip-compile
+```
+
+Alternatively, you can install the plugin directly with [pip]:
 
 ```bash
 pip install hatch hatch-pip-compile
