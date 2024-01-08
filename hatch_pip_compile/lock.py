@@ -59,7 +59,7 @@ class PipCompileLock:
             joined_dependencies = "\n".join([constraints_line, "#", joined_dependencies])
             cleaned_input_file = re.sub(
                 r"-c \S*",
-                f"-c {constraints_path}",
+                lambda _: f"-c {constraints_path}",
                 cleaned_input_file,
             )
         prefix += "\n" + joined_dependencies + "\n#"
