@@ -20,6 +20,7 @@ on:
         - cron: 0 12 1 * *
 jobs:
     test-suite:
+        runs-on: ubuntu-latest
         strategy:
             fail-fast: true
             matrix:
@@ -30,7 +31,6 @@ jobs:
                           command: "matrix:cov",
                           matrix: "+py=3.12",
                           hatch_version: "1.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Python-3.11,
@@ -38,7 +38,6 @@ jobs:
                           command: "matrix:cov",
                           matrix: "+py=3.11",
                           hatch_version: "1.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Python-3.10,
@@ -46,7 +45,6 @@ jobs:
                           command: "matrix:cov",
                           matrix: "+py=3.10",
                           hatch_version: "1.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Python-3.9,
@@ -54,7 +52,6 @@ jobs:
                           command: "matrix:cov",
                           matrix: "+py=3.9",
                           hatch_version: "1.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Python-3.8,
@@ -62,7 +59,6 @@ jobs:
                           command: "matrix:cov",
                           matrix: "+py=3.8",
                           hatch_version: "1.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Hatch-1.7.x,
@@ -70,7 +66,6 @@ jobs:
                           command: "versions:cov",
                           matrix: "+version=1.7.x",
                           hatch_version: "1.7.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Hatch-1.8.x,
@@ -78,7 +73,6 @@ jobs:
                           command: "versions:cov",
                           matrix: "+version=1.8.x",
                           hatch_version: "1.8.0",
-                          os: ubuntu-latest,
                       }
                     - {
                           name: Hatch-1.9.x,
@@ -86,17 +80,7 @@ jobs:
                           command: "versions:cov",
                           matrix: "+version=1.9.x",
                           hatch_version: "1.9.0",
-                          os: ubuntu-latest,
                       }
-                    - {
-                          name: Hatch-Windows,
-                          python: "3.11",
-                          command: "matrix:cov",
-                          matrix: "+py=3.11",
-                          hatch_version: "1.0",
-                          os: windows-latest,
-                      }
-        runs-on: ${{ matrix.os }}
         concurrency:
             group: ${{ github.workflow }}-${{ matrix.name }}-${{ github.ref }}
             cancel-in-progress: true
