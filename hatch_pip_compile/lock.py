@@ -54,12 +54,12 @@ class PipCompileLock:
         )
         if self.constraints_file is not None:
             constraint_sha = hashlib.sha256(self.constraints_file.read_bytes()).hexdigest()
-            constraints_path = self.constraints_file.relative_to(self.project_root)
+            constraints_path = self.constraints_file.relative_to(self.project_root).as_posix()
             constraints_line = f"# [constraints] {constraints_path} (SHA256: {constraint_sha})"
             joined_dependencies = "\n".join([constraints_line, "#", joined_dependencies])
             cleaned_input_file = re.sub(
                 r"-c \S*",
-                f"-c {constraints_path}",
+                lambda _: f"-c {constraints_path}",
                 cleaned_input_file,
             )
         prefix += "\n" + joined_dependencies + "\n#"
