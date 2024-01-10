@@ -14,6 +14,8 @@
   <a href="https://github.com/juftin/hatch-pip-compile"><img src="https://img.shields.io/pypi/v/hatch-pip-compile?color=blue&label=%F0%9F%94%A8%20hatch-pip-compile" alt="PyPI"></a>
   <a href="https://pypi.python.org/pypi/hatch-pip-compile/"><img src="https://img.shields.io/pypi/pyversions/hatch-pip-compile" alt="PyPI - Python Version"></a>
   <a href="https://github.com/juftin/hatch-pip-compile/blob/main/LICENSE"><img src="https://img.shields.io/github/license/juftin/hatch-pip-compile?color=blue&label=License" alt="GitHub License"></a>
+  <a href="https://github.com/juftin/hatch-pip-compile/actions/workflows/tests.yaml?query=branch%3Amain"><img src="https://github.com/juftin/hatch-pip-compile/actions/workflows/tests.yaml/badge.svg?branch=main" alt="Testing Status"></a>
+  <a href="https://codecov.io/gh/juftin/hatch-pip-compile"><img src="https://codecov.io/gh/juftin/hatch-pip-compile/graph/badge.svg?token=PCGB5QIC8M"/></a>
   <a href="https://github.com/pypa/hatch"><img src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg" alt="Hatch project"></a>
   <a href="https://github.com/jazzband/pip-tools"><img src="https://raw.githubusercontent.com/jazzband/website/main/jazzband/static/img/badge.svg" alt="Pip Tools project"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
