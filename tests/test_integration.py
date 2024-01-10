@@ -6,6 +6,7 @@ interaction between the various components of hatch-pip-compile
 and external tools (pip-tools / pip).
 """
 
+import sys
 from typing import Dict, Type
 
 import hatch
@@ -28,6 +29,8 @@ def test_new_dependency(
     """
     Test adding a new dependency
     """
+    if installer == "pip-sync" and sys.platform == "win32":
+        pytest.skip("Flaky test on Windows")
     original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
     pip_compile.toml_doc["project"]["dependencies"] = ["requests"]
