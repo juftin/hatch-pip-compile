@@ -215,7 +215,14 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         upgrade = os.getenv("PIP_COMPILE_UPGRADE") or False
         upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or False
-        force_upgrade = upgrade is not False or upgrade_packages is not False
+        pip_compile_force = bool(os.getenv("__PIP_COMPILE_FORCE__"))
+        force_upgrade = any(
+            [
+                upgrade is not False,
+                upgrade_packages is not False,
+                pip_compile_force is not False,
+            ]
+        )
         if not self.dependencies and not self.piptools_lock_file.exists():
             return True
         if self.piptools_constraints_file:

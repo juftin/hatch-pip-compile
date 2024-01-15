@@ -21,7 +21,9 @@ classifiers = [
 ]
 dependencies = [
   "hatch>=1.7.0,<2",
-  "pip-tools>=6"
+  "pip-tools>=6",
+  "click",
+  "rich"
 ]
 description = "hatch plugin to use pip-compile to manage project dependencies"
 dynamic = ["version"]
@@ -32,6 +34,9 @@ requires-python = ">=3.8"
 
 [project.entry-points.hatch]
 hatch-pip-compile = "hatch_pip_compile.hooks"
+
+[project.scripts]
+hatch-pip-compile = "hatch_pip_compile.cli:cli"
 
 [project.urls]
 Documentation = "https://juftin.github.io/hatch-pip-compile"
@@ -81,17 +86,13 @@ type = "pip-compile"
 detached = true
 
 [tool.hatch.envs.gen.scripts]
+lock-all = "hatch env run --env default -- python -m hatch_pip_compile --all --verbose {args:}"
 release = [
   "npm install --prefix .github/semantic_release/",
   "npx --prefix .github/semantic_release/ semantic-release {args:}"
 ]
 upgrade-all = [
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env default -- python --version",
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env lint -- python --version",
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env test -- python --version",
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env docs -- python --version",
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env matrix -- python --version",
-  "PIP_COMPILE_UPGRADE=1 hatch env run --env versions -- python --version"
+  "lock-all --upgrade"
 ]
 
 [tool.hatch.envs.lint]
@@ -165,20 +166,17 @@ matrix.version.dependencies = [
 [tool.hatch.version]
 path = "hatch_pip_compile/__about__.py"
 
-[[tool.mypy.overrides]]
+[tool.mypy]
 ignore_missing_imports = true
-module = [
-  "pytest.*",
-  "piptools.*",
-  "hatch.*",
-  "hatchling.*",
-  "packaging.*"
-]
 
 [tool.ruff]
 ignore = [
   # Allow non-abstract empty methods in abstract base classes
   "B027",
+  # Boolean-typed positional argument in function definition
+  "FBT001",
+  # Boolean default positional argument in function definition
+  "FBT002",
   # Allow boolean positional values in function calls, like `dict.get(... True)`
   "FBT003",
   # Ignore checks for possible passwords

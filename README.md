@@ -355,10 +355,17 @@ hatch env run --env default -- python --version
 ```
 
 If you're a user of the `--upgrade` / `--upgrade-package` options on `pip-compile`,
-these features can be enabled on this plugin using the environment variables
+these features can be enabled on this plugin by using the environment variables
 `PIP_COMPILE_UPGRADE` and `PIP_COMPILE_UPGRADE_PACKAGE`. When either of these
 environment variables are set `hatch` will force the lockfile to be regenerated
 whenever the environment is activated.
+
+> NOTE: **command line interface**
+>
+> `hatch-pip-compile` also makes a CLI available to handle the
+> the `PIP_COMPILE_UPGRADE` / `PIP_COMPILE_UPGRADE_PACKAGE` workflow
+> automatically. See the [hatch-pip-compile CLI](#using-the-hatch-pip-compile-cli)
+> section for more information.
 
 To run with `upgrade` functionality on the `default` environment:
 
@@ -374,6 +381,57 @@ PIP_COMPILE_UPGRADE_PACKAGE="mkdocs,mkdocs-material" hatch env run --env docs --
 
 The above commands call `python --version` on a particular environment,
 but the same behavior applies to any script that activates the environment.
+
+## Using the `hatch-pip-compile` CLI
+
+For convenience this package also makes a CLI available to handle the setting /
+unsetting of the `PIP_COMPILE_UPGRADE` / `PIP_COMPILE_UPGRADE_PACKAGE` environment variables
+and invoking the `hatch env run` command for you automatically. To use the CLI you'll need to
+install it outside your `pyproject.toml` / `hatch.toml` file.
+
+I recommend using [pipx] to
+install the CLI, but you can also install it directly with [pip]:
+
+```shell
+pipx install hatch-pip-compile
+```
+
+Once installed, you can run the CLI with the `hatch-pip-compile` command.
+
+### Examples
+
+#### Upgrade the `default` environment
+
+The below command will upgrade all packages in the `default` environment.
+
+```shell
+hatch-pip-compile --upgrade
+```
+
+#### Upgrade a non-default environment
+
+The below command will upgrade all packages in the `docs` environment.
+
+```shell
+hatch-pip-compile docs --upgrade
+```
+
+#### Upgrade a specific package
+
+The below command will upgrade the `requests` package in the `default`
+environment.
+
+```shell
+hatch-pip-compile --upgrade-package requests
+```
+
+#### Upgrade all `pip-compile` environments
+
+The below command will upgrade all packages in all `pip-compile` environments.
+
+```shell
+hatch-pip-compile --upgrade --all
+```
 
 ## Notes
 
