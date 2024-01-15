@@ -3,6 +3,7 @@
 site_name: hatch-pip-compile
 nav:
     - Home 🏠: index.md
+    - Command Line Interface ⌨️: cli.md
     - API Documentation 🤖: reference/
     - Contributing 🤝: contributing.md
 theme:
@@ -58,6 +59,7 @@ markdown_extensions:
     - pymdownx.emoji
     - pymdownx.tabbed:
           alternate_style: true
+    - mkdocs-click
 plugins:
     - search
     - markdown-exec

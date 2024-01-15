@@ -5,8 +5,10 @@
 # - pytest-cov
 # - tomlkit
 # - hatch~=1.9.0
+# - click
 # - hatch<2,>=1.7.0
 # - pip-tools>=6
+# - rich
 #
 
 anyio==4.2.0
@@ -19,6 +21,7 @@ certifi==2023.11.17
     #   httpx
 click==8.1.7
     # via
+    #   hatch.envs.versions.1.9.x
     #   hatch
     #   pip-tools
     #   userpath
@@ -96,7 +99,9 @@ pytest==7.4.4
 pytest-cov==4.1.0
     # via hatch.envs.versions.1.9.x
 rich==13.7.0
-    # via hatch
+    # via
+    #   hatch.envs.versions.1.9.x
+    #   hatch
 shellingham==1.5.4
     # via hatch
 sniffio==1.3.0
