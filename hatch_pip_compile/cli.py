@@ -8,14 +8,16 @@ import dataclasses
 import json
 import os
 import subprocess
-from typing import Any, Self, Sequence
+from typing import Any, Sequence
 
 import click
 import rich.traceback
 
+from hatch_pip_compile.__about__ import __application__, __version__
+
 
 @dataclasses.dataclass
-class _HatchCommandRunner:
+class HatchCommandRunner:
     """
     Hatch Command Runner
     """
@@ -45,8 +47,6 @@ class _HatchCommandRunner:
             raise click.BadParameter(msg)
         elif self.upgrade_all:
             self.environments = list(self.supported_environments)
-        elif isinstance(self.environments, str):
-            self.environments = [self.environments]
         unsupported_environments = set(self.environments).difference(self.supported_environments)
         if unsupported_environments:
             msg = (
@@ -56,7 +56,7 @@ class _HatchCommandRunner:
             )
             raise click.BadParameter(msg)
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> HatchCommandRunner:
         """
         Set the environment variables
         """
@@ -113,7 +113,7 @@ class _HatchCommandRunner:
                 capture_output=True,
                 check=False,
             )
-            if result.returncode != 0:
+            if result.returncode != 0:  # pragma: no cover
                 self.console.print(
                     "[bold yellow]hatch command[/bold yellow]: "
                     f"[bold blue]`{' '.join(environment_command)}`[/bold blue]"
@@ -146,6 +146,7 @@ class _HatchCommandRunner:
 
 
 @click.command("hatch-pip-compile")
+@click.version_option(version=__version__, prog_name=__application__)
 @click.argument("environment", default=None, type=click.STRING, required=False, nargs=-1)
 @click.option(
     "-U",
@@ -179,7 +180,7 @@ def cli(
     Upgrade your `hatch-pip-compile` managed dependencies
     from the command line.
     """
-    with _HatchCommandRunner(
+    with HatchCommandRunner(
         environments=environment,
         upgrade=upgrade,
         upgrade_packages=upgrade_packages,

@@ -59,7 +59,8 @@ show_missing = true
 branch = true
 omit = [
   "hatch_pip_compile/__about__.py",
-  "hatch_pip_compile/hooks.py"
+  "hatch_pip_compile/hooks.py",
+  "hatch_pip_compile/__main__.py"
 ]
 parallel = true
 source_pkgs = ["hatch_pip_compile", "tests"]
@@ -78,6 +79,10 @@ post-install-commands = [
 python = "3.11"
 type = "pip-compile"
 
+[tool.hatch.envs.default.scripts]
+cov = "hatch run test:cov {args:}"
+test = "hatch run test:test {args:}"
+
 [tool.hatch.envs.docs]
 detached = false
 type = "pip-compile"
@@ -86,7 +91,7 @@ type = "pip-compile"
 detached = true
 
 [tool.hatch.envs.gen.scripts]
-lock-all = "hatch env run --env default -- python -m hatch_pip_compile --all --verbose {args:}"
+lock-all = "hatch env run --env default -- python -m hatch_pip_compile --all {args:}"
 release = [
   "npm install --prefix .github/semantic_release/",
   "npx --prefix .github/semantic_release/ semantic-release {args:}"
@@ -138,6 +143,9 @@ dependencies = [
 [tool.hatch.envs.test.scripts]
 cov = [
   "pytest --cov-config=pyproject.toml --cov {args: tests/ -v}"
+]
+test = [
+  "pytest {args: tests/ -v}"
 ]
 
 [tool.hatch.envs.versions]
