@@ -2,6 +2,7 @@
 Shared fixtures for tests.
 """
 
+import contextlib
 import os
 import pathlib
 import shutil
@@ -28,6 +29,16 @@ def mock_check_command() -> Generator[patch, None, None]:
     Disable the `plugin_check_command` for testing
     """
     with patch("hatch_pip_compile.plugin.PipCompileEnvironment.plugin_check_command") as mock:
+        mock.return_value = CompletedProcess(args=[], returncode=0, stdout=b"", stderr=b"")
+        yield mock
+
+
+@pytest.fixture
+def subprocess_run() -> Generator[patch, None, None]:
+    """
+    Disable the `subprocess.run` for testing
+    """
+    with patch("subprocess.run") as mock:
         mock.return_value = CompletedProcess(args=[], returncode=0, stdout=b"", stderr=b"")
         yield mock
 
@@ -131,6 +142,18 @@ class PipCompileFixture:
         Update pyproject.toml
         """
         tomlkit.dump(self.toml_doc, self.pyproject.open("w"))
+
+    @contextlib.contextmanager
+    def chdir(self) -> Generator[None, None, None]:
+        """
+        Change the working directory to the isolation
+        """
+        current_dir = os.getcwd()
+        try:
+            os.chdir(self.isolation)
+            yield
+        finally:
+            os.chdir(current_dir)
 
 
 @pytest.fixture
