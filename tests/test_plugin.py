@@ -142,11 +142,34 @@ def test_env_var_disabled(pip_compile: PipCompileFixture, monkeypatch: pytest.Mo
         pip_compile.default_environment.pip_compile_cli()
 
 
-def test_constraint_env_self(pip_compile: PipCompileFixture) -> None:
+@pytest.mark.parametrize("environment_name", ["default", "misc", "docs"])
+def test_constraint_env_self(pip_compile: PipCompileFixture, environment_name: str) -> None:
     """
     Test the value of the constraint env b/w the default and test environments
     """
-    assert (
-        pip_compile.default_environment.constraint_env.name == pip_compile.default_environment.name
-    )
-    assert pip_compile.test_environment.constraint_env.name == pip_compile.default_environment.name
+    environment = pip_compile.reload_environment(environment=environment_name)
+    assert environment.constraint_env is environment
+
+
+@pytest.mark.parametrize("environment_name", ["test"])
+def test_constraint_env_other(pip_compile: PipCompileFixture, environment_name: str) -> None:
+    """
+    Test the value of the constraint env b/w the default and test environments
+    """
+    environment = pip_compile.reload_environment(environment=environment_name)
+    assert environment.constraint_env.name == pip_compile.default_environment.name
+
+
+@pytest.mark.parametrize("environment_name", ["default", "docs", "misc"])
+def test_prepare_environment(pip_compile: PipCompileFixture, environment_name: str) -> None:
+    """
+    Test the `prepare_environment` method
+    """
+    environment = pip_compile.reload_environment(environment=environment_name)
+    environment.prepare_environment()
+    if environment.dependencies:
+        assert environment.piptools_lock_file.exists()
+    else:
+        assert not environment.piptools_lock_file.exists()
+    assert environment.dependencies_in_sync() is True
+    assert environment.lockfile_up_to_date is True

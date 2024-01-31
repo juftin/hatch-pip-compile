@@ -29,7 +29,7 @@ def test_new_dependency(
     """
     Test adding a new dependency
     """
-    if installer == "pip-sync" and sys.platform == "win32":
+    if installer == "pip-sync" and sys.platform == "win32":  # pragma: no cover
         pytest.skip("Flaky test on Windows")
     original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
@@ -59,6 +59,8 @@ def test_delete_dependencies(
     """
     Test deleting all dependencies also deletes the lockfile
     """
+    if installer == "pip-sync" and sys.platform == "win32":  # pragma: no cover
+        pytest.skip("Flaky test on Windows")
     pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
     pip_compile.toml_doc["project"]["dependencies"] = []
     pip_compile.update_pyproject()

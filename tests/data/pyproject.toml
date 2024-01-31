@@ -21,6 +21,16 @@ path = ".venv/hatch-pip-compile-test"
 pip-compile-constraint = "default"
 type = "pip-compile"
 
+[tool.hatch.envs.docs]
+dependencies = [
+  "mkdocs"
+]
+dev-mode = false
+lock-filename = "requirements/{env_name}.lock"
+path = ".venv/docs"
+pip-compile-constraint = "misc"
+pip-compile-hashes = true
+
 [tool.hatch.envs.lint]
 dependencies = [
   "mypy>=1.6.1",
@@ -28,6 +38,13 @@ dependencies = [
 ]
 detached = true
 path = ".venv/lint"
+type = "pip-compile"
+
+[tool.hatch.envs.misc]
+dependencies = []
+detached = true
+path = ".venv/misc"
+skip-install = true
 type = "pip-compile"
 
 [tool.hatch.envs.test]

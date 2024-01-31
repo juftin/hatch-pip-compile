@@ -72,7 +72,7 @@ def test_cli_bad_env(pip_compile: PipCompileFixture) -> None:
         assert "error" in result.output.lower()
         assert (
             "The following environments are not supported or unknown: bad_env. "
-            "Supported environments are: default, lint, test"
+            "Supported environments are: default, docs, lint, misc, test"
         ) in result.output
 
 
@@ -99,7 +99,10 @@ def test_cli_all(pip_compile: PipCompileFixture) -> None:
     with runner.isolated_filesystem(temp_dir=pip_compile.isolation):
         result = runner.invoke(cli=cli, args=["--all"])
         assert result.exit_code == 0
-        assert "hatch-pip-compile: Targeting environments: default, lint, test" in result.output
+        assert (
+            "hatch-pip-compile: Targeting environments: default, docs, lint, misc, test"
+            in result.output
+        )
 
 
 def test_cli_upgrade(pip_compile: PipCompileFixture) -> None:
@@ -149,7 +152,7 @@ def test_command_runner_supported_environments(
             upgrade=True,
             upgrade_packages=[],
         )
-        assert command_runner.supported_environments == {"default", "test", "lint"}
+        assert command_runner.supported_environments == {"default", "test", "lint", "docs", "misc"}
 
 
 def test_command_runner_non_supported_environments(
@@ -164,7 +167,7 @@ def test_command_runner_non_supported_environments(
             click.BadParameter,
             match=(
                 "The following environments are not supported or unknown: bad_env. "
-                "Supported environments are: default, lint, test"
+                "Supported environments are: default, docs, lint, misc, test"
             ),
         ):
             _ = HatchCommandRunner(
