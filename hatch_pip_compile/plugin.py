@@ -119,6 +119,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Run pip-compile if necessary
         """
+        self.prepare_environment()
         if not self.lockfile_up_to_date:
             with self.safe_activation():
                 self.install_pip_tools()
@@ -323,10 +324,6 @@ class PipCompileEnvironment(VirtualEnvironment):
         elif not environment.dependencies:
             return self
         else:
-            try:
-                _ = environment.virtual_env.executables_directory
-            except OSError:
-                environment.create()
             return environment
 
     def validate_constraints_file(
@@ -378,3 +375,30 @@ class PipCompileEnvironment(VirtualEnvironment):
                 shell=shell,
                 **kwargs,
             )
+
+    def virtualenv_exists(self) -> bool:
+        """
+        Check if the virtualenv exists
+        """
+        try:
+            _ = self.virtual_env.executables_directory
+            return True
+        except OSError:
+            return False
+
+    def prepare_environment(self) -> None:
+        """
+        Prepare the environment
+
+        Ideally, hatch.cli.Application.prepare_environment would be called
+        but the `Application` class is not exposed to the environment plugin.
+        """
+        if not self.virtualenv_exists():
+            self.create()
+            if not self.dependencies_in_sync():
+                self.sync_dependencies()
+            if not self.skip_install:
+                if self.dev_mode:
+                    self.install_project_dev_mode()
+                else:
+                    self.install_project()

@@ -111,3 +111,23 @@ def test_pip_compile_disable_cli(pip_compile: PipCompileFixture, environment_nam
         )
         assert result.exit_code == 1
         assert isinstance(result.exception, HatchPipCompileError)
+
+
+def test_prune_removes_all_environments(pip_compile: PipCompileFixture) -> None:
+    """
+    Assert that running `hatch env prune` removes all environments
+    """
+    runner = CliRunner()
+    pip_compile.default_environment.create()
+    pip_compile.test_environment.create()
+    venv_dir = pip_compile.isolation / ".venv"
+    assert venv_dir.exists()
+    assert len(list(venv_dir.iterdir())) == 2
+    with runner.isolated_filesystem(pip_compile.isolation):
+        result = runner.invoke(
+            hatch.cli.hatch,
+            args=["env", "prune"],
+        )
+    assert result.exit_code == 0
+    if venv_dir.exists():
+        assert len(list(venv_dir.iterdir())) == 0
