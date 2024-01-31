@@ -4,6 +4,7 @@
 # - pytest
 # - pytest-cov
 # - tomlkit
+# - pytest-xdist
 # - hatch~=1.8.0
 # - click
 # - hatch<2,>=1.7.0
@@ -25,7 +26,7 @@ click==8.1.7
     #   hatch
     #   pip-tools
     #   userpath
-coverage==7.4.0
+coverage==7.4.1
     # via
     #   coverage
     #   pytest-cov
@@ -33,13 +34,15 @@ distlib==0.3.8
     # via virtualenv
 editables==0.5
     # via hatchling
+execnet==2.0.2
+    # via pytest-xdist
 filelock==3.13.1
     # via virtualenv
 h11==0.14.0
     # via httpcore
 hatch==1.8.1
     # via hatch.envs.versions.1.8.x
-hatchling==1.21.0
+hatchling==1.21.1
     # via hatch
 httpcore==1.0.2
     # via httpx
@@ -64,7 +67,7 @@ markdown-it-py==3.0.0
     # via rich
 mdurl==0.1.2
     # via markdown-it-py
-more-itertools==10.1.0
+more-itertools==10.2.0
     # via jaraco-classes
 packaging==23.2
     # via
@@ -82,7 +85,7 @@ platformdirs==4.1.0
     # via
     #   hatch
     #   virtualenv
-pluggy==1.3.0
+pluggy==1.4.0
     # via
     #   hatchling
     #   pytest
@@ -92,11 +95,14 @@ pygments==2.17.2
     # via rich
 pyproject-hooks==1.0.0
     # via build
-pytest==7.4.4
+pytest==8.0.0
     # via
     #   hatch.envs.versions.1.8.x
     #   pytest-cov
+    #   pytest-xdist
 pytest-cov==4.1.0
+    # via hatch.envs.versions.1.8.x
+pytest-xdist==3.5.0
     # via hatch.envs.versions.1.8.x
 rich==13.7.0
     # via
@@ -114,7 +120,7 @@ tomlkit==0.12.3
     # via
     #   hatch.envs.versions.1.8.x
     #   hatch
-trove-classifiers==2023.11.29
+trove-classifiers==2024.1.8
     # via hatchling
 userpath==1.9.1
     # via hatch

@@ -126,7 +126,7 @@ jobs:
             - name: Test Suite
               run: |
                   echo "::add-matcher::.github/workflows/matchers/python.json"
-                  hatch run ${{ matrix.matrix }} ${{ matrix.command }} --cov-report=xml tests/ -vv
+                  hatch run ${{ matrix.matrix }} ${{ matrix.command }}
                   echo "::remove-matcher owner=python::"
             - name: Upload coverage reports to Codecov
               if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11' && matrix.command == 'matrix:cov'
