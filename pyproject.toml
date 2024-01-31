@@ -57,6 +57,9 @@ show_missing = true
 
 [tool.coverage.run]
 branch = true
+disable_warnings = [
+  "module-not-measured"
+]
 omit = [
   "hatch_pip_compile/__about__.py",
   "hatch_pip_compile/hooks.py",
@@ -137,15 +140,16 @@ python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 dependencies = [
   "pytest",
   "pytest-cov",
-  "tomlkit"
+  "tomlkit",
+  "pytest-xdist"
 ]
 
 [tool.hatch.envs.test.scripts]
 cov = [
-  "pytest --cov-config=pyproject.toml --cov {args: tests/ -v}"
+  "pytest --cov --cov-config=pyproject.toml --cov-report=xml --cov-report=term-missing {args: -n auto tests/ -vv}"
 ]
 test = [
-  "pytest {args: tests/ -v}"
+  "pytest {args: -n auto tests/ -vv}"
 ]
 
 [tool.hatch.envs.versions]
@@ -166,6 +170,7 @@ matrix.version.dependencies = [
   "pytest",
   "pytest-cov",
   "tomlkit",
+  "pytest-xdist",
   {value = "hatch~=1.7.0", if = ["1.7.x"]},
   {value = "hatch~=1.8.0", if = ["1.8.x"]},
   {value = "hatch~=1.9.0", if = ["1.9.x"]}
