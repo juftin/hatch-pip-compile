@@ -11,12 +11,15 @@ from hatch_pip_compile.exceptions import HatchPipCompileError
 from tests.conftest import PipCompileFixture
 
 
-def test_invoke_environment_creates_env(pip_compile: PipCompileFixture) -> None:
+@pytest.mark.parametrize("environment_name", ["default", "test", "lint", "docs", "misc"])
+def test_invoke_environment_creates_env(
+    pip_compile: PipCompileFixture, environment_name: str
+) -> None:
     """
     Test using the CLI runner
     """
     runner = CliRunner()
-    environment = pip_compile.test_environment
+    environment = pip_compile.reload_environment(environment=environment_name)
     venv = environment.virtual_env.directory
     assert not venv.exists()
     with runner.isolated_filesystem(pip_compile.isolation):
@@ -129,5 +132,5 @@ def test_prune_removes_all_environments(pip_compile: PipCompileFixture) -> None:
             args=["env", "prune"],
         )
     assert result.exit_code == 0
-    if venv_dir.exists():
-        assert len(list(venv_dir.iterdir())) == 0
+    venv_dir.mkdir(exist_ok=True)
+    assert len(list(venv_dir.iterdir())) == 0
