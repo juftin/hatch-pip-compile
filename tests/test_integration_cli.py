@@ -4,8 +4,10 @@ Integration Tests using the CLI
 
 import hatch.cli
 import hatch.cli.env
+import pytest
 from click.testing import CliRunner
 
+from hatch_pip_compile.exceptions import HatchPipCompileError
 from tests.conftest import PipCompileFixture
 
 
@@ -91,3 +93,21 @@ def test_missing_lockfile_after_prepared(pip_compile: PipCompileFixture) -> None
         assert result.exit_code == 0
     # Assert the lockfile was recreated
     assert environment.piptools_lock_file.exists()
+
+
+@pytest.mark.parametrize("environment_name", ["default", "test", "lint"])
+def test_pip_compile_disable_cli(pip_compile: PipCompileFixture, environment_name: str) -> None:
+    """
+    Test that the `PIP_COMPILE_DISABLE` environment variable raises an error
+    """
+    runner = CliRunner()
+    environment = pip_compile.reload_environment(environment=environment_name)
+    environment.piptools_lock_file.unlink(missing_ok=True)
+    with runner.isolated_filesystem(pip_compile.isolation):
+        result = runner.invoke(
+            hatch.cli.hatch,
+            args=["-v", "env", "run", "--env", environment.name, "--", "python", "--version"],
+            env={"PIP_COMPILE_DISABLE": "1"},
+        )
+        assert result.exit_code == 1
+        assert isinstance(result.exception, HatchPipCompileError)

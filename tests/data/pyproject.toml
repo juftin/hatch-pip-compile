@@ -28,6 +28,7 @@ dependencies = [
 ]
 detached = true
 path = ".venv/lint"
+type = "pip-compile"
 
 [tool.hatch.envs.test]
 dependencies = [
