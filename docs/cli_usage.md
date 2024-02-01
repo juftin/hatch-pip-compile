@@ -1,28 +1,18 @@
-# Command Line Interface
+# Using the `hatch-pip-compile` CLI
 
-It's recommend to use [pipx] to install the CLI, but
-you can also install it with [pip]:
+For convenience this package also makes a CLI available to handle the setting /
+unsetting of the `PIP_COMPILE_UPGRADE` / `PIP_COMPILE_UPGRADE_PACKAGE` environment variables
+and invoking the `hatch env run` command for you automatically. To use the CLI you'll need to
+install it outside your `pyproject.toml` / `hatch.toml` file.
+
+I recommend using [pipx] to
+install the CLI, but you can also install it directly with [pip]:
 
 ```shell
 pipx install hatch-pip-compile
 ```
 
-::: mkdocs-click
-    :module: hatch_pip_compile.cli
-    :command: cli
-    :prog_name: hatch-pip-compile
-    :style: table
-    :list_subcommands: True
-
-## How it works
-
-The `hatch-pip-compile` CLI is a wrapper around `hatch` that simply
-sets the `PIP_COMPILE_UPGRADE` / `PIP_COMPILE_UPGRADE_PACKAGE` environment
-variables before running a `hatch` command in a given environment.
-
-These environment variables are used by the `hatch-pip-compile` plugin
-to run the `pip-compile` command with the `--upgrade` / `--upgrade-package`
-flags.
+Once installed, you can run the CLI with the `hatch-pip-compile` command.
 
 ## Examples
 
