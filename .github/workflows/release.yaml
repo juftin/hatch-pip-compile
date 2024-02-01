@@ -21,9 +21,9 @@ jobs:
                   fetch-depth: 2
                   ref: main
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
             - name: Install Hatch

@@ -16,7 +16,7 @@ jobs:
               with:
                   fetch-depth: 2
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
             - name: Install Hatch
@@ -29,7 +29,7 @@ jobs:
               run: |
                   hatch build
             - name: Publish package on PyPI
-              uses: pypa/gh-action-pypi-publish@v1.8.10
+              uses: pypa/gh-action-pypi-publish@release/v1
               with:
                   user: __token__
                   password: ${{ secrets.PYPI_TOKEN }}
