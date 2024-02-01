@@ -94,6 +94,15 @@ Set your environment type to `pip-compile` to use this plugin for the respective
 The plugin gives you options to configure how lockfiles are generated and how they are installed
 into your environment.
 
+The following example shows how to specify the `pip-compile-hashes` option
+on your environment in your `pyproject.toml` file:
+
+```toml
+[tool.hatch.envs.default]
+type = "pip-compile"
+pip-compile-hashes = true
+```
+
 #### Generating Lockfiles
 
 | name                                                              | type        | description                                                                                                                           |
