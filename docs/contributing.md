@@ -181,10 +181,10 @@ would create a branch named `1.2.x` and merge your changes into that branch.
 See the [semantic-release documentation] for more information about
 branch based releases and other advanced release cases.
 
-[pipx]: https://pypa.github.io/pipx/
-[pre-commit]: https://pre-commit.com/
-[gitmoji]: https://gitmoji.dev/
-[conventional commits]: https://www.conventionalcommits.org/en/v1.0.0/
+[pipx]: https://pipx.pypa.io
+[pre-commit]: https://pre-commit.com
+[gitmoji]: https://gitmoji.dev
+[conventional commits]: https://www.conventionalcommits.org
 [semantic-release]: https://github.com/semantic-release/semantic-release
-[semantic-versioning]: https://semver.org/
+[semantic-versioning]: https://semver.org
 [semantic-release documentation]: https://semantic-release.gitbook.io/semantic-release/usage/configuration#branches

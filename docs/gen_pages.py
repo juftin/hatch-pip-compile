@@ -31,6 +31,7 @@ for path in sorted(source_code.rglob("*.py")):
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
 readme_content = Path("README.md").read_text(encoding="utf-8")
+readme_content = readme_content.replace("](docs/", "](")
 # Exclude parts that are between two exact `<!--skip-->` lines
 readme_content = "\n".join(readme_content.split("\n<!--skip-->\n")[::2])
 with mkdocs_gen_files.open("index.md", "w") as index_file:

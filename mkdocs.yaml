@@ -3,7 +3,11 @@
 site_name: hatch-pip-compile
 nav:
     - Home 🏠: index.md
-    - Command Line Interface ⌨️: cli.md
+    - Examples 📚: examples.md
+    - Upgrading 🚀: upgrading.md
+    - Command Line Usage 📦: cli_usage.md
+    - Notes 📝: notes.md
+    - Command Line Docs ⌨️: cli.md
     - API Documentation 🤖: reference/
     - Contributing 🤝: contributing.md
 theme:
