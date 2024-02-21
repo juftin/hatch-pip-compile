@@ -7,14 +7,12 @@ and external tools (pip-tools / pip).
 """
 
 import sys
-from typing import Dict, Type
 
 import hatch
 import packaging.requirements
 import pytest
 
-from hatch_pip_compile.installer import PluginInstaller
-from tests.conftest import PipCompileFixture
+from tests.conftest import PipCompileFixture, installer_param, resolver_param
 
 try:
     match_major, hatch_minor, _ = hatch._version.__version__.split(".")
@@ -22,22 +20,29 @@ except AttributeError:
     match_major, hatch_minor, _ = hatch.__about__.__version__.split(".")
 
 
-@pytest.mark.parametrize("installer", ["pip", "pip-sync"])
+@installer_param
+@resolver_param
 def test_new_dependency(
-    installer: str, installer_dict: Dict[str, Type[PluginInstaller]], pip_compile: PipCompileFixture
+    installer: str,
+    pip_compile: PipCompileFixture,
+    resolver: str,
 ) -> None:
     """
     Test adding a new dependency
     """
     if installer == "pip-sync" and sys.platform == "win32":  # pragma: no cover
         pytest.skip("Flaky test on Windows")
-    original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
+    default_env = pip_compile.update_environment_resolver(environment="default", resolver=resolver)
+    original_requirements = default_env.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
     pip_compile.toml_doc["project"]["dependencies"] = ["requests"]
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
     pip_compile.update_pyproject()
-    updated_environment = pip_compile.reload_environment("default")
-    assert isinstance(updated_environment.installer, installer_dict[installer])
+    updated_environment = pip_compile.update_environment_installer(
+        environment=default_env, installer=installer
+    )
+    assert isinstance(
+        updated_environment.installer, updated_environment.dependency_installers[installer]
+    )
     assert updated_environment.dependencies == ["requests"]
     pip_compile.application.prepare_environment(environment=updated_environment)
     assert updated_environment.lockfile_up_to_date is True
@@ -52,20 +57,28 @@ def test_new_dependency(
     assert "requests" in result.stdout.decode()
 
 
-@pytest.mark.parametrize("installer", ["pip", "pip-sync"])
+@installer_param
+@resolver_param
 def test_delete_dependencies(
-    installer: str, installer_dict: Dict[str, Type[PluginInstaller]], pip_compile: PipCompileFixture
+    installer: str,
+    pip_compile: PipCompileFixture,
+    resolver: str,
 ) -> None:
     """
     Test deleting all dependencies also deletes the lockfile
     """
     if installer == "pip-sync" and sys.platform == "win32":  # pragma: no cover
         pytest.skip("Flaky test on Windows")
+    pip_compile.update_environment_resolver(
+        environment=pip_compile.default_environment, resolver=resolver
+    )
     pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
     pip_compile.toml_doc["project"]["dependencies"] = []
     pip_compile.update_pyproject()
     updated_environment = pip_compile.reload_environment("default")
-    assert isinstance(updated_environment.installer, installer_dict[installer])
+    assert isinstance(
+        updated_environment.installer, updated_environment.dependency_installers[installer]
+    )
     assert updated_environment.dependencies == []
     assert updated_environment.lockfile_up_to_date is False
     pip_compile.application.prepare_environment(environment=updated_environment)
@@ -75,10 +88,12 @@ def test_delete_dependencies(
     assert updated_environment.piptools_lock_file.exists() is False
 
 
-def test_create_constraint_environment(pip_compile: PipCompileFixture) -> None:
+@resolver_param
+def test_create_constraint_environment(pip_compile: PipCompileFixture, resolver: str) -> None:
     """
     Syncing an environment with a constraint env also syncs the constraint env
     """
+    pip_compile.update_environment_resolver(environment="default", resolver=resolver)
     original_requirements = pip_compile.default_environment.piptools_lock.read_header_requirements()
     assert original_requirements == [packaging.requirements.Requirement("hatch")]
     pip_compile.toml_doc["project"]["dependencies"] = ["requests"]
@@ -96,40 +111,44 @@ def test_create_constraint_environment(pip_compile: PipCompileFixture) -> None:
     assert "pytest" in result.stdout.decode()
 
 
-def test_dependency_uninstalled(pip_compile: PipCompileFixture) -> None:
+@resolver_param
+def test_dependency_uninstalled(pip_compile: PipCompileFixture, resolver: str) -> None:
     """
     An environment is prepared, then a dependency is uninstalled,
     the environment should be out of sync even though the lockfile
     is good
     """
-    pip_compile.application.prepare_environment(environment=pip_compile.test_environment)
-    list_result = pip_compile.test_environment.plugin_check_command(
+    test_env = pip_compile.update_environment_resolver(environment="test", resolver=resolver)
+    pip_compile.application.prepare_environment(environment=test_env)
+    list_result = test_env.plugin_check_command(
         command=["python", "-m", "pip", "list"],
         capture_output=True,
     )
     assert "pytest" in list_result.stdout.decode()
-    assert pip_compile.test_environment.dependencies_in_sync() is True
-    pip_compile.test_environment.plugin_check_command(
+    assert test_env.dependencies_in_sync() is True
+    test_env.plugin_check_command(
         command=["python", "-m", "pip", "uninstall", "pytest", "pytest-cov", "-y"],
     )
-    new_list_result = pip_compile.test_environment.plugin_check_command(
+    new_list_result = test_env.plugin_check_command(
         command=["python", "-m", "pip", "list"],
         capture_output=True,
     )
     assert "pytest" not in new_list_result.stdout.decode()
-    assert pip_compile.test_environment.lockfile_up_to_date is True
-    assert pip_compile.test_environment.dependencies_in_sync() is False
+    assert test_env.lockfile_up_to_date is True
+    assert test_env.dependencies_in_sync() is False
 
 
-def test_lockfile_missing(pip_compile: PipCompileFixture) -> None:
+@resolver_param
+def test_lockfile_missing(pip_compile: PipCompileFixture, resolver: str) -> None:
     """
     Lockfile missing on previously prepared environment
     """
     # Prepare the test environment, assert it is in sync
-    pip_compile.application.prepare_environment(environment=pip_compile.test_environment)
-    assert pip_compile.test_environment.dependencies_in_sync() is True
+    test_env = pip_compile.update_environment_resolver(environment="test", resolver=resolver)
+    pip_compile.application.prepare_environment(environment=test_env)
+    assert test_env.dependencies_in_sync() is True
     # Delete the lockfile, assert environment is in sync but lockfile is missing
-    pip_compile.test_environment.piptools_lock_file.unlink()
+    test_env.piptools_lock_file.unlink()
     updated_environment = pip_compile.reload_environment("test")
     list_result = updated_environment.plugin_check_command(
         command=["python", "-m", "pip", "list"],
@@ -156,10 +175,12 @@ def test_check_dependency_hash_creates_lock(pip_compile: PipCompileFixture) -> N
     assert updated_environment.piptools_lock_file.exists() is True
 
 
-def test_dependencies_in_sync(pip_compile: PipCompileFixture) -> None:
+@resolver_param
+def test_dependencies_in_sync(pip_compile: PipCompileFixture, resolver: str) -> None:
     """
     Test the `dependencies_in_sync` method
     """
+    pip_compile.update_environment_resolver(environment="default", resolver=resolver)
     pip_compile.default_environment.create()
     assert pip_compile.default_environment.lockfile_up_to_date is True
     assert pip_compile.default_environment.dependencies_in_sync() is False

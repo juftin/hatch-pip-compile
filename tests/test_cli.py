@@ -122,9 +122,11 @@ def test_cli_upgrade_packages(pip_compile: PipCompileFixture) -> None:
     """
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=pip_compile.isolation):
-        result = runner.invoke(cli=cli, args=["--upgrade-package", "requests"])
+        result = runner.invoke(
+            cli=cli, args=["--upgrade-package", "requests", "--upgrade-package", "urllib3"]
+        )
         assert result.exit_code == 0
-        assert "hatch-pip-compile: Upgrading packages: requests" in result.output
+        assert "hatch-pip-compile: Upgrading packages: requests, urllib3" in result.output
 
 
 def test_cli_upgrade_test(pip_compile: PipCompileFixture) -> None:

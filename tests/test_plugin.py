@@ -7,6 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
+from hatch_pip_compile.resolver import PipCompileResolver, UvResolver
 from tests.conftest import PipCompileFixture
 
 
@@ -94,9 +95,31 @@ def test_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixtur
         "piptools",
         "compile",
         "--quiet",
-        "--strip-extras",
         "--no-header",
         "--resolver=backtracking",
+        "--strip-extras",
+        "--output-file",
+    ]
+    call_args = list(mock_check_command.call_args)[0][0][:-2]
+    assert call_args == expected_call
+
+
+def test_uv_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
+    """
+    Test the `pip_compile_cli` method is called with the expected arguments (uv)
+    """
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "uv"
+    pip_compile.update_pyproject()
+    default_environment = pip_compile.reload_environment("default")
+    default_environment.pip_compile_cli()
+    expected_call = [
+        "python",
+        "-m",
+        "uv",
+        "pip",
+        "compile",
+        "--quiet",
+        "--no-header",
         "--output-file",
     ]
     call_args = list(mock_check_command.call_args)[0][0][:-2]
@@ -173,3 +196,40 @@ def test_prepare_environment(pip_compile: PipCompileFixture, environment_name: s
         assert not environment.piptools_lock_file.exists()
     assert environment.dependencies_in_sync() is True
     assert environment.lockfile_up_to_date is True
+
+
+def test_bad_resolver(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the `pip-compile-resolver` option on invalid resolver
+    """
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "unknown"
+    pip_compile.update_pyproject()
+    with pytest.raises(HatchPipCompileError, match="Invalid pip-compile-resolver"):
+        pip_compile.reload_environment("default").prepare_environment()
+
+
+def test_resolver_instance_default(pip_compile: PipCompileFixture) -> None:
+    """
+    Test the `pip-compile-resolver` option on default resolver
+    """
+    assert isinstance(pip_compile.default_environment.resolver, PipCompileResolver)
+
+
+def test_resolver_instance_pip_compile(pip_compile: PipCompileFixture) -> None:
+    """
+    Test that the `PipCompileResolver` is used
+    """
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "pip-compile"
+    pip_compile.update_pyproject()
+    environment = pip_compile.reload_environment("default")
+    assert isinstance(environment.resolver, PipCompileResolver)
+
+
+def test_resolver_instance_uv(pip_compile: PipCompileFixture) -> None:
+    """
+    Test that the `UVResolver` is used
+    """
+    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "uv"
+    pip_compile.update_pyproject()
+    environment = pip_compile.reload_environment("default")
+    assert isinstance(environment.resolver, UvResolver)
