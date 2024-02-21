@@ -2,16 +2,20 @@
 Package + Dependency Installers
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
+
+from hatch_pip_compile.base import HatchPipCompileBase
 
 if TYPE_CHECKING:
     from hatch_pip_compile.plugin import PipCompileEnvironment
 
 
 @dataclass
-class PluginInstaller(ABC):
+class PluginInstaller(HatchPipCompileBase, ABC):
     """
     Package Installer for the plugin
 
@@ -19,7 +23,7 @@ class PluginInstaller(ABC):
     how the plugin should install packages and dependencies.
     """
 
-    environment: "PipCompileEnvironment"
+    environment: PipCompileEnvironment
 
     @abstractmethod
     def install_dependencies(self) -> None:
@@ -61,6 +65,8 @@ class PipInstaller(PluginInstaller):
     Plugin Installer for `pip`
     """
 
+    pypi_dependencies: ClassVar[list[str]] = []
+
     def install_dependencies(self) -> None:
         """
         Install the dependencies with `pip`
@@ -79,6 +85,8 @@ class PipSyncInstaller(PluginInstaller):
     Plugin Installer for `pip-sync`
     """
 
+    pypi_dependencies: ClassVar[list[str]] = ["pip-tools"]
+
     def install_dependencies(self) -> None:
         """
         Install the dependencies with `pip-sync`
@@ -87,7 +95,7 @@ class PipSyncInstaller(PluginInstaller):
         uninstall everything in the environment before deleting the
         lockfile.
         """
-        self.environment.install_pip_tools()
+        self.install_pypi_dependencies()
         cmd = [
             self.environment.virtual_env.python_info.executable,
             "-m",
