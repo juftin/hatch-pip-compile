@@ -2,14 +2,12 @@
 Installation Tests
 """
 
-from typing import Dict, Type
 from unittest.mock import Mock
 
 import pytest
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
-from hatch_pip_compile.installer import PluginInstaller
-from tests.conftest import PipCompileFixture
+from tests.conftest import PipCompileFixture, installer_param
 
 
 def test_pip_install_dependencies(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
@@ -33,17 +31,17 @@ def test_pip_install_dependencies(mock_check_command: Mock, pip_compile: PipComp
     assert call_args == expected_call
 
 
-@pytest.mark.parametrize("installer", ["pip", "pip-sync"])
-def test_installer_type(
-    installer: str, installer_dict: Dict[str, Type[PluginInstaller]], pip_compile: PipCompileFixture
-) -> None:
+@installer_param
+def test_installer_type(installer: str, pip_compile: PipCompileFixture) -> None:
     """
     Test the `pip-compile-installer` configuration option
     """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-installer"] = installer
-    pip_compile.update_pyproject()
-    updated_environment = pip_compile.reload_environment("default")
-    assert isinstance(updated_environment.installer, installer_dict[installer])
+    updated_environment = pip_compile.update_environment_installer(
+        environment="default", installer=installer
+    )
+    assert isinstance(
+        updated_environment.installer, updated_environment.dependency_installers[installer]
+    )
 
 
 def test_installer_unknown(pip_compile: PipCompileFixture) -> None:

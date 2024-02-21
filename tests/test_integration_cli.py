@@ -8,18 +8,21 @@ import pytest
 from click.testing import CliRunner
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
-from tests.conftest import PipCompileFixture
+from tests.conftest import PipCompileFixture, resolver_param
 
 
+@resolver_param
 @pytest.mark.parametrize("environment_name", ["default", "test", "lint", "docs", "misc"])
 def test_invoke_environment_creates_env(
-    pip_compile: PipCompileFixture, environment_name: str
+    pip_compile: PipCompileFixture, environment_name: str, resolver: str
 ) -> None:
     """
     Test using the CLI runner
     """
     runner = CliRunner()
-    environment = pip_compile.reload_environment(environment=environment_name)
+    environment = pip_compile.update_environment_resolver(
+        environment=environment_name, resolver=resolver
+    )
     venv = environment.virtual_env.directory
     assert not venv.exists()
     with runner.isolated_filesystem(pip_compile.isolation):
@@ -98,13 +101,18 @@ def test_missing_lockfile_after_prepared(pip_compile: PipCompileFixture) -> None
     assert environment.piptools_lock_file.exists()
 
 
+@resolver_param
 @pytest.mark.parametrize("environment_name", ["default", "test", "lint"])
-def test_pip_compile_disable_cli(pip_compile: PipCompileFixture, environment_name: str) -> None:
+def test_pip_compile_disable_cli(
+    pip_compile: PipCompileFixture, environment_name: str, resolver: str
+) -> None:
     """
     Test that the `PIP_COMPILE_DISABLE` environment variable raises an error
     """
     runner = CliRunner()
-    environment = pip_compile.reload_environment(environment=environment_name)
+    environment = pip_compile.update_environment_resolver(
+        environment=environment_name, resolver=resolver
+    )
     environment.piptools_lock_file.unlink(missing_ok=True)
     with runner.isolated_filesystem(pip_compile.isolation):
         result = runner.invoke(

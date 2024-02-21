@@ -2,13 +2,15 @@
 Shared fixtures for tests.
 """
 
+from __future__ import annotations
+
 import contextlib
 import os
 import pathlib
 import shutil
 from dataclasses import dataclass, field
 from subprocess import CompletedProcess
-from typing import Dict, Generator, Type
+from typing import Generator
 from unittest.mock import patch
 
 import pytest
@@ -19,7 +21,6 @@ from hatch.project.core import Project
 from hatch.utils.fs import Path, temp_directory
 from hatch.utils.platform import Platform
 
-from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
 from hatch_pip_compile.plugin import PipCompileEnvironment
 
 
@@ -120,16 +121,20 @@ class PipCompileFixture:
         self.default_environment = self.reload_environment("default")
         self.test_environment = self.reload_environment("test")
 
-    def reload_environment(self, environment: str) -> PipCompileEnvironment:
+    def reload_environment(self, environment: str | PipCompileEnvironment) -> PipCompileEnvironment:
         """
         Reload a new environment given the current state of the isolated project
         """
+        if isinstance(environment, PipCompileEnvironment):
+            environment_name = environment.name
+        else:
+            environment_name = environment
         new_project = Project(self.isolation)
         return PipCompileEnvironment(
             root=self.isolation,
             metadata=new_project.metadata,
-            name=environment,
-            config=new_project.config.envs[environment],
+            name=environment_name,
+            config=new_project.config.envs[environment_name],
             matrix_variables={},
             data_directory=self.isolated_data_dir,
             isolated_data_directory=self.isolated_data_dir,
@@ -155,6 +160,36 @@ class PipCompileFixture:
         finally:
             os.chdir(current_dir)
 
+    def update_environment_resolver(
+        self, environment: str | PipCompileEnvironment, resolver: str
+    ) -> PipCompileEnvironment:
+        """
+        Update the environment resolver
+        """
+        if isinstance(environment, PipCompileEnvironment):
+            environment_name = environment.name
+        else:
+            environment_name = environment
+        self.toml_doc["tool"]["hatch"]["envs"][environment_name]["pip-compile-resolver"] = resolver
+        self.update_pyproject()
+        return self.reload_environment(environment_name)
+
+    def update_environment_installer(
+        self, environment: str | PipCompileEnvironment, installer: str
+    ) -> PipCompileEnvironment:
+        """
+        Update the environment installer
+        """
+        if isinstance(environment, PipCompileEnvironment):
+            environment_name = environment.name
+        else:
+            environment_name = environment
+        self.toml_doc["tool"]["hatch"]["envs"][environment_name][
+            "pip-compile-installer"
+        ] = installer
+        self.update_pyproject()
+        return self.reload_environment(environment_name)
+
 
 @pytest.fixture
 def pip_compile(
@@ -176,20 +211,13 @@ def pip_compile(
     )
 
 
-@pytest.fixture
-def installer_dict() -> Dict[str, Type[PluginInstaller]]:
-    """
-    Installer dictionary for parametrized tests
-    """
-    return {
-        "pip": PipInstaller,
-        "pip-sync": PipSyncInstaller,
-    }
-
-
 @pytest.fixture(autouse=True)
 def pip_compile_disable(monkeypatch: pytest.MonkeyPatch) -> None:
     """
     Delete the PIP_COMPILE_DISABLE environment variable
     """
     monkeypatch.delenv("PIP_COMPILE_DISABLE", raising=False)
+
+
+resolver_param = pytest.mark.parametrize("resolver", ["pip-compile", "uv"])
+installer_param = pytest.mark.parametrize("installer", ["pip", "pip-sync", "uv"])
