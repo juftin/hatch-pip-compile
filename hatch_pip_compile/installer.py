@@ -5,16 +5,13 @@ Package + Dependency Installers
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
+
+from hatch.env.utils import add_verbosity_flag
 
 from hatch_pip_compile.base import HatchPipCompileBase
 
-if TYPE_CHECKING:
-    from hatch_pip_compile.plugin import PipCompileEnvironment
 
-
-@dataclass
 class PluginInstaller(HatchPipCompileBase, ABC):
     """
     Package Installer for the plugin
@@ -22,8 +19,6 @@ class PluginInstaller(HatchPipCompileBase, ABC):
     This abstract base class is used to define the interface for
     how the plugin should install packages and dependencies.
     """
-
-    environment: PipCompileEnvironment
 
     @abstractmethod
     def install_dependencies(self) -> None:
@@ -35,26 +30,33 @@ class PluginInstaller(HatchPipCompileBase, ABC):
         """
         Sync the dependencies - same as `install_dependencies`
         """
+        self.install_pypi_dependencies()
         self.install_dependencies()
+
+    def construct_pip_install_command(self, args: list[str]) -> list[str]:
+        """
+        Construct a `pip install` command with the given arguments
+        """
+        return self.environment.construct_pip_install_command(args)
 
     def install_project(self) -> None:
         """
         Install the project (`--no-deps`)
         """
+        self.install_pypi_dependencies()
         with self.environment.safe_activation():
             self.environment.plugin_check_command(
-                self.environment.construct_pip_install_command(
-                    args=["--no-deps", str(self.environment.root)]
-                )
+                self.construct_pip_install_command(args=["--no-deps", str(self.environment.root)])
             )
 
     def install_project_dev_mode(self) -> None:
         """
         Install the project in editable mode (`--no-deps`)
         """
+        self.install_pypi_dependencies()
         with self.environment.safe_activation():
             self.environment.plugin_check_command(
-                self.environment.construct_pip_install_command(
+                self.construct_pip_install_command(
                     args=["--no-deps", "--editable", str(self.environment.root)]
                 )
             )
@@ -65,19 +67,41 @@ class PipInstaller(PluginInstaller):
     Plugin Installer for `pip`
     """
 
-    pypi_dependencies: ClassVar[list[str]] = []
-
     def install_dependencies(self) -> None:
         """
         Install the dependencies with `pip`
         """
+        self.install_pypi_dependencies()
         with self.environment.safe_activation():
             if not self.environment.piptools_lock_file.exists():
                 return
             extra_args = self.environment.config.get("pip-compile-install-args", [])
             args = [*extra_args, "--requirement", str(self.environment.piptools_lock_file)]
-            install_command = self.environment.construct_pip_install_command(args=args)
+            install_command = self.construct_pip_install_command(args=args)
             self.environment.plugin_check_command(install_command)
+
+
+class UvInstaller(PipInstaller):
+    """
+    Plugin Installer for `uv`
+    """
+
+    pypi_dependencies: ClassVar[list[str]] = ["uv"]
+
+    def construct_pip_install_command(self, args: list[str]) -> list[str]:
+        """
+        Construct a `pip install` command with the given arguments
+        """
+        command = [
+            "python",
+            "-m",
+            "uv",
+            "pip",
+            "install",
+        ]
+        add_verbosity_flag(command, self.environment.verbosity, adjustment=-1)
+        command.extend(args)
+        return command
 
 
 class PipSyncInstaller(PluginInstaller):

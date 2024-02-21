@@ -10,16 +10,16 @@ import pathlib
 import shutil
 import tempfile
 from subprocess import CompletedProcess
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional, Type, Union
 
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
 from hatchling.dep.core import dependencies_in_sync
-from packaging.requirements import Requirement
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
-from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller
+from hatch_pip_compile.installer import PipInstaller, PipSyncInstaller, PluginInstaller, UvInstaller
 from hatch_pip_compile.lock import PipCompileLock
+from hatch_pip_compile.resolver import BaseResolver, PipCompileResolver, UvResolver
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +29,17 @@ class PipCompileEnvironment(VirtualEnvironment):
     Virtual Environment supported by pip-compile
     """
 
-    PLUGIN_NAME = "pip-compile"
-
-    default_env_name = "default"
+    PLUGIN_NAME: ClassVar[str] = "pip-compile"
+    default_env_name: ClassVar[str] = "default"
+    dependency_resolvers: ClassVar[Dict[str, Type[BaseResolver]]] = {
+        "pip-compile": PipCompileResolver,
+        "uv": UvResolver,
+    }
+    dependency_installers: ClassVar[Dict[str, Type[PluginInstaller]]] = {
+        "pip": PipInstaller,
+        "pip-sync": PipSyncInstaller,
+        "uv": UvInstaller,
+    }
 
     def __repr__(self):
         """
@@ -54,27 +62,25 @@ class PipCompileEnvironment(VirtualEnvironment):
             with self.metadata.context.apply_context(self.context):
                 lock_filename = self.metadata.context.format(lock_filename_config)
         self.piptools_lock_file = self.root / lock_filename
-        self.piptools_lock = PipCompileLock(
-            lock_file=self.piptools_lock_file,
-            dependencies=self.dependencies,
-            virtualenv=self.virtual_env,
-            constraints_file=self.piptools_constraints_file,
-            project_root=self.root,
-            env_name=self.name,
-            project_name=self.metadata.name,
-        )
+        self.piptools_lock = PipCompileLock(environment=self)
         install_method = self.config.get("pip-compile-installer", "pip")
-        self.installer: PluginInstaller
-        if install_method == "pip":
-            self.installer = PipInstaller(environment=self)
-        elif install_method == "pip-sync":
-            self.installer = PipSyncInstaller(environment=self)
-        else:
+        resolve_method = self.config.get("pip-compile-resolver", "pip-compile")
+        if install_method not in self.dependency_installers.keys():
             msg = (
-                f"Invalid pip-tools install method: {install_method} - "
-                "must be 'pip' or 'pip-sync'"
+                f"Invalid pip-compile-installer: {install_method} - "
+                f"must be one of {', '.join(self.dependency_installers.keys())}"
             )
             raise HatchPipCompileError(msg)
+        if resolve_method not in self.dependency_resolvers.keys():
+            msg = (
+                f"Invalid pip-compile-resolver: {resolve_method} - "
+                f"must be one of {', '.join(self.dependency_resolvers.keys())}"
+            )
+            raise HatchPipCompileError(msg)
+        resolver_class = self.dependency_resolvers[resolve_method]
+        installer_class = self.dependency_installers[install_method]
+        self.resolver: BaseResolver = resolver_class(environment=self)
+        self.installer: PluginInstaller = installer_class(environment=self)
 
     @staticmethod
     def get_option_types() -> Dict[str, Any]:
@@ -88,6 +94,7 @@ class PipCompileEnvironment(VirtualEnvironment):
             "pip-compile-constraint": str,
             "pip-compile-installer": str,
             "pip-compile-install-args": List[str],
+            "pip-compile-resolver": str,
         }
 
     def dependency_hash(self) -> str:
@@ -102,19 +109,6 @@ class PipCompileEnvironment(VirtualEnvironment):
             lockfile_hash = self.piptools_lock.get_file_content_hash()
             return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
 
-    def install_pip_tools(self) -> None:
-        """
-        Install pip-tools (if not already installed)
-        """
-        with self.safe_activation():
-            in_sync = dependencies_in_sync(
-                requirements=[Requirement("pip-tools")],
-                sys_path=self.virtual_env.sys_path,
-                environment=self.virtual_env.environment,
-            )
-            if not in_sync:
-                self.plugin_check_command(self.construct_pip_install_command(["pip-tools"]))
-
     def run_pip_compile(self) -> None:
         """
         Run pip-compile if necessary
@@ -122,7 +116,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.prepare_environment()
         if not self.lockfile_up_to_date:
             with self.safe_activation():
-                self.install_pip_tools()
+                self.resolver.install_pypi_dependencies()
                 if self.piptools_lock_file.exists():
                     _ = self.piptools_lock.compare_python_versions(
                         verbose=self.config.get("pip-compile-verbose", None)
@@ -141,42 +135,18 @@ class PipCompileEnvironment(VirtualEnvironment):
         if no_compile:
             msg = "hatch-pip-compile is disabled but attempted to run a lockfile update."
             raise HatchPipCompileError(msg)
-        upgrade = bool(os.getenv("PIP_COMPILE_UPGRADE"))
-        upgrade_packages = os.getenv("PIP_COMPILE_UPGRADE_PACKAGE") or None
-        upgrade_args = []
-        upgrade_package_args = []
-        if upgrade:
-            upgrade_args.append("--upgrade")
-        if upgrade_packages:
-            upgrade_packages_sep = upgrade_packages.split(",")
-            for package in upgrade_packages_sep:
-                upgrade_package_args.append(f"--upgrade-package={package.strip()}")
-        cmd = [
-            self.virtual_env.python_info.executable,
-            "-m",
-            "piptools",
-            "compile",
-            "--verbose" if self.config.get("pip-compile-verbose", None) is True else "--quiet",
-            "--strip-extras",
-            "--no-header",
-            "--resolver=backtracking",
-        ]
-        if self.config.get("pip-compile-hashes", False) is True:
-            cmd.append("--generate-hashes")
-        if self.piptools_constraints_file is not None:
-            cmd.extend(["--constraint", str(self.piptools_constraints_file)])
-        cmd.extend(self.config.get("pip-compile-args", []))
-        cmd.extend(upgrade_args)
-        cmd.extend(upgrade_package_args)
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
             output_file = tmp_path / "lock.txt"
-            cmd.extend(["--output-file", str(output_file), str(input_file)])
             input_file.write_text("\n".join([*self.dependencies, ""]))
             if self.piptools_lock_file.exists():
                 shutil.copy(self.piptools_lock_file, output_file)
             self.piptools_lock_file.parent.mkdir(exist_ok=True, parents=True)
+            cmd = self.resolver.get_pip_compile_args(
+                input_file=input_file,
+                output_file=output_file,
+            )
             self.plugin_check_command(cmd)
             self.piptools_lock.process_lock(lockfile=output_file)
             shutil.move(output_file, self.piptools_lock_file)
