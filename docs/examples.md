@@ -131,9 +131,38 @@ Whether to generate hashes in the lockfile. Defaults to `false`.
     pip-compile-hashes = true
     ```
 
+## pip-compile-resolver
+
+Which resolver to use to generate the lockfile. Defaults to `pip-compile`.
+
+[uv] is a drop in replacement for `pip-compile` with a much faster resolver written in rust.
+If you'd like to use `uv` instead of `pip-compile` you can set the `pip-compile-resolver` option.
+
+> NOTE: **pip-compile-installer**
+>
+> [uv] can also be used as the default installer instead of `pip`. See
+> the [pip-compile-installer](#pip-compile-installer) option for more
+> information.
+
+-   **_pyproject.toml_**
+
+    ```toml
+    [tool.hatch.envs.<envName>]
+    type = "pip-compile"
+    pip-compile-resolver = "uv"
+    ```
+
+-   **_hatch.toml_**
+
+    ```toml
+    [envs.<envName>]
+    type = "pip-compile"
+    pip-compile-resolver = "uv"
+    ```
+
 ## pip-compile-args
 
-Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be specified here.
+Extra arguments to pass to `pip-compile-resolver`. Custom PyPI indexes can be specified here.
 
 -   **_pyproject.toml_**
 
@@ -161,7 +190,8 @@ Extra arguments to pass to `pip-compile`. Custom PyPI indexes can be specified h
 
 Set to `true` to run `pip-compile` in verbose mode instead of quiet mode.
 
-Optionally, if you would like to silence any warnings set the `pip-compile-verbose` option to `false`.
+Optionally, if you would like to silence any warnings set the `pip-compile-verbose` option
+to `false`.
 
 -   **_pyproject.toml_**
 
@@ -181,15 +211,16 @@ Optionally, if you would like to silence any warnings set the `pip-compile-verbo
 
 ## pip-compile-installer
 
-Whether to use [pip] or [pip-sync] to install dependencies into the project. Defaults to `pip`.
-When you choose the `pip` option the plugin will run `pip install -r {lockfile}` under the hood
-to install the dependencies. When you choose the `pip-sync` option `pip-sync {lockfile}` is invoked
-by the plugin.
+Whether to use [pip], [pip-sync], or [uv] to install dependencies into the project. Defaults
+to `pip`. When you choose the `pip` option the plugin will run `pip install -r {lockfile}`
+under the hood to install the dependencies. When you choose the `pip-sync` option
+`pip-sync {lockfile}` is invoked by the plugin. [uv] is a drop in replacement for
+`pip`, it has the same behavior as `pip` installer, `uv pip install -r {lockfile}`.
 
 The key difference between these options is that `pip-sync` will uninstall any packages that are
-not in the lockfile and remove them from your environment. `pip-sync` is useful if you want to ensure
-that your environment is exactly the same as the lockfile. If the environment should be used
-across different Python versions and platforms `pip` is the safer option to use.
+not in the lockfile and remove them from your environment. `pip-sync` is useful if you want to
+ensure that your environment is exactly the same as the lockfile. If the environment should
+be used across different Python versions and platforms `pip` is the safer option to use.
 
 -   **_pyproject.toml_**
 
@@ -237,3 +268,4 @@ installer but want to pass the `--no-deps` flag to `pip install` you can do so w
 [pip-sync]: https://github.com/jazzband/pip-tools
 [pip]: https://pip.pypa.io
 [inheritance]: hhttps://hatch.pypa.io/latest/config/environment/overview/#inheritance
+[uv]: https://github.com/astral-sh/uv

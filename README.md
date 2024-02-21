@@ -7,7 +7,7 @@
 </div>
 
 <p align="center">
-<a href="https://github.com/pypa/hatch">hatch</a> plugin to use <a href="https://github.com/jazzband/pip-tools">pip-compile</a> to manage project dependencies and lockfiles.
+<a href="https://github.com/pypa/hatch">hatch</a> plugin to use <a href="https://github.com/jazzband/pip-tools">pip-compile</a> (or <a href="https://github.com/astral-sh/uv">uv</a>) to manage project dependencies and lockfiles.
 </p>
 
 <p align="center">
@@ -19,6 +19,7 @@
   <a href="https://codecov.io/gh/juftin/hatch-pip-compile"><img src="https://codecov.io/gh/juftin/hatch-pip-compile/graph/badge.svg?token=PCGB5QIC8M"/></a>
   <a href="https://github.com/pypa/hatch"><img src="https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg" alt="Hatch project"></a>
   <a href="https://github.com/jazzband/pip-tools"><img src="https://raw.githubusercontent.com/jazzband/website/main/jazzband/static/img/badge.svg" alt="Pip Tools project"></a>
+  <a href="https://github.com/astral-sh/uv"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
   <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-lightgreen?logo=pre-commit" alt="pre-commit"></a>
   <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>
@@ -88,6 +89,7 @@ Set your environment type to `pip-compile` to use this plugin for the respective
 -   [pip-compile-constraint](docs/examples.md#pip-compile-constraint) - syncing dependency versions across environments
 -   [Upgrading Dependencies](docs/examples.md#upgrading-dependencies) - how to upgrade dependencies
 -   [Using Hashes](docs/examples.md#pip-compile-hashes) - how to include hashes in your lockfile
+-   [Using uv instead of pip-compile](docs/examples.md#pip-compile-resolver) - how to use `uv` instead of `pip-compile`
 
 ### Configuration Options
 
@@ -110,15 +112,16 @@ pip-compile-hashes = true
 | [lock-filename](docs/examples.md#lock-filename)                   | `str`       | The filename of the ultimate lockfile. `default` env is `requirements.txt`, non-default is `requirements/requirements-{env_name}.txt` |
 | [pip-compile-constraint](docs/examples.md#pip-compile-constraint) | `str`       | An environment to use as a constraint file, ensuring that all shared dependencies are pinned to the same versions.                    |
 | [pip-compile-hashes](docs/examples.md#pip-compile-hashes)         | `bool`      | Whether to generate hashes in the lockfile. Defaults to `false`.                                                                      |
+| [pip-compile-resolver](docs/examples.md#pip-compile-resolver)     | `str`       | Whether to use `pip-compile` or `uv` to resolve dependencies into the project. Defaults to `pip-compile`                              |
+| [pip-compile-args](docs/examples.md#pip-compile-args)             | `list[str]` | Additional command-line arguments to pass to `pip-compile-resolver`                                                                   |
 | [pip-compile-verbose](docs/examples.md#pip-compile-verbose)       | `bool`      | Set to `true` to run `pip-compile` in verbose mode instead of quiet mode, set to `false` to silence warnings                          |
-| [pip-compile-args](docs/examples.md#pip-compile-args)             | `list[str]` | Additional command-line arguments to pass to `pip-compile`                                                                            |
 
 #### Installing Lockfiles
 
-| name                                                                  | type        | description                                                                                    |
-| --------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------- |
-| [pip-compile-installer](docs/examples.md#pip-compile-installer)       | `str`       | Whether to use `pip` or `pip-sync` to install dependencies into the project. Defaults to `pip` |
-| [pip-compile-install-args](docs/examples.md#pip-compile-install-args) | `list[str]` | Additional command-line arguments to pass to `pip-compile-installer`                           |
+| name                                                                  | type        | description                                                                                           |
+| --------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| [pip-compile-installer](docs/examples.md#pip-compile-installer)       | `str`       | Whether to use `pip`, `pip-sync`, or `uv` to install dependencies into the project. Defaults to `pip` |
+| [pip-compile-install-args](docs/examples.md#pip-compile-install-args) | `list[str]` | Additional command-line arguments to pass to `pip-compile-installer`                                  |
 
 <!--skip-->
 

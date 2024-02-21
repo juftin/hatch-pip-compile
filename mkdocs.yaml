@@ -36,7 +36,6 @@ repo_name: hatch-pip-compile
 edit_uri: blob/main/docs/
 site_author: juftin
 remote_branch: gh-pages
-copyright: Copyright © 2023 Justin Flannery
 extra:
     generator: false
 exclude_docs: |
