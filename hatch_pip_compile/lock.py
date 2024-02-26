@@ -40,7 +40,7 @@ class PipCompileLock(HatchPipCompileBase):
         joined_dependencies = "\n".join([f"# - {dep}" for dep in self.environment.dependencies])
         lockfile_text = lockfile.read_text()
         cleaned_input_file = re.sub(
-            rf"-r \S*/{self.environment.name}\.in",
+            rf"-r \S*[\\/]{self.environment.name}\.in",
             f"hatch.envs.{self.environment.name}",
             lockfile_text,
         )
