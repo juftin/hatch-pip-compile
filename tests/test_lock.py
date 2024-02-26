@@ -1,6 +1,7 @@
 """
 Testing the `lock` module
 """
+from textwrap import dedent
 
 from packaging.requirements import Requirement
 from packaging.version import Version
@@ -67,3 +68,41 @@ def test_read_lock_requirements(pip_compile: PipCompileFixture) -> None:
         "ruff==0.1.6",
         "typing-extensions==4.8.0",
     }
+
+
+def test_replace_temporary_lockfile_windows(pip_compile: PipCompileFixture) -> None:
+    """
+    Regex Replace Temporary File Path: Windows
+    """
+    lock_raw = r"""
+    httpx==0.22.0
+        # via -r C:\Users\xxx\AppData\Local\Temp\tmp_kn984om\default.in
+    """
+    lock_body = dedent(lock_raw).strip()
+    cleaned_text = pip_compile.default_environment.piptools_lock.replace_temporary_lockfile(
+        lock_body
+    )
+    expected_raw = r"""
+    httpx==0.22.0
+        # via hatch.envs.default
+    """
+    assert cleaned_text == dedent(expected_raw).strip()
+
+
+def test_replace_temporary_lockfile_unix(pip_compile: PipCompileFixture) -> None:
+    """
+    Regex Replace Temporary File Path: Unix
+    """
+    lock_raw = r"""
+    httpx==0.22.0
+        # via -r /tmp/tmp_kn984om/default.in
+    """
+    lock_body = dedent(lock_raw).strip()
+    cleaned_text = pip_compile.default_environment.piptools_lock.replace_temporary_lockfile(
+        lock_body
+    )
+    expected_raw = r"""
+    httpx==0.22.0
+        # via hatch.envs.default
+    """
+    assert cleaned_text == dedent(expected_raw).strip()

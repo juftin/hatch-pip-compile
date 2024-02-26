@@ -39,11 +39,7 @@ class PipCompileLock(HatchPipCompileBase):
         prefix = dedent(raw_prefix).strip()
         joined_dependencies = "\n".join([f"# - {dep}" for dep in self.environment.dependencies])
         lockfile_text = lockfile.read_text()
-        cleaned_input_file = re.sub(
-            rf"-r \S*/{self.environment.name}\.in",
-            f"hatch.envs.{self.environment.name}",
-            lockfile_text,
-        )
+        cleaned_input_file = self.replace_temporary_lockfile(lockfile_text=lockfile_text)
         if self.environment.piptools_constraints_file is not None:
             lockfile_contents = self.environment.piptools_constraints_file.read_bytes()
             cross_platform_contents = lockfile_contents.replace(b"\r\n", b"\n")
@@ -167,3 +163,14 @@ class PipCompileLock(HatchPipCompileBase):
             session=PipSession(),
         )
         return [ireq.req for ireq in install_requirements]  # type: ignore[misc]
+
+    def replace_temporary_lockfile(self, lockfile_text: str) -> str:
+        """
+        Replace the temporary lockfile with the new lockfile
+        """
+        cleaned_input_file = re.sub(
+            rf"-r \S*[\\/]{self.environment.name}\.in",
+            f"hatch.envs.{self.environment.name}",
+            lockfile_text,
+        )
+        return cleaned_input_file
