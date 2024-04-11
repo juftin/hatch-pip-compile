@@ -19,8 +19,8 @@
     > NOTE: **pre-commit**
     >
     > Hatch will attempt to set up pre-commit hooks for you using
-    > [pre-commit]. If you don't already,
-    > make sure to install pre-commit as well: `pipx install pre-commit`
+    > [pre-commit]. If you don't already, make sure to install
+    > pre-commit as well: `pipx install pre-commit`
 
 2.  Build the Virtual Environment
 
