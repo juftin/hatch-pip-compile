@@ -130,17 +130,21 @@ class PipCompileFixture:
         else:
             environment_name = environment
         new_project = Project(self.isolation)
-        return PipCompileEnvironment(
-            root=self.isolation,
-            metadata=new_project.metadata,
-            name=environment_name,
-            config=new_project.config.envs[environment_name],
-            matrix_variables={},
-            data_directory=self.isolated_data_dir,
-            isolated_data_directory=self.isolated_data_dir,
-            platform=self.platform,
-            verbosity=0,
-        )
+        try:
+            env = self.application.get_environment(env_name=environment_name)
+        except AttributeError:
+            env = PipCompileEnvironment(
+                root=self.isolation,
+                metadata=new_project.metadata,
+                name=environment_name,
+                config=new_project.config.envs[environment_name],
+                matrix_variables={},
+                data_directory=self.isolated_data_dir,
+                isolated_data_directory=self.isolated_data_dir,
+                platform=self.platform,
+                verbosity=0,
+            )
+        return env
 
     def update_pyproject(self) -> None:
         """
