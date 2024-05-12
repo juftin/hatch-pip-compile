@@ -265,9 +265,9 @@ class PipCompileEnvironment(VirtualEnvironment):
                 f"[hatch-pip-compile] The environment {environment_name} does not exist."
             )
             raise HatchPipCompileError(error_message)
-        try:
+        if isinstance(self.app, hatch.cli.Application):
             env = self.app.get_environment(env_name=environment_name)
-        except AttributeError:
+        else:
             env = PipCompileEnvironment(
                 root=self.root,
                 metadata=self.metadata,
