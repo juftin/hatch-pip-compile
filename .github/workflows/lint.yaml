@@ -9,6 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             PIP_COMPILE_DISABLE: true
+            HATCH_DEBUG: true
         steps:
             - name: Set up Github Workspace
               uses: actions/checkout@v4
