@@ -365,10 +365,11 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Prepare the environment
         """
-        if isinstance(self.app, hatch.cli.Application):
-            self.app.prepare_environment(environment=self)
-        else:
-            self._prepare_environment_legacy()
+        self._prepare_environment_legacy()
+        # if isinstance(self.app, hatch.cli.Application):
+        #     self.app.prepare_environment(environment=self)
+        # else:
+        #     self._prepare_environment_legacy()
 
     def _prepare_environment_legacy(self) -> None:
         """
