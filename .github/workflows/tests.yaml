@@ -21,7 +21,7 @@ on:
 jobs:
     test-suite:
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 include:
                     - {
