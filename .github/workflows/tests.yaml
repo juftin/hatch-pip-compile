@@ -77,7 +77,7 @@ jobs:
                           python: "3.11",
                           command: "versions:cov",
                           matrix: "+version=1.8.x",
-                          hatch_version: "1.8.0",
+                          hatch_version: "1.8.1",
                           os: ubuntu-latest,
                       }
                     - {
@@ -85,7 +85,23 @@ jobs:
                           python: "3.11",
                           command: "versions:cov",
                           matrix: "+version=1.9.x",
-                          hatch_version: "1.9.0",
+                          hatch_version: "1.9.7",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.10.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.10.x",
+                          hatch_version: "1.10.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.11.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.11.x",
+                          hatch_version: "1.11.1",
                           os: ubuntu-latest,
                       }
                     - {
