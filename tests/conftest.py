@@ -13,8 +13,10 @@ from subprocess import CompletedProcess
 from typing import Generator
 from unittest.mock import patch
 
+import hatch
 import pytest
 import tomlkit
+from click.testing import CliRunner, Result
 from hatch.cli.application import Application
 from hatch.config.constants import AppEnvVars, ConfigEnvVars, PublishEnvVars
 from hatch.project.core import Project
@@ -105,6 +107,7 @@ class PipCompileFixture:
     application: Application = field(init=False)
     default_environment: PipCompileEnvironment = field(init=False)
     test_environment: PipCompileEnvironment = field(init=False)
+    cli_runner: CliRunner = field(init=False)
 
     def __post_init__(self) -> None:
         """
@@ -116,10 +119,14 @@ class PipCompileFixture:
             interactive=False,
             enable_color=False,
         )
-        self.application.data_dir = self.isolated_data_dir
+        self.application.data_dir = self.isolated_data_dir / "data"
+        self.application.config_file.load()
+        self.application.cache_dir = self.isolated_data_dir / "cache"
         self.application.project = self.project
+        self.current_environment = self.reload_environment("default")
         self.default_environment = self.reload_environment("default")
         self.test_environment = self.reload_environment("test")
+        self.cli_runner = CliRunner()
 
     def reload_environment(self, environment: str | PipCompileEnvironment) -> PipCompileEnvironment:
         """
@@ -129,18 +136,8 @@ class PipCompileFixture:
             environment_name = environment.name
         else:
             environment_name = environment
-        new_project = Project(self.isolation)
-        return PipCompileEnvironment(
-            root=self.isolation,
-            metadata=new_project.metadata,
-            name=environment_name,
-            config=new_project.config.envs[environment_name],
-            matrix_variables={},
-            data_directory=self.isolated_data_dir,
-            isolated_data_directory=self.isolated_data_dir,
-            platform=self.platform,
-            verbosity=0,
-        )
+        env = self.application.get_environment(env_name=environment_name)
+        return env
 
     def update_pyproject(self) -> None:
         """
@@ -189,6 +186,63 @@ class PipCompileFixture:
         ] = installer
         self.update_pyproject()
         return self.reload_environment(environment_name)
+
+    def cli_invoke(self, args: list[str], env: dict[str, str] | None = None) -> Result:
+        """
+        Invoke the CLI
+        """
+        invoke_kwargs = {"args": args}
+        if env:
+            invoke_kwargs["env"] = env
+        with self.cli_runner.isolated_filesystem(self.isolation):
+            return self.cli_runner.invoke(hatch.cli.hatch, **invoke_kwargs)
+
+    def invoke_environment(
+        self, environment: PipCompileEnvironment, env: dict[str, str] | None = None
+    ) -> Result:
+        """
+        Sync the environment
+        """
+        result = self.cli_invoke(
+            args=["env", "run", "--env", environment.name, "--", "python", "--version"],
+            env=env,
+        )
+        return result
+
+    @staticmethod
+    def virtualenv_exists(environment: PipCompileEnvironment) -> bool:
+        """
+        Check if the virtual environment exists
+        """
+        virtualenv_cfg = environment.virtual_env.directory / "pyvenv.cfg"
+        return virtualenv_cfg.exists()
+
+    def is_installed(
+        self,
+        environment: PipCompileEnvironment,
+        package: str,
+    ) -> bool:
+        """
+        Check if a package is installed in the environment
+
+        This method simply checks if the package is in the site-packages directory
+        of the virtual environment.
+        """
+        if not self.virtualenv_exists(environment=environment):
+            return False
+        if self.platform.windows:
+            site_packages = environment.virtual_env.directory / "Lib" / "site-packages"
+            if not site_packages.exists():
+                return False
+        else:
+            site_packages_search = environment.virtual_env.directory.glob(
+                "lib/python*/site-packages"
+            )
+            site_packages = next(site_packages_search, None)
+            if site_packages is None:
+                return False
+        package_dir = site_packages / package
+        return (package_dir / "__init__.py").exists()
 
 
 @pytest.fixture
