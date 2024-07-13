@@ -12,6 +12,7 @@ import tempfile
 from subprocess import CompletedProcess
 from typing import Any, ClassVar, Dict, List, Optional, Type, Union
 
+import hatch.cli
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
 from hatchling.dep.core import dependencies_in_sync
@@ -264,18 +265,22 @@ class PipCompileEnvironment(VirtualEnvironment):
                 f"[hatch-pip-compile] The environment {environment_name} does not exist."
             )
             raise HatchPipCompileError(error_message)
-        return PipCompileEnvironment(
-            root=self.root,
-            metadata=self.metadata,
-            name=environment_name,
-            config=self.pipools_environment_dict.get(environment_name, {}),
-            matrix_variables=self.matrix_variables,
-            data_directory=self.data_directory,
-            isolated_data_directory=self.isolated_data_directory,
-            platform=Platform(),
-            verbosity=self.verbosity,
-            app=None,
-        )
+        if isinstance(self.app, hatch.cli.Application):
+            env = self.app.get_environment(env_name=environment_name)
+        else:
+            env = PipCompileEnvironment(
+                root=self.root,
+                metadata=self.metadata,
+                name=environment_name,
+                config=self.pipools_environment_dict.get(environment_name, {}),
+                matrix_variables=self.matrix_variables,
+                data_directory=self.data_directory,
+                isolated_data_directory=self.isolated_data_directory,
+                platform=Platform(),
+                verbosity=self.verbosity,
+                app=self.app,
+            )
+        return env
 
     @functools.cached_property
     def constraint_env(self) -> "PipCompileEnvironment":
@@ -360,8 +365,9 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Prepare the environment
 
-        Ideally, hatch.cli.Application.prepare_environment would be called
-        but the `Application` class is not exposed to the environment plugin.
+        Ideally, we could access the `self.app` attribute,
+        but this ultimately leads to a recursion error when
+        `self.app.prepare_environment()` is called.
         """
         if not self.virtualenv_exists():
             self.create()
