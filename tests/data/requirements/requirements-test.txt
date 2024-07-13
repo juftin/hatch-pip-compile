@@ -174,7 +174,7 @@ tomli-w==1.0.0
     # via
     #   -c requirements.txt
     #   hatch
-tomlkit==0.12.3
+tomlkit==0.12.5
     # via
     #   -c requirements.txt
     #   hatch
