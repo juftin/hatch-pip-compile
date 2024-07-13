@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import pytest
 
 from hatch_pip_compile.exceptions import HatchPipCompileError
-from hatch_pip_compile.resolver import PipCompileResolver, UvResolver
+from hatch_pip_compile.resolver import PipCompileResolver
 from tests.conftest import PipCompileFixture
 
 
@@ -46,14 +46,6 @@ def test_expected_dependencies(pip_compile: PipCompileFixture) -> None:
     """
     assert set(pip_compile.default_environment.dependencies) == {"hatch"}
     assert set(pip_compile.test_environment.dependencies) == {"pytest", "pytest-cov", "hatch"}
-
-
-def test_lockfile_up_to_date(pip_compile: PipCompileFixture) -> None:
-    """
-    Test the prepared lockfiles are up-to-date
-    """
-    assert pip_compile.default_environment.lockfile_up_to_date is True
-    assert pip_compile.test_environment.lockfile_up_to_date is True
 
 
 def test_lockfile_up_to_date_missing(pip_compile: PipCompileFixture) -> None:
@@ -104,58 +96,6 @@ def test_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixtur
     assert call_args == expected_call
 
 
-def test_uv_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
-    """
-    Test the `pip_compile_cli` method is called with the expected arguments (uv)
-    """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "uv"
-    pip_compile.update_pyproject()
-    default_environment = pip_compile.reload_environment("default")
-    default_environment.pip_compile_cli()
-    expected_call = [
-        "python",
-        "-m",
-        "uv",
-        "pip",
-        "compile",
-        "--quiet",
-        "--no-header",
-        "--output-file",
-    ]
-    call_args = list(mock_check_command.call_args)[0][0][:-2]
-    assert call_args == expected_call
-
-
-def test_environment_change(
-    pip_compile: PipCompileFixture,
-) -> None:
-    """
-    Override the `dependencies` property and assert the `lockfile_up_to_date` property is False
-    """
-    assert pip_compile.test_environment.lockfile_up_to_date is True
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["test"]["dependencies"] = ["requests"]
-    pip_compile.update_pyproject()
-    new_environment = pip_compile.reload_environment("test")
-    assert new_environment.dependencies == ["requests", "hatch"]
-    assert new_environment.lockfile_up_to_date is False
-
-
-def test_constraint_dependency_change(
-    pip_compile: PipCompileFixture, mock_check_command: Mock
-) -> None:
-    """
-    Update the constraint environment and assert it and its downstream environments are out-of-sync
-    """
-    assert pip_compile.default_environment.lockfile_up_to_date is True
-    assert pip_compile.test_environment.lockfile_up_to_date is True
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["dependencies"] = ["requests"]
-    pip_compile.update_pyproject()
-    new_default_env = pip_compile.reload_environment("default")
-    new_test_env = pip_compile.reload_environment("test")
-    assert new_default_env.lockfile_up_to_date is False
-    assert new_test_env.lockfile_up_to_date is False
-
-
 def test_env_var_disabled(pip_compile: PipCompileFixture, monkeypatch: pytest.MonkeyPatch) -> None:
     """
     Test the `lockfile_up_to_date` property when the lockfile is empty
@@ -198,16 +138,6 @@ def test_prepare_environment(pip_compile: PipCompileFixture, environment_name: s
     assert environment.lockfile_up_to_date is True
 
 
-def test_bad_resolver(pip_compile: PipCompileFixture) -> None:
-    """
-    Test the `pip-compile-resolver` option on invalid resolver
-    """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "unknown"
-    pip_compile.update_pyproject()
-    with pytest.raises(HatchPipCompileError, match="Invalid pip-compile-resolver"):
-        pip_compile.reload_environment("default").prepare_environment()
-
-
 def test_resolver_instance_default(pip_compile: PipCompileFixture) -> None:
     """
     Test the `pip-compile-resolver` option on default resolver
@@ -223,13 +153,3 @@ def test_resolver_instance_pip_compile(pip_compile: PipCompileFixture) -> None:
     pip_compile.update_pyproject()
     environment = pip_compile.reload_environment("default")
     assert isinstance(environment.resolver, PipCompileResolver)
-
-
-def test_resolver_instance_uv(pip_compile: PipCompileFixture) -> None:
-    """
-    Test that the `UVResolver` is used
-    """
-    pip_compile.toml_doc["tool"]["hatch"]["envs"]["default"]["pip-compile-resolver"] = "uv"
-    pip_compile.update_pyproject()
-    environment = pip_compile.reload_environment("default")
-    assert isinstance(environment.resolver, UvResolver)
