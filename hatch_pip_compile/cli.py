@@ -135,7 +135,7 @@ class HatchCommandRunner:
             The name of the environments
         """
         result = subprocess.run(
-            args=["hatch", "env", "show", "--json"],
+            args=["hatch", "env", "show", "--json", "--internal"],
             capture_output=True,
             check=True,
         )

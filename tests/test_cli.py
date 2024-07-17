@@ -42,7 +42,7 @@ def test_cli_no_args_mocked(pip_compile: PipCompileFixture, subprocess_run: Mock
         assert subprocess_run.call_count == 1
         subprocess_run.assert_called_once()
         subprocess_run.assert_called_with(
-            args=["hatch", "env", "show", "--json"], capture_output=True, check=True
+            args=["hatch", "env", "show", "--json", "--internal"], capture_output=True, check=True
         )
 
 
