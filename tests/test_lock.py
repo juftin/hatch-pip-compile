@@ -1,6 +1,7 @@
 """
 Testing the `lock` module
 """
+
 from textwrap import dedent
 
 from packaging.requirements import Requirement
