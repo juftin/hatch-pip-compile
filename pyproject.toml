@@ -20,7 +20,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
 dependencies = [
-  "hatch>=1.10.0,<2",
+  "hatch>=1.7.0,<2",
   "pip-tools>=6",
   "click",
   "rich"

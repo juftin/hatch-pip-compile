@@ -134,15 +134,34 @@ class HatchCommandRunner:
         List[str]
             The name of the environments
         """
+
+        show_command = ["hatch", "env", "show", "--json"]
+
+        if cls._get_hatch_version() >= (1, 10):
+            # Versions greater than 1.10 have built in internal environments
+            show_command.append("--internal")
+
         result = subprocess.run(
-            args=["hatch", "env", "show", "--json", "--internal"],
+            args=show_command,
             capture_output=True,
             check=True,
         )
+
         environment_dict: dict[str, Any] = json.loads(result.stdout)
         return {
             key for key, value in environment_dict.items() if value.get("type") == "pip-compile"
         }
+
+    @staticmethod
+    def _get_hatch_version() -> tuple[int, ...]:
+        result = subprocess.run(
+            args=["hatch", "--version"],
+            capture_output=True,
+            check=True,
+        )
+        # Version is the last portion of the string
+        version_string = result.stdout.strip().split()[-1]
+        return tuple([int(p) for p in version_string.split(b".") if p.isdigit()])
 
 
 @click.command("hatch-pip-compile")
