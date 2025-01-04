@@ -265,6 +265,23 @@ installer but want to pass the `--no-deps` flag to `pip install` you can do so w
     ]
     ```
 
+## Alternate Install Locations
+
+If you'd like to install dependencies into a different location, you must configure
+this at the `hatch` level in your `config.toml` file:
+
+```toml
+[dirs.env]
+virtual = ".venv"
+pip-compile = ".venv"
+```
+
+Alternatively, you can set this from the commandline:
+
+```shell
+hatch config set dirs.env.pip-compile ".venv"
+```
+
 [pip-sync]: https://github.com/jazzband/pip-tools
 [pip]: https://pip.pypa.io
 [inheritance]: hhttps://hatch.pypa.io/latest/config/environment/overview/#inheritance
