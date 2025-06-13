@@ -67,7 +67,7 @@ class HatchCommandRunner:
                 "[bold green]hatch-pip-compile[/bold green]: Upgrading all dependencies"
             )
         elif self.upgrade_packages:
-            env_vars["PIP_COMPILE_UPGRADE_PACKAGES"] = ",".join(self.upgrade_packages)
+            env_vars["PIP_COMPILE_UPGRADE_PACKAGE"] = ",".join(self.upgrade_packages)
             message = (
                 "[bold green]hatch-pip-compile[/bold green]: "
                 f"Upgrading packages: {', '.join(self.upgrade_packages)}"
