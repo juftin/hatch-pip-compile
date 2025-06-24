@@ -32,18 +32,35 @@ def test_cli_version() -> None:
     assert f"hatch-pip-compile, version {__version__}" in result.output
 
 
-def test_cli_no_args_mocked(pip_compile: PipCompileFixture, subprocess_run: Mock) -> None:
+@pytest.mark.parametrize(
+    "hatch_version, expected_args",
+    [
+        (b"Hatch, version 1.7.0", ["hatch", "env", "show", "--json"]),
+        (b"Hatch, version 1.12.0", ["hatch", "env", "show", "--json", "--internal"]),
+    ],
+)
+def test_cli_no_args_mocked(
+    hatch_version: bytes,
+    expected_args: list[str],
+    pip_compile: PipCompileFixture,
+    subprocess_run: Mock,
+) -> None:
     """
     Test the CLI with no arguments - mock the result
     """
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=pip_compile.isolation):
+        version_mock = Mock()
+        version_mock.stdout = hatch_version
+        environment_mock = Mock()
+        environment_mock.stdout = b"{}"
+        subprocess_run.side_effect = [
+            version_mock,
+            environment_mock,
+        ]
         _ = runner.invoke(cli=cli)
-        assert subprocess_run.call_count == 1
-        subprocess_run.assert_called_once()
-        subprocess_run.assert_called_with(
-            args=["hatch", "env", "show", "--json"], capture_output=True, check=True
-        )
+        assert subprocess_run.call_count == 2
+        subprocess_run.assert_called_with(args=expected_args, capture_output=True, check=True)
 
 
 def test_cli_no_args(pip_compile: PipCompileFixture) -> None:
