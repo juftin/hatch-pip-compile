@@ -139,7 +139,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_path = pathlib.Path(tmpdir)
             input_file = tmp_path / f"{self.name}.in"
-            output_file = tmp_path / "lock.txt"
+            output_file = tmp_path / "pylock.toml"
             input_file.write_text("\n".join([*self.dependencies, ""]))
             if self.piptools_lock_file.exists():
                 shutil.copy(self.piptools_lock_file, output_file)
