@@ -6,15 +6,15 @@ from __future__ import annotations
 
 import dataclasses
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
 from typing import Any, Sequence
 
 import click
 import rich.traceback
+from hatch.project.core import Project
 
 from hatch_pip_compile.__about__ import __application__, __version__
-from hatch.project.core import Project
 
 @dataclasses.dataclass
 class HatchCommandRunner:
