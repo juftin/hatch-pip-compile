@@ -16,6 +16,7 @@ from hatch.project.core import Project
 
 from hatch_pip_compile.__about__ import __application__, __version__
 
+
 @dataclasses.dataclass
 class HatchCommandRunner:
     """
