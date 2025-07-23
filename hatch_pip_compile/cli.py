@@ -5,11 +5,10 @@ hatch-pip-compile CLI
 from __future__ import annotations
 
 import dataclasses
-import json
 import os
+from pathlib import Path
 import subprocess
 from typing import Any, Sequence
-from pathlib import Path
 
 import click
 import rich.traceback
@@ -138,7 +137,7 @@ class HatchCommandRunner:
         project = Project(
             Path.cwd(),
         )
-        environment_dict = project.config.envs.keys()
+        environment_dict = project.config.envs
         return {
             key for key, value in environment_dict.items() if value.get("type") == "pip-compile"
         }
