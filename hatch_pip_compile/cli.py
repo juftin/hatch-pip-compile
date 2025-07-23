@@ -9,12 +9,13 @@ import json
 import os
 import subprocess
 from typing import Any, Sequence
+from pathlib import Path
 
 import click
 import rich.traceback
 
 from hatch_pip_compile.__about__ import __application__, __version__
-
+from hatch.project.core import Project
 
 @dataclasses.dataclass
 class HatchCommandRunner:
@@ -134,12 +135,10 @@ class HatchCommandRunner:
         List[str]
             The name of the environments
         """
-        result = subprocess.run(
-            args=["hatch", "env", "show", "--json"],
-            capture_output=True,
-            check=True,
+        project = Project(
+            Path.cwd(),
         )
-        environment_dict: dict[str, Any] = json.loads(result.stdout)
+        environment_dict = project.config.envs.keys()
         return {
             key for key, value in environment_dict.items() if value.get("type") == "pip-compile"
         }
