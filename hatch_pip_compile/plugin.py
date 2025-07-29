@@ -91,10 +91,10 @@ class PipCompileEnvironment(VirtualEnvironment):
         return {  # pragma: no cover
             "lock-filename": str,
             "pip-compile-hashes": bool,
-            "pip-compile-args": List[str],
+            "pip-compile-args": list,
             "pip-compile-constraint": str,
             "pip-compile-installer": str,
-            "pip-compile-install-args": List[str],
+            "pip-compile-install-args": list,
             "pip-compile-resolver": str,
         }
 
