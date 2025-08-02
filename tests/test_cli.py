@@ -39,10 +39,19 @@ def test_cli_no_args_mocked(pip_compile: PipCompileFixture, subprocess_run: Mock
     runner = CliRunner()
     with runner.isolated_filesystem(temp_dir=pip_compile.isolation):
         _ = runner.invoke(cli=cli)
-        assert subprocess_run.call_count == 1
-        subprocess_run.assert_called_once()
-        subprocess_run.assert_called_with(
-            args=["hatch", "env", "show", "--json"], capture_output=True, check=True
+        subprocess_run.assert_called_once_with(
+            args=[
+                "hatch",
+                "env",
+                "run",
+                "--env",
+                "default",
+                "--",
+                "python",
+                "--version",
+            ],
+            capture_output=True,
+            check=False,
         )
 
 

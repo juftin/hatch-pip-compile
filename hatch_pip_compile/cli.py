@@ -5,13 +5,14 @@ hatch-pip-compile CLI
 from __future__ import annotations
 
 import dataclasses
-import json
 import os
 import subprocess
+from pathlib import Path
 from typing import Any, Sequence
 
 import click
 import rich.traceback
+from hatch.project.core import Project
 
 from hatch_pip_compile.__about__ import __application__, __version__
 
@@ -134,12 +135,10 @@ class HatchCommandRunner:
         List[str]
             The name of the environments
         """
-        result = subprocess.run(
-            args=["hatch", "env", "show", "--json"],
-            capture_output=True,
-            check=True,
+        project = Project(
+            Path.cwd(),
         )
-        environment_dict: dict[str, Any] = json.loads(result.stdout)
+        environment_dict = project.config.envs
         return {
             key for key, value in environment_dict.items() if value.get("type") == "pip-compile"
         }
