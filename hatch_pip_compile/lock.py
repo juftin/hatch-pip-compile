@@ -130,13 +130,20 @@ class PipCompileLock(HatchPipCompileBase):
         """
         Compare requirements
 
+        For backward compatibility, we ensure sets equality by checking the
+        size of sets and set A is a subset of set B.
+
         Parameters
         ----------
         requirements : Iterable[Requirement]
             List of requirements to compare against the lock file
         """
         lock_requirements = self.read_header_requirements()
-        return set(requirements) == set(lock_requirements)
+        requirements_set = set(requirements)
+        lock_requirements_set = set(lock_requirements)
+        return len(requirements_set) == len(lock_requirements_set) and all(
+            any(req == lreq for lreq in lock_requirements_set) for req in requirements_set
+        )
 
     def compare_constraint_sha(self, sha: str) -> bool:
         """
