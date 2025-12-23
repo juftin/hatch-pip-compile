@@ -49,22 +49,6 @@ jobs:
                           os: ubuntu-latest,
                       }
                     - {
-                          name: Python-3.9,
-                          python: "3.9",
-                          command: "matrix:cov",
-                          matrix: "+py=3.9",
-                          hatch_version: "1.0",
-                          os: ubuntu-latest,
-                      }
-                    - {
-                          name: Python-3.8,
-                          python: "3.8",
-                          command: "matrix:cov",
-                          matrix: "+py=3.8",
-                          hatch_version: "1.0",
-                          os: ubuntu-latest,
-                      }
-                    - {
                           name: Hatch-1.7.x,
                           python: "3.11",
                           command: "versions:cov",
@@ -110,6 +94,22 @@ jobs:
                           command: "versions:cov",
                           matrix: "+version=1.12.x",
                           hatch_version: "1.12.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.13.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.13.x",
+                          hatch_version: "1.13.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.16.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.16.x",
+                          hatch_version: "1.16.0",
                           os: ubuntu-latest,
                       }
                     - {
