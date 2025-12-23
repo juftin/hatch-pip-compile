@@ -25,6 +25,22 @@ jobs:
             matrix:
                 include:
                     - {
+                          name: Python-3.14,
+                          python: "3.14",
+                          command: "matrix:cov",
+                          matrix: "+py=3.14",
+                          hatch_version: "1.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Python-3.13,
+                          python: "3.13",
+                          command: "matrix:cov",
+                          matrix: "+py=3.13",
+                          hatch_version: "1.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
                           name: Python-3.12,
                           python: "3.12",
                           command: "matrix:cov",
