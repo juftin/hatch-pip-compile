@@ -149,7 +149,7 @@ class PipCompileLock(HatchPipCompileBase):
         requirements_list = sorted(requirements, key=str)
         lock_requirements_list = sorted(lock_requirements, key=str)
         return len(requirements_list) == len(lock_requirements_list) and all(
-            req == lreq for lreq, req in zip(requirements_list, lock_requirements_list)
+            req == lreq for req, lreq in zip(requirements_list, lock_requirements_list)
         )
 
     def compare_constraint_sha(self, sha: str) -> bool:
