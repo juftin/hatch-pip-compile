@@ -130,13 +130,27 @@ class PipCompileLock(HatchPipCompileBase):
         """
         Compare requirements
 
+        For backward compatibility, we ensure sets equality by checking the
+        size of sorted lists and comparing each item.
+
+        TODO: This can be reverted to
+        ```
+        lock_requirements = self.read_header_requirements()
+        return set(requirements) == set(lock_requirements)
+        ```
+        when https://github.com/pypa/packaging/pull/1022 gets released.
+
         Parameters
         ----------
         requirements : Iterable[Requirement]
             List of requirements to compare against the lock file
         """
         lock_requirements = self.read_header_requirements()
-        return set(requirements) == set(lock_requirements)
+        requirements_list = sorted(requirements, key=str)
+        lock_requirements_list = sorted(lock_requirements, key=str)
+        return len(requirements_list) == len(lock_requirements_list) and all(
+            req == lreq for req, lreq in zip(requirements_list, lock_requirements_list)
+        )
 
     def compare_constraint_sha(self, sha: str) -> bool:
         """
