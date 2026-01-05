@@ -23,7 +23,7 @@ classifiers = [
 ]
 dependencies = [
   "hatch>=1.7.0,<2",
-  "pip-tools>=7.5.2",
+  "pip-tools>=6",
   "click",
   "rich"
 ]

@@ -7,7 +7,7 @@
 # - pytest-xdist
 # - hatch<1.15,>=1.7.0
 # - hatch<2,>=1.7.0
-# - pip-tools>=7.5.2
+# - pip-tools>=6
 # - click
 # - rich
 #
@@ -148,9 +148,9 @@ typing-extensions==4.13.2
     #   virtualenv
 userpath==1.9.2
     # via hatch
-uv==0.9.21
+uv==0.9.22
     # via hatch
-virtualenv==20.35.4
+virtualenv==20.36.0
     # via hatch
 wheel==0.45.1
     # via pip-tools
