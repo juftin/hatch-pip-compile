@@ -5,6 +5,7 @@
 # - pytest-cov
 # - tomlkit
 # - pytest-xdist
+# - hatch~=1.16.0
 # - hatch<2,>=1.7.0
 # - pip-tools>=7.5.2
 # - click
@@ -25,7 +26,7 @@ certifi==2026.1.4
     #   httpx
 click==8.3.1
     # via
-    #   hatch.envs.matrix.py3.11
+    #   hatch.envs.versions.1.16.x
     #   hatch
     #   pip-tools
     #   userpath
@@ -40,7 +41,7 @@ filelock==3.20.2
 h11==0.16.0
     # via httpcore
 hatch==1.16.2
-    # via hatch.envs.matrix.py3.11
+    # via hatch.envs.versions.1.16.x
 hatchling==1.28.0
     # via hatch
 httpcore==1.0.9
@@ -85,7 +86,7 @@ pathspec==0.12.1
 pexpect==4.9.0
     # via hatch
 pip-tools==7.5.2
-    # via hatch.envs.matrix.py3.11
+    # via hatch.envs.versions.1.16.x
 platformdirs==4.5.1
     # via
     #   hatch
@@ -108,16 +109,16 @@ pyproject-hooks==1.2.0
     #   pip-tools
 pytest==9.0.2
     # via
-    #   hatch.envs.matrix.py3.11
+    #   hatch.envs.versions.1.16.x
     #   pytest-cov
     #   pytest-xdist
 pytest-cov==7.0.0
-    # via hatch.envs.matrix.py3.11
+    # via hatch.envs.versions.1.16.x
 pytest-xdist==3.8.0
-    # via hatch.envs.matrix.py3.11
+    # via hatch.envs.versions.1.16.x
 rich==14.2.0
     # via
-    #   hatch.envs.matrix.py3.11
+    #   hatch.envs.versions.1.16.x
     #   hatch
 shellingham==1.5.4
     # via hatch
@@ -125,7 +126,7 @@ tomli-w==1.2.0
     # via hatch
 tomlkit==0.13.3
     # via
-    #   hatch.envs.matrix.py3.11
+    #   hatch.envs.versions.1.16.x
     #   hatch
 trove-classifiers==2025.12.1.14
     # via hatchling

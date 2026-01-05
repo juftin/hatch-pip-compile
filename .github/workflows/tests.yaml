@@ -25,6 +25,22 @@ jobs:
             matrix:
                 include:
                     - {
+                          name: Python-3.14,
+                          python: "3.14",
+                          command: "matrix:cov",
+                          matrix: "+py=3.14",
+                          hatch_version: "1.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Python-3.13,
+                          python: "3.13",
+                          command: "matrix:cov",
+                          matrix: "+py=3.13",
+                          hatch_version: "1.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
                           name: Python-3.12,
                           python: "3.12",
                           command: "matrix:cov",
@@ -110,6 +126,38 @@ jobs:
                           command: "versions:cov",
                           matrix: "+version=1.12.x",
                           hatch_version: "1.12.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.13.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.13.x",
+                          hatch_version: "1.13.0",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.14.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.14.x",
+                          hatch_version: "1.14.2",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.15.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.15.x",
+                          hatch_version: "1.15.1",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.16.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.16.x",
+                          hatch_version: "1.16.2",
                           os: ubuntu-latest,
                       }
                     - {

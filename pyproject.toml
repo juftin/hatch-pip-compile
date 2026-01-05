@@ -16,12 +16,14 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
 dependencies = [
   "hatch>=1.7.0,<2",
-  "pip-tools>=6",
+  "pip-tools>=7.5.2",
   "click",
   "rich"
 ]
@@ -91,6 +93,7 @@ detached = false
 type = "pip-compile"
 
 [tool.hatch.envs.gen]
+builder = true
 detached = true
 
 [tool.hatch.envs.gen.scripts]
@@ -131,10 +134,17 @@ style = [
 typing = "mypy --install-types --non-interactive {args:hatch_pip_compile}"
 
 [tool.hatch.envs.matrix]
+pip-compile-constraint = ""
 template = "test"
 
 [[tool.hatch.envs.matrix.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+
+[tool.hatch.envs.matrix.overrides]
+matrix.python.dependencies = [
+  {value = "hatch>=1.7.0,<1.15", if = ["3.8"]},
+  {value = "hatch>=1.7.0,<1.16", if = ["3.9"]}
+]
 
 [tool.hatch.envs.test]
 dependencies = [
@@ -165,7 +175,11 @@ version = [
   "1.9.x",
   "1.10.x",
   "1.11.x",
-  "1.12.x"
+  "1.12.x",
+  "1.13.x",
+  "1.14.x",
+  "1.15.x",
+  "1.16.x"
 ]
 
 [tool.hatch.envs.versions.overrides]
@@ -179,7 +193,11 @@ matrix.version.dependencies = [
   {value = "hatch~=1.9.7", if = ["1.9.x"]},
   {value = "hatch~=1.10.0", if = ["1.10.x"]},
   {value = "hatch~=1.11.1", if = ["1.11.x"]},
-  {value = "hatch~=1.12.0", if = ["1.12.x"]}
+  {value = "hatch~=1.12.0", if = ["1.12.x"]},
+  {value = "hatch~=1.13.0", if = ["1.13.x"]},
+  {value = "hatch~=1.14.0", if = ["1.14.x"]},
+  {value = "hatch~=1.15.0", if = ["1.15.x"]},
+  {value = "hatch~=1.16.0", if = ["1.16.x"]}
 ]
 
 [tool.hatch.version]
