@@ -139,7 +139,12 @@ class HatchCommandRunner:
             capture_output=True,
             check=True,
         )
-        environment_dict: dict[str, Any] = json.loads(result.stdout)
+        # Extract the relevant JSON output by extracting the last line in stdout,
+        # to prevent JSONDecodeError.
+        # When present, previous lines might be logs from Hatch plugins,
+        # like custom environment collectors.
+        envs_raw = result.stdout.strip().rsplit(b"\n", maxsplit=1)[-1]
+        environment_dict: dict[str, Any] = json.loads(envs_raw)
         return {
             key for key, value in environment_dict.items() if value.get("type") == "pip-compile"
         }
