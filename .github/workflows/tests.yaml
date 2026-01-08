@@ -203,6 +203,6 @@ jobs:
                   echo "::remove-matcher owner=python::"
             - name: Upload coverage reports to Codecov
               if: matrix.os == 'ubuntu-latest' && matrix.python == '3.11' && matrix.command == 'matrix:cov'
-              uses: codecov/codecov-action@v3
+              uses: codecov/codecov-action@v5
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
