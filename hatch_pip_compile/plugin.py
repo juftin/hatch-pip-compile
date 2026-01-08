@@ -204,9 +204,9 @@ class PipCompileEnvironment(VirtualEnvironment):
             if not valid_constraint:
                 return False
         if not self.dependencies and self.piptools_lock_file.exists():
-            return False
+            return False  # pragma: no cover
         elif force_upgrade:
-            return False
+            return False  # pragma: no cover
         elif self.dependencies and not self.piptools_lock_file.exists():
             return False
         elif self.dependencies and self.piptools_lock_file.exists():

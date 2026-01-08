@@ -123,6 +123,7 @@ class PipCompileFixture:
         self.application.config_file.load()
         self.application.cache_dir = self.isolated_data_dir / "cache"
         self.application.project = self.project
+        self.project.app = self.application
         self.current_environment = self.reload_environment("default")
         self.default_environment = self.reload_environment("default")
         self.test_environment = self.reload_environment("test")

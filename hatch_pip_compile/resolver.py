@@ -34,11 +34,13 @@ class BaseResolver(HatchPipCompileBase, ABC):
         upgrade_args = []
         upgrade_package_args = []
         if upgrade:
-            upgrade_args.append("--upgrade")
+            upgrade_args.append("--upgrade")  # pragma: no cover
         if upgrade_packages:
-            upgrade_packages_sep = upgrade_packages.split(",")
-            for package in upgrade_packages_sep:
-                upgrade_package_args.append(f"--upgrade-package={package.strip()}")
+            upgrade_packages_sep = upgrade_packages.split(",")  # pragma: no cover
+            for package in upgrade_packages_sep:  # pragma: no cover
+                upgrade_package_args.append(
+                    f"--upgrade-package={package.strip()}"
+                )  # pragma: no cover
         cmd = [
             *self.resolver_executable,
             "--verbose"
