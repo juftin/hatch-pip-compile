@@ -126,7 +126,13 @@ class PipCompileEnvironment(VirtualEnvironment):
     def run_pip_compile(self) -> None:
         """
         Run pip-compile if necessary
+
+        When ``PIP_COMPILE_DISABLE`` is set (e.g. in CI), this method
+        returns early so the pre-committed lockfile is used as-is.
         """
+        if os.getenv("PIP_COMPILE_DISABLE"):
+            logger.debug("PIP_COMPILE_DISABLE is set; skipping pip-compile run")
+            return
         self.prepare_environment()
         if not self.lockfile_up_to_date:
             with self.safe_activation():

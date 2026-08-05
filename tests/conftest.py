@@ -42,7 +42,10 @@ def subprocess_run() -> Generator[patch, None, None]:
     Disable the `subprocess.run` for testing
     """
     with patch("subprocess.run") as mock:
-        mock.return_value = CompletedProcess(args=[], returncode=0, stdout=b"{'environment': {'python_version': '3.11'}}", stderr=b"")
+        mock.return_value = CompletedProcess(
+            args=[], returncode=0,
+            stdout=b"{'environment': {'python_version': '3.11'}}", stderr=b""
+        )
         yield mock
 
 
