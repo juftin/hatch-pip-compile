@@ -35,9 +35,10 @@ The `uv` locker is recommended — it handles `--check` (CI), `--upgrade`, and
 `dep sync` correctly. The `pip` locker works for generation but has limited
 `--check` and no `apply_lock` support.
 
-Prefer per-env `locked = true` over global `lock-envs = true`, which also
-affects internal Hatch environments (`hatch-build`, `hatch-uv`) and can cause
-spurious CI failures.
+Prefer per-env `locked = true` over global `lock-envs = true`. As of
+writing (Hatch 1.17.1), `lock-envs = true` also affects internal Hatch
+environments (`hatch-build`, `hatch-uv`) and can cause spurious CI
+failures — this may be addressed in a future release.
 
 See the upstream [lockfile how-to] for full usage details.
 
