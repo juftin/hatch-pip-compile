@@ -1,5 +1,6 @@
 # Using the `hatch-pip-compile` CLI
 
+> [!WARNING]
 > **This plugin is deprecated.** Hatch v1.17.0+ has first-class lockfile
 > support. See the **[Migration Guide]** to replace `hatch-pip-compile`.
 > The `hatch env lock`, `hatch dep lock`, and `hatch lock` commands

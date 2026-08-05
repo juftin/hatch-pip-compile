@@ -6,6 +6,7 @@
   </a>
 </div>
 
+> [!WARNING]
 > **DEPRECATED** — Hatch v1.17.0+ has first-class lockfile support.
 > This plugin is no longer needed. See the **[Migration Guide]** for
 > how to replace it with upstream features.

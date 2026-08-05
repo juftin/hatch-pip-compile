@@ -1,5 +1,6 @@
 # Examples
 
+> [!WARNING]
 > **This plugin is deprecated.** Hatch v1.17.0+ has first-class lockfile
 > support. See the **[Migration Guide]** to replace `hatch-pip-compile`.
 >
