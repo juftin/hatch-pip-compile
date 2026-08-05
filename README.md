@@ -136,7 +136,7 @@ pip-compile-hashes = true
 
 #### Check Out the [Docs]
 
-- [Migration Guide](docs/migration.md)
+- [Migration Guide ↗️](docs/migration.md)
 - [Examples 📚](docs/examples.md)
 - [Upgrading 🚀](docs/upgrading.md)
 - [Command Line Usage 📦](docs/cli_usage.md)
