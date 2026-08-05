@@ -1,5 +1,10 @@
 # Notes
 
+> **This plugin is deprecated.** Hatch v1.17.0+ has first-class lockfile
+> support. See the **[Migration Guide]** to replace `hatch-pip-compile`.
+>
+> [Migration Guide]: migration.md
+
 ## Dev Dependencies
 
 Using the default hatch configuration, dev dependencies listed in your

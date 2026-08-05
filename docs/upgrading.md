@@ -1,5 +1,10 @@
 # Upgrading Dependencies
 
+> **This plugin is deprecated.** Hatch v1.17.0+ has first-class lockfile
+> support. See the **[Migration Guide]** to replace `hatch-pip-compile`.
+>
+> [Migration Guide]: migration.md
+
 Upgrading all dependencies can be as simple as deleting your lockfile and
 recreating it by reactivating the environment:
 
