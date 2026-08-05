@@ -6,11 +6,6 @@
   </a>
 </div>
 
-> [!WARNING]
-> **DEPRECATED** — Hatch v1.17.0+ has first-class lockfile support.
-> This plugin is no longer needed. See the **[Migration Guide]** for
-> how to replace it with upstream features.
-
 <p align="center">
 <a href="https://github.com/pypa/hatch">hatch</a> plugin to use <a href="https://github.com/jazzband/pip-tools">pip-compile</a> (or <a href="https://github.com/astral-sh/uv">uv</a>) to manage project dependencies and lockfiles.
 </p>
@@ -30,6 +25,11 @@
   <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>
   <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
 </p>
+
+> [!WARNING]
+> **DEPRECATED** — Hatch v1.17.0+ has first-class lockfile support.
+> This plugin is no longer needed. See the **[Migration Guide]** for
+> how to replace it with upstream features.
 
 ## Usage
 
