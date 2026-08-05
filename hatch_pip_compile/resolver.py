@@ -65,7 +65,7 @@ class PipCompileResolver(BaseResolver):
     Pip Compile Resolver
     """
 
-    pypi_dependencies: ClassVar[list[str]] = ["pip-tools"]
+    pypi_dependencies: ClassVar[list[str]] = ["pip<26", "pip-tools"]
     resolver_options: ClassVar[list[str]] = ["--resolver=backtracking", "--strip-extras"]
 
     @property
