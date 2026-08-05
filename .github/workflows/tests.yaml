@@ -157,7 +157,15 @@ jobs:
                           python: "3.11",
                           command: "versions:cov",
                           matrix: "+version=1.16.x",
-                          hatch_version: "1.16.2",
+                          hatch_version: "1.16.5",
+                          os: ubuntu-latest,
+                      }
+                    - {
+                          name: Hatch-1.17.x,
+                          python: "3.11",
+                          command: "versions:cov",
+                          matrix: "+version=1.17.x",
+                          hatch_version: "1.17.1",
                           os: ubuntu-latest,
                       }
                     - {
