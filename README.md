@@ -26,6 +26,11 @@
   <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg" alt="Gitmoji"></a>
 </p>
 
+> [!WARNING]
+> **DEPRECATED** — Hatch v1.17.0+ has first-class lockfile support.
+> This plugin is no longer needed. See the **[Migration Guide]** for
+> how to replace it with upstream features.
+
 ## Usage
 
 The `hatch-pip-compile` plugin will automatically run `pip-compile` whenever your
@@ -41,7 +46,7 @@ Declare `hatch-pip-compile` as a dependency in your `pyproject.toml` file under 
 `[tool.hatch.env]` table and hatch will automatically install it. You must also have
 your environment type set to `pip-compile` (see [Configuration](#configuration)).
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.env]
@@ -53,7 +58,7 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
     type = "pip-compile"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [env]
@@ -69,14 +74,14 @@ your environment type set to `pip-compile` (see [Configuration](#configuration))
 
 Set your environment type to `pip-compile` to use this plugin for the respective environment:
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.default]
     type = "pip-compile"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.default]
@@ -85,11 +90,11 @@ Set your environment type to `pip-compile` to use this plugin for the respective
 
 ### Common Scenarios
 
--   [lock-filename](docs/examples.md#lock-filename) - changing the default lockfile path
--   [pip-compile-constraint](docs/examples.md#pip-compile-constraint) - syncing dependency versions across environments
--   [Upgrading Dependencies](docs/examples.md#upgrading-dependencies) - how to upgrade dependencies
--   [Using Hashes](docs/examples.md#pip-compile-hashes) - how to include hashes in your lockfile
--   [Using uv instead of pip-compile](docs/examples.md#pip-compile-resolver) - how to use `uv` instead of `pip-compile`
+- [lock-filename](docs/examples.md#lock-filename) - changing the default lockfile path
+- [pip-compile-constraint](docs/examples.md#pip-compile-constraint) - syncing dependency versions across environments
+- [Upgrading Dependencies](docs/examples.md#upgrading-dependencies) - how to upgrade dependencies
+- [Using Hashes](docs/examples.md#pip-compile-hashes) - how to include hashes in your lockfile
+- [Using uv instead of pip-compile](docs/examples.md#pip-compile-resolver) - how to use `uv` instead of `pip-compile`
 
 ### Configuration Options
 
@@ -131,10 +136,11 @@ pip-compile-hashes = true
 
 #### Check Out the [Docs]
 
--   [Examples 📚](docs/examples.md)
--   [Upgrading 🚀](docs/upgrading.md)
--   [Command Line Usage 📦](docs/cli_usage.md)
--   [Notes 📝](docs/notes.md)
+- [Migration Guide ↗️](docs/migration.md)
+- [Examples 📚](docs/examples.md)
+- [Upgrading 🚀](docs/upgrading.md)
+- [Command Line Usage 📦](docs/cli_usage.md)
+- [Notes 📝](docs/notes.md)
 
 #### Looking to contribute? See the [Contributing Guide]
 
@@ -143,5 +149,6 @@ pip-compile-hashes = true
 <!--skip-->
 
 [Docs]: https://juftin.github.io/hatch-pip-compile/
+[Migration Guide]: docs/migration.md
 [Contributing Guide]: https://juftin.github.io/hatch-pip-compile/contributing
 [Changelog]: https://github.com/juftin/hatch-pip-compile/releases

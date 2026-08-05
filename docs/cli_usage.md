@@ -1,5 +1,13 @@
 # Using the `hatch-pip-compile` CLI
 
+> [!WARNING]
+> **This plugin is deprecated.** Hatch v1.17.0+ has first-class lockfile
+> support. See the **[Migration Guide]** to replace `hatch-pip-compile`.
+> The `hatch env lock`, `hatch dep lock`, and `hatch lock` commands
+> replace this CLI tool.
+>
+> [Migration Guide]: migration.md
+
 For convenience this package also makes a CLI available to handle the setting /
 unsetting of the `PIP_COMPILE_UPGRADE` / `PIP_COMPILE_UPGRADE_PACKAGE` environment variables
 and invoking the `hatch env run` command for you automatically. To use the CLI you'll need to

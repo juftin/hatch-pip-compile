@@ -7,7 +7,7 @@ authors = [
   {name = "Justin Flannery", email = "juftin@juftin.com"}
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 7 - Inactive",
   "Framework :: Hatch",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
@@ -27,7 +27,7 @@ dependencies = [
   "click",
   "rich"
 ]
-description = "hatch plugin to use pip-compile to manage project dependencies"
+description = "[DEPRECATED] Hatch v1.17.0+ has first-class lockfile support — use that instead"
 dynamic = ["version"]
 license = "MIT"
 name = "hatch-pip-compile"
