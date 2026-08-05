@@ -168,8 +168,8 @@ def test_command_runner_non_supported_environments(
         with pytest.raises(
             click.BadParameter,
             match=(
-                "The following environments are not supported or unknown: bad_env. "
-                "Supported environments are: default, docs, lint, misc, test"
+                r"The following environments are not supported or unknown: bad_env. "
+                r"Supported environments are: default, docs, lint, misc, test"
             ),
         ):
             _ = HatchCommandRunner(

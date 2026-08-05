@@ -8,9 +8,9 @@ import contextlib
 import os
 import pathlib
 import shutil
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from subprocess import CompletedProcess
-from typing import Generator
 from unittest.mock import patch
 
 import hatch
@@ -42,7 +42,10 @@ def subprocess_run() -> Generator[patch, None, None]:
     Disable the `subprocess.run` for testing
     """
     with patch("subprocess.run") as mock:
-        mock.return_value = CompletedProcess(args=[], returncode=0, stdout=b"", stderr=b"")
+        mock.return_value = CompletedProcess(
+            args=[], returncode=0,
+            stdout=b"{'environment': {'python_version': '3.11'}}", stderr=b""
+        )
         yield mock
 
 

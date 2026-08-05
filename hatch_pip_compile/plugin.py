@@ -10,7 +10,7 @@ import pathlib
 import shutil
 import tempfile
 from subprocess import CompletedProcess
-from typing import Any, ClassVar, Dict, List, Optional, Type, Union
+from typing import Any, ClassVar
 
 import hatch.cli
 from hatch.env.virtual import VirtualEnvironment
@@ -32,11 +32,11 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     PLUGIN_NAME: ClassVar[str] = "pip-compile"
     default_env_name: ClassVar[str] = "default"
-    dependency_resolvers: ClassVar[Dict[str, Type[BaseResolver]]] = {
+    dependency_resolvers: ClassVar[dict[str, type[BaseResolver]]] = {
         "pip-compile": PipCompileResolver,
         "uv": UvResolver,
     }
-    dependency_installers: ClassVar[Dict[str, Type[PluginInstaller]]] = {
+    dependency_installers: ClassVar[dict[str, type[PluginInstaller]]] = {
         "pip": PipInstaller,
         "pip-sync": PipSyncInstaller,
         "uv": UvInstaller,
@@ -84,7 +84,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.installer: PluginInstaller = installer_class(environment=self)
 
     @staticmethod
-    def get_option_types() -> Dict[str, Any]:
+    def get_option_types() -> dict[str, Any]:
         """
         Get option types
         """
@@ -100,20 +100,39 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     def dependency_hash(self) -> str:
         """
-        Get the dependency hash
+        Return a hash of the environment's dependency state without side effects.
+
+        Incorporates:
+        - Hatch's base dependency hash (from specs/config via ``hash_dependencies``)
+        - Lockfile content hash (if it exists, catches hand-editing)
+        - Constraint environment's dependency hash (catches upstream changes)
+
+        Does NOT create a virtual environment or run pip-compile.
+        Matches the base Hatch ``VirtualEnvironment.dependency_hash`` contract
+        of being a pure computation with no side effects.
         """
-        self.run_pip_compile()
         hatch_hash = super().dependency_hash()
-        if not self.dependencies:
-            return hatch_hash
-        else:
+
+        if self.piptools_lock_file.exists():
             lockfile_hash = self.piptools_lock.get_file_content_hash()
-            return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
+            hatch_hash = f"{hatch_hash}-{lockfile_hash}"
+
+        if self.constraint_env.name != self.name:
+            constraint_hash = self.constraint_env.dependency_hash()
+            hatch_hash = f"{hatch_hash}-{constraint_hash}"
+
+        return hashlib.sha256(hatch_hash.encode()).hexdigest()
 
     def run_pip_compile(self) -> None:
         """
         Run pip-compile if necessary
+
+        When ``PIP_COMPILE_DISABLE`` is set (e.g. in CI), this method
+        returns early so the pre-committed lockfile is used as-is.
         """
+        if os.getenv("PIP_COMPILE_DISABLE"):
+            logger.debug("PIP_COMPILE_DISABLE is set; skipping pip-compile run")
+            return
         self.prepare_environment()
         if not self.lockfile_up_to_date:
             with self.safe_activation():
@@ -244,7 +263,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.installer.sync_dependencies()
 
     @property
-    def piptools_constraints_file(self) -> Optional[pathlib.Path]:
+    def piptools_constraints_file(self) -> pathlib.Path | None:
         """
         Get the constraint file path
         """
@@ -332,14 +351,14 @@ class PipCompileEnvironment(VirtualEnvironment):
         return True
 
     @property
-    def pipools_environment_dict(self) -> Dict[str, Any]:
+    def pipools_environment_dict(self) -> dict[str, Any]:
         """
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
 
     def plugin_check_command(
-        self, command: Union[str, List[str]], *, shell: bool = False, **kwargs: Any
+        self, command: str | list[str], *, shell: bool = False, **kwargs: Any
     ) -> CompletedProcess:
         """
         Run a command from the virtualenv

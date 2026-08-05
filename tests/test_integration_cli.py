@@ -147,6 +147,11 @@ def test_add_new_dependency(pip_compile: PipCompileFixture, installer: str, reso
 
 @installer_param
 @resolver_param
+@pytest.mark.skipif(
+    "tuple(int(p) for p in __import__('importlib.metadata').metadata.version('hatch')"
+    ".split('.')) >= (1, 17)",
+    reason="Hatch >=1.17 eagerly prepares default env during env run — behavioral change upstream",
+)
 def test_add_new_dependency_constraint_env(
     pip_compile: PipCompileFixture, installer: str, resolver: str
 ) -> None:

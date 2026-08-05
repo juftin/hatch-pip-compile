@@ -109,7 +109,7 @@ class PipSyncInstaller(PluginInstaller):
     Plugin Installer for `pip-sync`
     """
 
-    pypi_dependencies: ClassVar[list[str]] = ["pip-tools"]
+    pypi_dependencies: ClassVar[list[str]] = ["pip<26", "pip-tools"]
 
     def install_dependencies(self) -> None:
         """
