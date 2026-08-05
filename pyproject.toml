@@ -11,8 +11,6 @@ classifiers = [
   "Framework :: Hatch",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -32,7 +30,7 @@ dynamic = ["version"]
 license = "MIT"
 name = "hatch-pip-compile"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 [project.entry-points.hatch]
 hatch-pip-compile = "hatch_pip_compile.hooks"
@@ -138,13 +136,9 @@ pip-compile-constraint = ""
 template = "test"
 
 [[tool.hatch.envs.matrix.matrix]]
-python = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 [tool.hatch.envs.matrix.overrides]
-matrix.python.dependencies = [
-  {value = "hatch>=1.7.0,<1.15", if = ["3.8"]},
-  {value = "hatch>=1.7.0,<1.16", if = ["3.9"]}
-]
 
 [tool.hatch.envs.test]
 dependencies = [
@@ -258,7 +252,7 @@ select = [
   "W",  # pycodestyle (Warning)
   "YTT"  # flake8-2020
 ]
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
