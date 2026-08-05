@@ -11,17 +11,16 @@ lockfiles, upgrading dependencies, and CI verification — without a plugin.
 - [tool.hatch.env]
 - requires = ["hatch-pip-compile"]
 
-+ [tool.hatch]
-+ lock-envs = true
-
   [tool.hatch.envs.default]
 - type = "pip-compile"
 - pip-compile-hashes = true
 + locked = true
++ installer = "uv"
 
   [tool.hatch.envs.test]
 - type = "pip-compile"
 + locked = true
++ installer = "uv"
   dependencies = ["pytest"]
 ```
 
@@ -32,21 +31,29 @@ rm requirements.txt requirements/    # delete old lockfiles
 hatch env lock                        # generate pylock.toml
 ```
 
+The `uv` locker is recommended — it handles `--check` (CI), `--upgrade`, and
+`dep sync` correctly. The `pip` locker works for generation but has limited
+`--check` and no `apply_lock` support.
+
+Prefer per-env `locked = true` over global `lock-envs = true`, which also
+affects internal Hatch environments (`hatch-build`, `hatch-uv`) and can cause
+spurious CI failures.
+
 See the upstream [lockfile how-to] for full usage details.
 
 ## Feature Mapping
 
-| hatch-pip-compile                     | Upstream Hatch                     |
-| ------------------------------------- | ---------------------------------- |
-| `type = "pip-compile"`                | `locked = true`                    |
-| `lock-filename = "..."`               | `lock-filename = "..."`            |
-| `pip-compile-resolver = "uv"`         | `locker = "uv"`                    |
-| `pip-compile-resolver = "pip-compile"`| `locker = "pip"`                   |
-| `pip-compile-hashes = true`           | Always on in PEP 751 lockfiles     |
-| `pip-compile-installer = "uv"`        | `installer = "uv"` + `locker = "uv"` |
-| `pip-compile-installer = "pip-sync"`  | `hatch dep sync` (UV locker only)  |
-| `pip-compile-constraint = "..."`      | No direct equivalent; UV's layered locks approximate this |
-| `pip-compile-args = [...]`            | Use `env-vars` (`PIP_*` / `UV_*`)   |
+| hatch-pip-compile                      | Upstream Hatch                       |
+| -------------------------------------- | ------------------------------------ |
+| `type = "pip-compile"`                 | `locked = true`                      |
+| `lock-filename = "..."`                | `lock-filename = "..."`              |
+| `pip-compile-resolver = "uv"`          | `installer = "uv"` → auto-selects `locker = "uv"` |
+| `pip-compile-resolver = "pip-compile"` | `locker = "pip"` (pip ≥ 25.1)        |
+| `pip-compile-hashes = true`            | Always on in PEP 751 lockfiles       |
+| `pip-compile-installer = "uv"`         | `installer = "uv"`                   |
+| `pip-compile-installer = "pip-sync"`   | `hatch dep sync` (UV locker only)    |
+| `pip-compile-constraint = "..."`       | No direct equivalent; UV's layered locks approximate this |
+| `pip-compile-args = [...]`             | Use `env-vars` (`PIP_*` / `UV_*`)    |
 
 ## Command Equivalents
 
