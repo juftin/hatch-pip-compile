@@ -8,9 +8,9 @@ import contextlib
 import os
 import pathlib
 import shutil
+from collections.abc import Generator
 from dataclasses import dataclass, field
 from subprocess import CompletedProcess
-from typing import Generator
 from unittest.mock import patch
 
 import hatch

@@ -10,7 +10,7 @@ import pathlib
 import shutil
 import tempfile
 from subprocess import CompletedProcess
-from typing import Any, ClassVar, Dict, List, Optional, Type, Union
+from typing import Any, ClassVar
 
 import hatch.cli
 from hatch.env.virtual import VirtualEnvironment
@@ -32,11 +32,11 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     PLUGIN_NAME: ClassVar[str] = "pip-compile"
     default_env_name: ClassVar[str] = "default"
-    dependency_resolvers: ClassVar[Dict[str, Type[BaseResolver]]] = {
+    dependency_resolvers: ClassVar[dict[str, type[BaseResolver]]] = {
         "pip-compile": PipCompileResolver,
         "uv": UvResolver,
     }
-    dependency_installers: ClassVar[Dict[str, Type[PluginInstaller]]] = {
+    dependency_installers: ClassVar[dict[str, type[PluginInstaller]]] = {
         "pip": PipInstaller,
         "pip-sync": PipSyncInstaller,
         "uv": UvInstaller,
@@ -84,7 +84,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.installer: PluginInstaller = installer_class(environment=self)
 
     @staticmethod
-    def get_option_types() -> Dict[str, Any]:
+    def get_option_types() -> dict[str, Any]:
         """
         Get option types
         """
@@ -102,13 +102,18 @@ class PipCompileEnvironment(VirtualEnvironment):
         """
         Get the dependency hash
         """
-        self.run_pip_compile()
+        if not os.getenv("PIP_COMPILE_DISABLE"):
+            self.run_pip_compile()
         hatch_hash = super().dependency_hash()
         if not self.dependencies:
             return hatch_hash
-        else:
-            lockfile_hash = self.piptools_lock.get_file_content_hash()
-            return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
+        if os.getenv("PIP_COMPILE_DISABLE"):
+            if self.piptools_lock_file.exists():
+                lockfile_hash = self.piptools_lock.get_file_content_hash()
+                return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
+            return hatch_hash
+        lockfile_hash = self.piptools_lock.get_file_content_hash()
+        return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
 
     def run_pip_compile(self) -> None:
         """
@@ -244,7 +249,7 @@ class PipCompileEnvironment(VirtualEnvironment):
         self.installer.sync_dependencies()
 
     @property
-    def piptools_constraints_file(self) -> Optional[pathlib.Path]:
+    def piptools_constraints_file(self) -> pathlib.Path | None:
         """
         Get the constraint file path
         """
@@ -332,14 +337,14 @@ class PipCompileEnvironment(VirtualEnvironment):
         return True
 
     @property
-    def pipools_environment_dict(self) -> Dict[str, Any]:
+    def pipools_environment_dict(self) -> dict[str, Any]:
         """
         Get the environment dictionary
         """
         return self.metadata.hatch.config.get("envs", {})
 
     def plugin_check_command(
-        self, command: Union[str, List[str]], *, shell: bool = False, **kwargs: Any
+        self, command: str | list[str], *, shell: bool = False, **kwargs: Any
     ) -> CompletedProcess:
         """
         Run a command from the virtualenv

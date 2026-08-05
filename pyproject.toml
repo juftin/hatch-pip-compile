@@ -145,7 +145,8 @@ dependencies = [
   "pytest",
   "pytest-cov",
   "tomlkit",
-  "pytest-xdist"
+  "pytest-xdist",
+  "typing-extensions>=4.0"
 ]
 
 [tool.hatch.envs.test.scripts]

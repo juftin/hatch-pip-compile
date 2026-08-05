@@ -8,7 +8,8 @@ import dataclasses
 import json
 import os
 import subprocess
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import click
 import rich.traceback
