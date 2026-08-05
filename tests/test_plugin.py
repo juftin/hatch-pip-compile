@@ -45,7 +45,7 @@ def test_expected_dependencies(pip_compile: PipCompileFixture) -> None:
     Test expected dependencies from `PipCompileEnvironment`
     """
     assert set(pip_compile.default_environment.dependencies) == {"hatch", "cffi>=2.0"}
-    assert set(pip_compile.test_environment.dependencies) == {"pytest", "pytest-cov", "hatch"}
+    assert set(pip_compile.test_environment.dependencies) == {"pytest", "pytest-cov", "hatch", "cffi>=2.0"}
 
 
 def test_lockfile_up_to_date_missing(pip_compile: PipCompileFixture) -> None:

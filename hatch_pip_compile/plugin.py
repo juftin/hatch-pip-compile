@@ -100,20 +100,28 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     def dependency_hash(self) -> str:
         """
-        Get the dependency hash
+        Return a hash of the environment's dependency state without side effects.
+
+        Incorporates:
+        - Hatch's base dependency hash (from specs/config via ``hash_dependencies``)
+        - Lockfile content hash (if it exists, catches hand-editing)
+        - Constraint environment's dependency hash (catches upstream changes)
+
+        Does NOT create a virtual environment or run pip-compile.
+        Matches the base Hatch ``VirtualEnvironment.dependency_hash`` contract
+        of being a pure computation with no side effects.
         """
-        if not os.getenv("PIP_COMPILE_DISABLE"):
-            self.run_pip_compile()
         hatch_hash = super().dependency_hash()
-        if not self.dependencies:
-            return hatch_hash
-        if os.getenv("PIP_COMPILE_DISABLE"):
-            if self.piptools_lock_file.exists():
-                lockfile_hash = self.piptools_lock.get_file_content_hash()
-                return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
-            return hatch_hash
-        lockfile_hash = self.piptools_lock.get_file_content_hash()
-        return hashlib.sha256(f"{hatch_hash}-{lockfile_hash}".encode()).hexdigest()
+
+        if self.piptools_lock_file.exists():
+            lockfile_hash = self.piptools_lock.get_file_content_hash()
+            hatch_hash = f"{hatch_hash}-{lockfile_hash}"
+
+        if self.constraint_env.name != self.name:
+            constraint_hash = self.constraint_env.dependency_hash()
+            hatch_hash = f"{hatch_hash}-{constraint_hash}"
+
+        return hashlib.sha256(hatch_hash.encode()).hexdigest()
 
     def run_pip_compile(self) -> None:
         """
