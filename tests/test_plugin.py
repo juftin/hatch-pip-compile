@@ -76,7 +76,7 @@ def test_lockfile_up_to_date_mismatch(pip_compile: PipCompileFixture) -> None:
     assert pip_compile.default_environment.lockfile_up_to_date is False
 
 
-def test_pip_compile_cli(mock_check_command: Mock, pip_compile: PipCompileFixture) -> None:
+def test_pip_compile_cli(mock_check_command: Mock, subprocess_run: Mock, pip_compile: PipCompileFixture) -> None:
     """
     Test the `pip_compile_cli` method is called with the expected arguments
     """
