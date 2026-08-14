@@ -70,10 +70,10 @@ hatch env show
 That above command will tell you that there are four environments that
 you can use:
 
--   `default`
--   `docs`
--   `gen`
--   `lint`
+- `default`
+- `docs`
+- `gen`
+- `lint`
 
 Each of these environments has a set of commands that you can run.
 To see the commands for a specific environment, run:
@@ -84,10 +84,10 @@ hatch env show default
 
 Here we can see that the `default` environment has the following commands:
 
--   `cov`
--   `cov-report`
--   `test`
--   `test-cov`
+- `cov`
+- `cov-report`
+- `test`
+- `test-cov`
 
 The one that we're interested in is `cov`, which will run the tests
 for the project.

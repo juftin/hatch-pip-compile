@@ -23,6 +23,8 @@ certifi==2026.1.4
     # via
     #   httpcore
     #   httpx
+cffi==2.1.1
+    # via cryptography
 click==8.3.1
     # via
     #   hatch.envs.matrix.py3.10
@@ -31,6 +33,8 @@ click==8.3.1
     #   userpath
 coverage==7.13.1
     # via pytest-cov
+cryptography==50.0.0
+    # via secretstorage
 distlib==0.4.0
     # via virtualenv
 exceptiongroup==1.3.1
@@ -68,6 +72,10 @@ jaraco-context==6.0.2
     # via keyring
 jaraco-functools==4.4.0
     # via keyring
+jeepney==0.9.0
+    # via
+    #   keyring
+    #   secretstorage
 keyring==25.7.0
     # via hatch
 markdown-it-py==4.0.0
@@ -101,6 +109,8 @@ pluggy==1.6.0
     #   pytest-cov
 ptyprocess==0.7.0
     # via pexpect
+pycparser==3.0
+    # via cffi
 pygments==2.19.2
     # via
     #   pytest
@@ -123,6 +133,8 @@ rich==14.2.0
     # via
     #   hatch.envs.matrix.py3.10
     #   hatch
+secretstorage==3.5.0
+    # via keyring
 shellingham==1.5.4
     # via hatch
 tomli==2.3.0
@@ -143,6 +155,7 @@ trove-classifiers==2025.12.1.14
 typing-extensions==4.15.0
     # via
     #   anyio
+    #   cryptography
     #   exceptiongroup
     #   virtualenv
 userpath==1.9.2

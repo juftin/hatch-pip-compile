@@ -19,12 +19,16 @@ certifi==2026.1.4
     # via
     #   httpcore
     #   httpx
+cffi==2.1.1
+    # via cryptography
 click==8.3.1
     # via
     #   hatch.envs.default
     #   hatch
     #   pip-tools
     #   userpath
+cryptography==50.0.0
+    # via secretstorage
 distlib==0.4.0
     # via virtualenv
 filelock==3.20.2
@@ -54,6 +58,10 @@ jaraco-context==6.0.2
     # via keyring
 jaraco-functools==4.4.0
     # via keyring
+jeepney==0.9.0
+    # via
+    #   keyring
+    #   secretstorage
 keyring==25.7.0
     # via hatch
 markdown-it-py==4.0.0
@@ -83,6 +91,8 @@ pluggy==1.6.0
     # via hatchling
 ptyprocess==0.7.0
     # via pexpect
+pycparser==3.0
+    # via cffi
 pygments==2.19.2
     # via rich
 pyproject-hooks==1.2.0
@@ -94,6 +104,8 @@ rich==14.2.0
     # via
     #   hatch.envs.default
     #   hatch
+secretstorage==3.5.0
+    # via keyring
 shellingham==1.5.4
     # via hatch
 tomli-w==1.2.0

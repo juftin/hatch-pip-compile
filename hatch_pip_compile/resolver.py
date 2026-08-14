@@ -4,6 +4,7 @@ Dependency Resolvers
 
 from __future__ import annotations
 
+import inspect
 import os
 from abc import ABC, abstractmethod
 from typing import ClassVar
@@ -65,7 +66,12 @@ class PipCompileResolver(BaseResolver):
     Pip Compile Resolver
     """
 
-    pypi_dependencies: ClassVar[list[str]] = ["pip-tools"]
+    pypi_dependencies: ClassVar[list[str]] = [
+        "pip-tools",
+        # Explicitly add `typing-extensions` to the list of dependencies
+        # to ensure compatibility with Python 3.8-3.10
+        "typing-extensions",
+    ]
     resolver_options: ClassVar[list[str]] = ["--resolver=backtracking", "--strip-extras"]
 
     @property
@@ -93,6 +99,14 @@ class UvResolver(BaseResolver):
         """
         Resolver Executable
         """
+        if inspect.getattr_static(self.environment, "uv_path", None):
+            # uv_path is supported for Hatch>=1.10.0
+            return [
+                self.environment.uv_path,
+                "pip",
+                "compile",
+            ]
+
         return [
             self.environment.virtual_env.python_info.executable,
             "-m",

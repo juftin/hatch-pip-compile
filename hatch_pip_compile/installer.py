@@ -4,6 +4,7 @@ Package + Dependency Installers
 
 from __future__ import annotations
 
+import inspect
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
@@ -92,13 +93,21 @@ class UvInstaller(PipInstaller):
         """
         Construct a `pip install` command with the given arguments
         """
-        command = [
-            "python",
-            "-m",
-            "uv",
-            "pip",
-            "install",
-        ]
+        if inspect.getattr_static(self.environment, "uv_path", None):
+            # uv_path is supported for Hatch>=1.10.0
+            command = [
+                self.environment.uv_path,
+                "pip",
+                "install",
+            ]
+        else:
+            command = [
+                self.environment.virtual_env.python_info.executable,
+                "-m",
+                "uv",
+                "pip",
+                "install",
+            ]
         add_verbosity_flag(command, self.environment.verbosity, adjustment=-1)
         command.extend(args)
         return command
@@ -109,7 +118,12 @@ class PipSyncInstaller(PluginInstaller):
     Plugin Installer for `pip-sync`
     """
 
-    pypi_dependencies: ClassVar[list[str]] = ["pip-tools"]
+    pypi_dependencies: ClassVar[list[str]] = [
+        "pip-tools",
+        # Explicitly add `typing-extensions` to the list of dependencies
+        # to ensure compatibility with Python 3.8-3.10
+        "typing-extensions",
+    ]
 
     def install_dependencies(self) -> None:
         """

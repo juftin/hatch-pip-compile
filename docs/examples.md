@@ -7,7 +7,7 @@ for the `default` environment, and `requirements/requirements-{env_name}.txt` fo
 
 Changing the lock file path:
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -15,7 +15,7 @@ Changing the lock file path:
     lock-filename = "locks/{env_name}.lock"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -25,7 +25,7 @@ Changing the lock file path:
 
 Changing the lock filename to a path in the project root:
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.lint]
@@ -33,7 +33,7 @@ Changing the lock filename to a path in the project root:
     lock-filename = "linting-requirements.txt"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.lint]
@@ -50,7 +50,7 @@ on the `test` environment to ensure that all shared dependencies are pinned to t
 same versions. `pip-compile-constraint` can also be set to an empty string to disable
 the feature.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.default]
@@ -64,7 +64,7 @@ the feature.
     pip-compile-constraint = "default"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.default]
@@ -85,7 +85,7 @@ all other environments. It's important to note that when `detached = true`,
 inheritance is disabled and the `type` and `pip-compile-constraint` options
 must be set explicitly.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.default]
@@ -98,7 +98,7 @@ must be set explicitly.
     ]
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.default]
@@ -115,7 +115,7 @@ must be set explicitly.
 
 Whether to generate hashes in the lockfile. Defaults to `false`.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -123,7 +123,7 @@ Whether to generate hashes in the lockfile. Defaults to `false`.
     pip-compile-hashes = true
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -144,7 +144,7 @@ If you'd like to use `uv` instead of `pip-compile` you can set the `pip-compile-
 > the [pip-compile-installer](#pip-compile-installer) option for more
 > information.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -152,7 +152,7 @@ If you'd like to use `uv` instead of `pip-compile` you can set the `pip-compile-
     pip-compile-resolver = "uv"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -164,7 +164,7 @@ If you'd like to use `uv` instead of `pip-compile` you can set the `pip-compile-
 
 Extra arguments to pass to `pip-compile-resolver`. Custom PyPI indexes can be specified here.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -175,7 +175,7 @@ Extra arguments to pass to `pip-compile-resolver`. Custom PyPI indexes can be sp
     ]
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -193,7 +193,7 @@ Set to `true` to run `pip-compile` in verbose mode instead of quiet mode.
 Optionally, if you would like to silence any warnings set the `pip-compile-verbose` option
 to `false`.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -201,7 +201,7 @@ to `false`.
     pip-compile-verbose = true
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -222,7 +222,7 @@ not in the lockfile and remove them from your environment. `pip-sync` is useful 
 ensure that your environment is exactly the same as the lockfile. If the environment should
 be used across different Python versions and platforms `pip` is the safer option to use.
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -230,7 +230,7 @@ be used across different Python versions and platforms `pip` is the safer option
     pip-compile-installer = "pip-sync"
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
@@ -243,7 +243,7 @@ be used across different Python versions and platforms `pip` is the safer option
 Extra arguments to pass to `pip-compile-installer`. For example, if you'd like to use `pip` as the
 installer but want to pass the `--no-deps` flag to `pip install` you can do so with this option:
 
--   **_pyproject.toml_**
+- **_pyproject.toml_**
 
     ```toml
     [tool.hatch.envs.<envName>]
@@ -254,7 +254,7 @@ installer but want to pass the `--no-deps` flag to `pip install` you can do so w
     ]
     ```
 
--   **_hatch.toml_**
+- **_hatch.toml_**
 
     ```toml
     [envs.<envName>]
