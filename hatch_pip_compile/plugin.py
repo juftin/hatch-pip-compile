@@ -13,7 +13,6 @@ from subprocess import CompletedProcess
 from typing import Any, ClassVar, Dict, List, Optional, Type, Union
 
 import hatch.cli
-from hatch.config.constants import AppEnvVars
 from hatch.env.virtual import VirtualEnvironment
 from hatch.utils.platform import Platform
 from hatchling.dep.core import dependencies_in_sync
@@ -382,13 +381,14 @@ class PipCompileEnvironment(VirtualEnvironment):
 
     def get_env_var_option(self, option: str) -> str:
         """
-        Returns the value of the upper-cased environment variable `HATCH_ENV_TYPE_<PLUGIN_NAME>_<option>`.
+        Returns the value of the upper-cased environment variable
+        `HATCH_ENV_TYPE_<PLUGIN_NAME>_<option>`.
         """
         plugin_name = self.PLUGIN_NAME
 
-        # Hatch <=v1.18.0 does not replace dashes with underscores in the PLUGIN_NAME
-        # when deriving the environment variable name.
-        self.PLUGIN_NAME = plugin_name.replace('-', '_')
+        # Hatch <=v1.18.0 does not replace dashes with underscores
+        # in the PLUGIN_NAME when deriving the environment variable name.
+        self.PLUGIN_NAME = plugin_name.replace("-", "_")
         value = super().get_env_var_option(option)
         self.PLUGIN_NAME = plugin_name
 
