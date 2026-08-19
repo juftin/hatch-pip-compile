@@ -153,3 +153,11 @@ def test_resolver_instance_pip_compile(pip_compile: PipCompileFixture) -> None:
     pip_compile.update_pyproject()
     environment = pip_compile.reload_environment("default")
     assert isinstance(environment.resolver, PipCompileResolver)
+
+def test_get_env_var_option(pip_compile: PipCompileFixture, monkeypatch: pytest.MonkeyPatch) -> None:
+    """
+    Test the `get_env_var_option` method
+    """
+    monkeypatch.setenv("HATCH_ENV_TYPE_PIP_COMPILE_UV_PATH", "/usr/bin/uv")
+    pip_compile.default_environment.get_env_var_option("uv_path") == "/usr/bin/uv"
+
