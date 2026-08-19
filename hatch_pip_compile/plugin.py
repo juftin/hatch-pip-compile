@@ -388,7 +388,7 @@ class PipCompileEnvironment(VirtualEnvironment):
 
         # Hatch <=v1.18.0 does not replace dashes with underscores
         # in the PLUGIN_NAME when deriving the environment variable name.
-        # 
+        # Here we workaround it by patching the PLUGIN_NAME.
         self.PLUGIN_NAME = plugin_name.replace("-", "_")  # type: ignore[misc]
         value = super().get_env_var_option(option)
         self.PLUGIN_NAME = plugin_name  # type: ignore[misc]
