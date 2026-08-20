@@ -378,3 +378,19 @@ class PipCompileEnvironment(VirtualEnvironment):
                     self.install_project_dev_mode()
                 else:
                     self.install_project()
+
+    def get_env_var_option(self, option: str) -> str:
+        """
+        Returns the value of the upper-cased environment variable
+        `HATCH_ENV_TYPE_<PLUGIN_NAME>_<option>`.
+        """
+        plugin_name = self.PLUGIN_NAME
+
+        # Hatch <=v1.18.0 does not replace dashes with underscores
+        # in the PLUGIN_NAME when deriving the environment variable name.
+        # Here we workaround it by patching the PLUGIN_NAME.
+        self.PLUGIN_NAME = plugin_name.replace("-", "_")  # type: ignore[misc]
+        value = super().get_env_var_option(option)
+        self.PLUGIN_NAME = plugin_name  # type: ignore[misc]
+
+        return value
