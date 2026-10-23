@@ -11,11 +11,11 @@ classifiers = [
   "Framework :: Hatch",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy"
 ]
@@ -30,7 +30,7 @@ dynamic = ["version"]
 license = "MIT"
 name = "hatch-pip-compile"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 [project.entry-points.hatch]
 hatch-pip-compile = "hatch_pip_compile.hooks"
@@ -136,7 +136,7 @@ pip-compile-constraint = ""
 template = "test"
 
 [[tool.hatch.envs.matrix.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+python = ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
 [tool.hatch.envs.matrix.overrides]
 
@@ -253,7 +253,7 @@ select = [
   "W",  # pycodestyle (Warning)
   "YTT"  # flake8-2020
 ]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
