@@ -12,7 +12,7 @@ jobs:
             HATCH_DEBUG: true
         steps:
             - name: Set up Github Workspace
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   fetch-depth: 0
             - name: Set up Python Environment
