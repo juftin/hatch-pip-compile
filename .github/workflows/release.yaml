@@ -16,7 +16,7 @@ jobs:
             pull-requests: write
         steps:
             - name: Check out the repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   fetch-depth: 2
                   ref: main
@@ -53,7 +53,7 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         steps:
             - name: Checkout Latest Changes
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
               with:
                   ref: ${{ github.ref }}
                   fetch-depth: 0
