@@ -181,12 +181,12 @@ jobs:
               with:
                   fetch-depth: 0
             - name: Set up Python Environment ${{ matrix.python }}
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v7
               with:
                   python-version: ${{ matrix.python }}
             - name: Install Default Python
               if: matrix.python != '3.11' && matrix.python != '3.8'
-              uses: actions/setup-python@v5
+              uses: actions/setup-python@v7
               with:
                   python-version: "3.11"
             - name: Install Hatch
